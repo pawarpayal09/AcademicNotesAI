@@ -62,6 +62,9 @@ Students spend significant time searching through lengthy PDF notes to find rele
 
 ---
 
+## 📂 Project Structure
+
+```text
 AcademicNotesAI/
 │
 ├── app.py
@@ -73,24 +76,35 @@ AcademicNotesAI/
 ├── chat_history_manager.py
 ├── favourites_manager.py
 ├── requirements.txt
-├── .env
 ├── README.md
+├── .env
+├── .gitignore
 │
 ├── css/
 │   └── style.css
 │
 ├── data/
-│   └── (Academic PDFs)
+│   └── (Academic PDF Notes)
+│
+├── pages/
+│   ├── Chatbot.py
+│   └── FavouriteNotes.py
 │
 ├── storage/
 │   ├── chat_history.json
 │   └── favourites.json
 │
 ├── vectorstore/
+│   ├── index.faiss
+│   └── index.pkl
 │
-└── pages/
-    ├── Chatbot.py
-    ├── FavouriteNotes.py
+├── .devcontainer/
+│   └── devcontainer.json
+│
+├── test_rag.py
+│
+└── venv/          (Local Virtual Environment - Not uploaded to GitHub)
+```
 
 ---
 
