@@ -1,4 +1,4 @@
-# 📚 Academic Notes AI
+# 📚 Academic Notes AI – Intelligent RAG Chatbot for Academic Learning
 
 ## 📖 Project Overview
 Academic Notes AI is an AI-powered educational chatbot that helps students ask questions from academic PDF notes and receive accurate, context-based answers using Retrieval-Augmented Generation (RAG). It combines Google's Gemini LLM, LangChain, FAISS, and Sentence Transformer embeddings to provide intelligent responses.
@@ -22,13 +22,18 @@ Students spend significant time searching through lengthy PDF notes to find rele
 ## ✨ Features
 - 📚 Ask questions from academic notes
 - 📄 Upload custom PDF documents
-- 🤖 AI-powered question answering
+- 🤖 AI-powered question answering using Gemini
 - 💬 Chat history stored locally
+- ⭐ Save important AI answers for quick access
+- 📌 Dedicated Saved Notes page
+- 🔍 Search saved notes instantly
+- 🗑 Remove saved notes anytime
 - 🔊 Text-to-Speech (Listen Answer)
 - 📥 Download chat as PDF
 - 📑 Source document references
-- 🎨 Modern Streamlit user interface
+- 🎨 Modern and responsive Streamlit user interface
 - ⚡ Fast semantic search using FAISS
+- 📂 Organized sidebar navigation
 
 ---
 
@@ -53,32 +58,44 @@ Students spend significant time searching through lengthy PDF notes to find rele
 - gTTS
 - ReportLab
 - python-dotenv
+- JSON (Local Storage)
 
 ---
 
-## 🏗️ Project Architecture
-
-PDF Files
-⬇
-Text Extraction
-⬇
-Text Chunking
-⬇
-Embeddings Generation
-⬇
-FAISS Vector Database
-⬇
-User Question
-⬇
-Similarity Search
-⬇
-Gemini LLM
-⬇
-Final Answer
+AcademicNotesAI/
+│
+├── app.py
+├── rag.py
+├── ingest.py
+├── pdf_processor.py
+├── pdf_export.py
+├── speech.py
+├── chat_history_manager.py
+├── favourites_manager.py
+├── requirements.txt
+├── .env
+├── README.md
+│
+├── css/
+│   └── style.css
+│
+├── data/
+│   └── (Academic PDFs)
+│
+├── storage/
+│   ├── chat_history.json
+│   └── favourites.json
+│
+├── vectorstore/
+│
+└── pages/
+    ├── Chatbot.py
+    ├── FavouriteNotes.py
 
 ---
 
 ## ⚙️ Project Workflow
+
 1. Upload academic PDF notes.
 2. Extract text from PDFs.
 3. Split text into chunks.
@@ -88,30 +105,7 @@ Final Answer
 7. Retrieve relevant chunks.
 8. Gemini generates the final answer.
 9. Display answer with source documents.
-
----
-
-## 📂 Project Structure
-
-```text
-AcademicNotesChatbot/
-│
-├── app.py
-├── rag.py
-├── ingest.py
-├── pdf_processor.py
-├── speech.py
-├── pdf_export.py
-├── requirements.txt
-├── .env
-├── assets/
-├── css/
-├── data/
-├── pages/
-│   └── Chatbot.py
-├── vectorstore/
-└── README.md
-```
+10. Save important answers for future revision.
 
 ---
 
@@ -152,12 +146,15 @@ streamlit run app.py
 ## 📌 How to Use
 
 1. Start the Streamlit application.
-2. Select the knowledge source.
-3. Upload a PDF (optional).
-4. Ask a question.
-5. View the AI-generated answer.
-6. Listen to the answer using Text-to-Speech.
-7. Download the chat as a PDF.
+2. Select the desired knowledge source.
+3. Upload academic PDF notes (optional).
+4. Ask questions in natural language.
+5. View AI-generated answers.
+6. Save important answers using **Save Note**.
+7. Open **Saved Notes** to revisit bookmarked answers.
+8. Search saved notes instantly.
+9. Listen to answers using Text-to-Speech.
+10. Download the complete chat as a PDF.
 
 ---
 
@@ -187,7 +184,24 @@ The chatbot converts AI-generated answers into speech using the Google Text-to-S
 
 ## 💬 Chat History
 
-Previous conversations are stored locally and displayed in the sidebar, enabling users to revisit earlier chats.
+All conversations are automatically stored locally and displayed in the sidebar, allowing users to continue previous discussions without losing context.
+
+---
+
+## ⭐ Saved Notes
+
+The chatbot allows users to save important AI-generated answers for future reference.
+
+Features include:
+
+- 📌 Save important answers with one click
+- 📚 Dedicated Saved Notes page
+- 🔍 Search saved notes instantly
+- 🗑 Remove saved notes when no longer needed
+- 📅 Displays save date for each note
+- ⚡ Quickly reopen saved academic concepts
+
+This feature helps students build their own personalized revision notes while studying.
 
 ---
 
@@ -199,12 +213,14 @@ Users can download the complete conversation as a PDF file for future reference 
 
 ## 📈 Future Enhancements
 
-- Speech-to-Text (Voice Input)
-- Multi-language Support
-- OCR for Image PDFs
-- User Authentication
-- Cloud Database Integration
-- Mobile Application
+- 🎤 Speech-to-Text (Voice Input)
+- 🌐 Multi-language Support
+- 🧠 AI-generated Quiz Mode
+- 🔖 Note Categories & Tags
+- 👤 User Authentication
+- ☁ Cloud Database Integration
+- 📱 Mobile Application
+- 🌙 Dark / Light Theme Support
 
 ---
 
