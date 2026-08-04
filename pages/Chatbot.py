@@ -1,8 +1,10 @@
 import os
+import time
 import streamlit as st
 from datetime import datetime, timedelta
 from speech import text_to_speech
 from pdf_export import generate_chat_pdf
+from favourites_manager import add_favourite
 
 from rag import (
     ask_question,
@@ -362,6 +364,16 @@ with st.sidebar:
     st.divider()
     
     # ==========================================
+    # SAVED NOTES
+    # ==========================================
+
+    if st.button(
+        "📌 Saved Notes",
+        use_container_width=True
+    ):
+        st.switch_page("pages/FavouriteNotes.py")
+
+    # ==========================================
     # CLEAR CHAT
     # ==========================================
 
@@ -396,11 +408,20 @@ Gemini • LangChain • FAISS
 """
     )
 
-# ==========================================
-# DIVIDER
-# ==========================================
-
 st.divider()
+
+# =====================================================
+# SAVE SUCCESS POPUP
+# =====================================================
+
+if st.session_state.get("saved_success", False):
+
+    st.toast(
+        "✅ Note added to Saved Notes",
+        icon="📌"
+    )
+
+    st.session_state.saved_success = False
 
 # =====================================================
 # CHAT HISTORY
@@ -414,36 +435,85 @@ for i, message in enumerate(st.session_state.messages):
 
         if message["role"] == "assistant":
 
-            if st.button(
-                "🔊 Listen Answer",
-                key=f"tts_{i}_{abs(hash(message['content']))}",
-                use_container_width=False
-            ):
+            # ==========================================
+            # ACTION BUTTONS
+            # ==========================================
 
-                audio_file = text_to_speech(message["content"])
+            col1, col2, col3 = st.columns(3)
 
-                with open(audio_file, "rb") as f:
+            # ------------------------------------------
+            # SAVE NOTE
+            # ------------------------------------------
 
-                    st.audio(
-                        f.read(),
-                        format="audio/mp3"
+            with col1:
+
+                if st.button(
+                    "📌 Save Note",
+                    key=f"fav_{i}",
+                    use_container_width=True
+                ):
+
+                    # Find the user question just before this answer
+                    question = ""
+
+                    if i > 0:
+
+                        previous = st.session_state.messages[i - 1]
+
+                        if previous["role"] == "user":
+
+                            question = previous["content"]
+
+                    add_favourite(
+                        question=question,
+                        answer=message["content"],
+                        sources=message.get("sources", [])
                     )
 
-            # ==========================================
-            # DOWNLOAD CHAT AS PDF
-            # ==========================================
+                    # Success message for 2 seconds
+                    st.session_state.saved_success = True
 
-            pdf_buffer = generate_chat_pdf(
-                st.session_state.messages
-            )
+                    st.rerun()
 
-            st.download_button(
-                label="📥 Download Chat as PDF",
-                data=pdf_buffer,
-                file_name="AcademicNotesAI_Chat.pdf",
-                mime="application/pdf",
-                key=f"download_chat_pdf_{i}_{abs(hash(message['content']))}"
-            )
+            # ------------------------------------------
+            # LISTEN ANSWER
+            # ------------------------------------------
+
+            with col2:
+
+                if st.button(
+                    "🔊 Listen",
+                    key=f"tts_{i}_{abs(hash(message['content']))}",
+                    use_container_width=True
+                ):
+
+                    audio_file = text_to_speech(message["content"])
+
+                    with open(audio_file, "rb") as f:
+
+                        st.audio(
+                            f.read(),
+                            format="audio/mp3"
+                        )
+
+            # ------------------------------------------
+            # DOWNLOAD PDF
+            # ------------------------------------------
+
+            with col3:
+
+                pdf_buffer = generate_chat_pdf(
+                    st.session_state.messages
+                )
+
+                st.download_button(
+                    label="📥 Download",
+                    data=pdf_buffer,
+                    file_name="AcademicNotesAI_Chat.pdf",
+                    mime="application/pdf",
+                    key=f"download_chat_pdf_{i}_{abs(hash(message['content']))}",
+                    use_container_width=True
+                )
 
             # ==========================================
             # SOURCE DOCUMENTS

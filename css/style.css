@@ -194,3 +194,115 @@ section[data-testid="stSidebar"]{
     font-weight:600;
 
 }
+
+/* =======================================
+   Saved Notes Cards
+======================================= */
+
+div[data-testid="stVerticalBlock"] > div:has(button){
+
+    border-radius:18px;
+
+}
+
+/* Open Button */
+
+button[kind="secondary"]{
+
+    border-radius:12px;
+
+}
+
+/* Remove Button */
+
+button:hover{
+
+    transition:.25s;
+
+}
+
+/* ==========================================
+   Favourite Notes Page
+========================================== */
+
+div[data-testid="stMetric"]{
+
+border-radius:18px;
+
+padding:18px;
+
+background:white;
+
+box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+}
+
+.stInfo{
+
+border-radius:16px;
+
+}
+
+.stSuccess{
+
+border-radius:16px;
+
+}
+
+.stWarning{
+
+border-radius:16px;
+
+}
+
+div[data-testid="stVerticalBlock"]{
+
+gap:12px;
+
+}
+
+/* ==========================================
+   Favourite Notes Page
+========================================== */
+
+div[data-testid="stMetric"]{
+
+    border-radius:18px;
+
+    background:white;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+}
+
+/* Saved Note Cards */
+
+div[data-testid="stVerticalBlock"] > div{
+
+    transition:.25s;
+
+}
+
+div[data-testid="stVerticalBlock"] > div:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* Search Box */
+
+.stTextInput input{
+
+    border-radius:12px;
+
+}
+
+/* Footer */
+
+.footer{
+
+    color:gray;
+
+    text-align:center;
+
+}
