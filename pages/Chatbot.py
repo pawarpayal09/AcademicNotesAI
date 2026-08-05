@@ -221,9 +221,7 @@ with st.sidebar:
 - Explain Classification.
 - Explain Regression.
 - What is DBMS?
-- Explain DBMS Architecture.
 - Explain Normalization.
-- Difference between DBMS and File System.
 - Explain SQL.
 - Explain Cloud Computing.
 - Explain IaaS.

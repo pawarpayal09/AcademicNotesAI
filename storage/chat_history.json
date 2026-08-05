@@ -184,5 +184,24 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "0fc1fec6-10ac-46d9-8bd5-36bcd7bc18d9",
+        "title": "What is DBMS?",
+        "date": "2026-08-05",
+        "messages": [
+            
+            {
+                "role": "user",
+                "content": "What is DBMS?"
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\n* A **Database Management System (DBMS)** is software designed to assist in maintaining, utilizing, and supporting the management of large collections of data.\n\n---\n\n### Explanation\n* A DBMS provides a structured system to manage large datasets. \n* The alternative to using a DBMS is an ad hoc approach, which involves storing data in operating system files and writing application-specific code to manage it.\n\n---\n\n### Advantages\nUsing a DBMS offers several key advantages over storing data in standard operating system files:\n* **Efficient Data Access:** Allows effective retrieval and management of data.\n* **Data Independence:** Keeps data management separate from application code.\n* **Data Integrity:** Helps maintain the accuracy and quality of data.\n* **Security:** Provides protection for stored information.\n* **Quick Application Development:** Enables faster building of data-driven applications.\n* **Support for Concurrent Access:** Allows multiple users to access data simultaneously.\n* **Recovery from System Failures:** Restores data properly if a system crashes.\n\n---\n\n### Example\nA **university database** is an example of how a database system stores data:\n* **Entities:** Students, faculty, courses, and classrooms.\n* **Relationships:** \n  * Students enrolling in courses\n  * Faculty teaching courses\n  * The use of classrooms for courses\n\n---\n\n### Conclusion\n* A DBMS is a crucial tool for handling large collections of data safely and efficiently, offering major improvements over writing custom code for basic file storage.",
+                "sources": [
+                    "Database Management Systems-Raghu ramakrishnan (2).pdf"
+                ]
+            }
+        ]
     }
 ]

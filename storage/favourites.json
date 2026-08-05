@@ -1,14 +1,5 @@
 [
     {
-        "id": "7e477bf1-81b9-4069-9b25-faf959f3a3f5",
-        "question": "Explain Unsupervised Learning.",
-        "answer": "# Definition\n\n**Unsupervised learning** is a type of learning where no supervisor is present to provide correct values or output labels. The learning process relies entirely on input data alone.\n\n# Explanation\n\nThe primary aim of unsupervised learning is to uncover regularities, patterns, and structure in the input data. In the input space, certain patterns occur more frequently than others. Unsupervised learning aims to determine what generally happens in the data and what does not. \n\nIn statistics, this process of discovering patterns and structure in the data is called **density estimation**.\n\n# Key Points\n\n* **No Supervisor:** There is no supervisor to guide the learning or supply target outputs.\n* **Input-Only Data:** The learning algorithm only receives input data.\n* **Pattern Recognition:** It focuses on finding structure and identifying which patterns occur most frequently.\n* **Statistical Definition:** It corresponds to density estimation in statistics.\n\n# Applications\n\n* **Clustering:** This is a method used for density estimation where the goal is to discover natural clusters or groupings within the input data.",
-        "sources": [
-            "6. Introduction to machine learning.pdf"
-        ],
-        "date": "2026-08-04 20:28"
-    },
-    {
         "id": "a31573ed-dca8-4e3b-bdb8-8cdc9b2d15f2",
         "question": "what is operating system?",
         "answer": "# Definition\n\nBased on the uploaded PDF, an operating system acts as a **Command Interpreter** that translates human-understandable commands given by a user into machine language (m/c) that the CPU can understand.\n\n# Explanation\n\nThe CPU cannot directly understand commands given by a user. The operating system performs the function of translating these user commands into machine code. Additionally, it handles the operational details of the computer hardware to allow efficient usage, makes the computer convenient to use, and allows new system functions to be added and tested without interfering with existing services.\n\n# Key Points\n\n*   **Command Interpretation:** Translates user commands into machine language for the CPU.\n*   **Convenience:** Makes the computer system convenient and easy for the user to use.\n*   **Efficiency:** Handles hardware operation details so the computer hardware is used in an efficient way.\n*   **Ability to Evolve:** Permits effective development, testing, and introduction of new system functions without interfering with current services.\n\n# Advantages\n\n*   **Higher CPU Utilization:** Keeps the CPU busy most of the time.\n\n# Disadvantages\n\n*   Information regarding disadvantages is not provided in the uploaded PDF.\n\n# Applications\n\n*   Information regarding specific applications is not explicitly provided in the uploaded PDF.\n\n# Example\n\n*   Windows operating system.\n\n# Conclusion\n\nAccording to the provided document, an operating system is a system component that bridges the gap between the user and the CPU by interpreting commands, while maintaining user convenience, hardware efficiency, and the system's ability to evolve.",
@@ -53,5 +44,14 @@
             "tmpvdx5u643.pdf"
         ],
         "date": "2026-08-04 23:10"
+    },
+    {
+        "id": "72abe635-487d-4b57-a83c-23c9053a7e9d",
+        "question": "Explain Unsupervised Learning.",
+        "answer": "# Definition\n\n**Unsupervised learning** is a type of learning where no supervisor is present to provide correct values or output labels. The learning process relies entirely on input data alone.\n\n# Explanation\n\nThe primary aim of unsupervised learning is to uncover regularities, patterns, and structure in the input data. In the input space, certain patterns occur more frequently than others. Unsupervised learning aims to determine what generally happens in the data and what does not. \n\nIn statistics, this process of discovering patterns and structure in the data is called **density estimation**.\n\n# Key Points\n\n* **No Supervisor:** There is no supervisor to guide the learning or supply target outputs.\n* **Input-Only Data:** The learning algorithm only receives input data.\n* **Pattern Recognition:** It focuses on finding structure and identifying which patterns occur most frequently.\n* **Statistical Definition:** It corresponds to density estimation in statistics.\n\n# Applications\n\n* **Clustering:** This is a method used for density estimation where the goal is to discover natural clusters or groupings within the input data.",
+        "sources": [
+            "6. Introduction to machine learning.pdf"
+        ],
+        "date": "2026-08-05 09:24"
     }
 ]
