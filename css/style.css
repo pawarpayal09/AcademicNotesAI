@@ -306,3 +306,80 @@ div[data-testid="stVerticalBlock"] > div:hover{
     text-align:center;
 
 }
+
+/* =====================================================
+   CHATBOT - MICROPHONE ALIGNMENT
+   ===================================================== */
+
+/*
+   IMPORTANT:
+   st.audio_input() is rendered by Streamlit as a
+   separate component, so we target the actual component
+   directly instead of trying to place it inside
+   .voice-mic-container.
+*/
+
+/* -----------------------------------------
+   MICROPHONE COMPONENT
+   ----------------------------------------- */
+
+div[data-testid="stAudioInput"] {
+
+    width: 56px !important;
+    min-width: 56px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    /*
+       Move microphone DOWN to align its bottom
+       edge with the chat input.
+    */
+    position: relative !important;
+    top: 32px !important;
+
+}
+
+
+/* -----------------------------------------
+   MICROPHONE BUTTON
+   ----------------------------------------- */
+
+div[data-testid="stAudioInput"] button {
+
+    width: 52px !important;
+    height: 52px !important;
+
+    min-width: 52px !important;
+    min-height: 52px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border-radius: 14px !important;
+
+}
+
+
+/* -----------------------------------------
+   REMOVE INTERNAL SPACING
+   ----------------------------------------- */
+
+div[data-testid="stAudioInput"] > div {
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+}
+
+
+/* -----------------------------------------
+   MICROPHONE INNER ELEMENTS
+   ----------------------------------------- */
+
+div[data-testid="stAudioInput"] > div > div {
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+}

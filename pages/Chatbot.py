@@ -5,6 +5,39 @@ from datetime import datetime, timedelta
 from speech import text_to_speech
 from pdf_export import generate_chat_pdf
 from favourites_manager import add_favourite
+from speech_to_text import speech_to_text
+
+# =====================================================
+# LOAD SHARED CSS
+# =====================================================
+
+# =====================================================
+# LOAD SHARED CSS
+# =====================================================
+
+def load_css():
+
+    css_path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)),
+        "css",
+        "style.css"
+    )
+
+    if os.path.exists(css_path):
+
+        with open(css_path, "r", encoding="utf-8") as f:
+
+            st.markdown(
+                f"<style>{f.read()}</style>",
+                unsafe_allow_html=True
+            )
+
+    else:
+
+        st.warning(f"⚠️ CSS file not found: {css_path}")
+
+
+load_css()
 
 from rag import (
     ask_question,
@@ -526,12 +559,150 @@ for i, message in enumerate(st.session_state.messages):
                         st.write(f"✅ {source}")
 
 # =====================================================
-# CHAT INPUT
+# VOICE INPUT + CHAT INPUT
 # =====================================================
 
-question = st.chat_input(
-    "Ask your academic question..."
+# -----------------------------------------------------
+# Initialize voice session state
+# -----------------------------------------------------
+
+if "voice_question" not in st.session_state:
+    st.session_state.voice_question = None
+
+if "voice_reset" not in st.session_state:
+    st.session_state.voice_reset = 0
+
+# =====================================================
+# MICROPHONE + CHAT BOX
+# =====================================================
+
+voice_col, chat_col = st.columns(
+    [0.75, 9.25],
+    gap="small",
+    vertical_alignment="bottom"
 )
+
+
+# =====================================================
+# MICROPHONE
+# =====================================================
+
+with voice_col:
+
+    st.markdown(
+        '<div class="voice-mic-container">',
+        unsafe_allow_html=True
+    )
+
+    audio_value = st.audio_input(
+        "",
+        key=f"main_voice_input_{st.session_state.voice_reset}"
+    )
+
+    st.markdown(
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+
+# =====================================================
+# CHAT / SEARCH BOX
+# =====================================================
+
+with chat_col:
+
+    typed_question = st.chat_input(
+        "Ask your academic question..."
+    )
+
+
+# =====================================================
+# PROCESS VOICE INPUT
+# =====================================================
+
+voice_question = None
+
+
+if audio_value:
+
+    with st.spinner(
+        "🔄 Converting your voice into text..."
+    ):
+
+        try:
+
+            voice_question = speech_to_text(
+                audio_value.getvalue()
+            )
+
+        except Exception as e:
+
+            voice_question = None
+
+            st.error(
+                f"❌ Error converting voice: {e}"
+            )
+
+
+# =====================================================
+# SUCCESSFUL VOICE INPUT
+# =====================================================
+
+if voice_question:
+
+    voice_question = voice_question.strip()
+
+    if voice_question:
+
+        st.session_state.voice_question = (
+            voice_question
+        )
+
+        st.success(
+            f"🎤 Recognized: {voice_question}"
+        )
+
+
+# =====================================================
+# VOICE RECOGNITION FAILED
+# =====================================================
+
+elif audio_value:
+
+    st.error(
+        "❌ I could not understand your voice."
+    )
+
+    st.warning(
+        "🎤 Please record your question again."
+    )
+
+
+# =====================================================
+# FINAL QUESTION
+# =====================================================
+
+question = typed_question
+
+
+# -----------------------------------------------------
+# If no typed question, use voice question
+# -----------------------------------------------------
+
+if not question:
+
+    question = st.session_state.get(
+        "voice_question"
+    )
+
+
+# -----------------------------------------------------
+# Clear voice question after using it
+# -----------------------------------------------------
+
+if question:
+
+    st.session_state.voice_question = None
 
 # =====================================================
 # PROCESS USER QUESTION
@@ -684,4 +855,3 @@ with col2:
 with col3:
 
     st.caption("👩‍💻 Developed by Payal Pawar")
-            
