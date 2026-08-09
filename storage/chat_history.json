@@ -37,6 +37,39 @@
                 "sources": [
                     "Database Management Systems-Raghu ramakrishnan (2).pdf"
                 ]
+            },
+            {
+                "role": "user",
+                "content": "What is Operating System"
+            },
+            {
+                "role": "assistant",
+                "content": "# Definition\n\nBased on the provided document, an **Operating System** performs functions for the computer system and acts as a **Command Interpreter**. Since the CPU cannot understand user commands directly, the operating system translates human-understandable commands into machine language.\n\n# Explanation\n\nThe CPU is unable to comprehend commands directly given by a human user. The Operating System bridges this gap by converting these human-understandable commands into machine-understandable code. In addition, it manages hardware details to make the computer easy to use and ensures hardware resources are utilized efficiently.\n\n# Key Points\n\nThe operating system serves three main objectives:\n\n* **Convenience:** It makes the computer system convenient and easy for the user to use.\n* **Efficiency:** It allows the computer hardware to be used efficiently by handling operational details.\n* **Ability to Evolve:** It is designed to permit the effective development, testing, and introduction of new system functions without interfering with existing services.\n\nMain Functions/Services mentioned:\n* **Command Interpreter:** Translates human-understandable user commands into machine code for the CPU.\n\n# Advantages\n\n* **Higher CPU Utilization:** Most of the time, the CPU remains busy, leading to better utilization of processing power.\n\n# Disadvantages\n\n* Information regarding specific disadvantages is cut off / not provided in the uploaded text.\n\n# Applications\n\n* Specific applications are not explicitly detailed in the provided text.\n\n# Example\n\n* **Windows Operating System:** Mentioned as the most common type of operating system seen everywhere today.\n\n# Conclusion\n\nIn summary, an Operating System acts as a command interpreter that translates user instructions into machine language so the CPU can process them. Its core focus is to deliver user convenience, hardware efficiency, and seamless evolution for new functions while maintaining high CPU utilization.",
+                "sources": [
+                    "tmp2k12p10h.pdf"
+                ]
+            },
+            {
+                "role": "user",
+                "content": "What is Linux and list the commnads."
+            },
+            {
+                "role": "assistant",
+                "content": "I couldn't find this information in the uploaded PDF.",
+                "sources": [
+                    "tmp2k12p10h.pdf"
+                ]
+            },
+            {
+                "role": "user",
+                "content": "history of linux"
+            },
+            {
+                "role": "assistant",
+                "content": "I couldn't find this information in the uploaded PDF.",
+                "sources": [
+                    "tmp2k12p10h.pdf"
+                ]
             }
         ]
     },
@@ -190,7 +223,6 @@
         "title": "What is DBMS?",
         "date": "2026-08-05",
         "messages": [
-            
             {
                 "role": "user",
                 "content": "What is DBMS?"
@@ -200,6 +232,25 @@
                 "content": "### Definition\n* A **Database Management System (DBMS)** is software designed to assist in maintaining, utilizing, and supporting the management of large collections of data.\n\n---\n\n### Explanation\n* A DBMS provides a structured system to manage large datasets. \n* The alternative to using a DBMS is an ad hoc approach, which involves storing data in operating system files and writing application-specific code to manage it.\n\n---\n\n### Advantages\nUsing a DBMS offers several key advantages over storing data in standard operating system files:\n* **Efficient Data Access:** Allows effective retrieval and management of data.\n* **Data Independence:** Keeps data management separate from application code.\n* **Data Integrity:** Helps maintain the accuracy and quality of data.\n* **Security:** Provides protection for stored information.\n* **Quick Application Development:** Enables faster building of data-driven applications.\n* **Support for Concurrent Access:** Allows multiple users to access data simultaneously.\n* **Recovery from System Failures:** Restores data properly if a system crashes.\n\n---\n\n### Example\nA **university database** is an example of how a database system stores data:\n* **Entities:** Students, faculty, courses, and classrooms.\n* **Relationships:** \n  * Students enrolling in courses\n  * Faculty teaching courses\n  * The use of classrooms for courses\n\n---\n\n### Conclusion\n* A DBMS is a crucial tool for handling large collections of data safely and efficiently, offering major improvements over writing custom code for basic file storage.",
                 "sources": [
                     "Database Management Systems-Raghu ramakrishnan (2).pdf"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "84f33c90-f220-4d59-8767-58bd4807b878",
+        "title": "Explain Normalization.",
+        "date": "2026-08-09",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Explain Normalization."
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\n\nData normalization refers to scaling data values to a much smaller specified range, such as [-1, 1] or [0.0, 1.0].\n\n---\n\n### Explanation\n\nWhen dealing with a numeric attribute (let's call it attribute $A$), we may have $n$ number of observed values: $V_1, V_2, V_3, \\dots, V_n$. Normalization methods take these original observed values and transform them so that they fit within a smaller standard range. \n\n---\n\n### Key Points\n\n* **Scaling Range:** It changes data values to fit within smaller bounds like [-1, 1] or [0.0, 1.0].\n* **Min-Max Normalization:** A specific method mentioned that implements a linear transformation on the original data.\n* **Variables Used in Min-Max Normalization:**\n  * **$\\text{min}_A$**: The minimum value observed for attribute $A$.\n  * **$\\text{max}_A$**: The maximum value observed for attribute $A$.\n  * **$V_i$**: The specific observed value for attribute $A$ that is being normalized.\n\n---\n\n### Conclusion\n\nData normalization is a technique used to shrink numeric data ranges into a smaller, standardized scale using linear transformation methods like Min-max normalization.\n\n*(Note: Sections for Advantages, Disadvantages, Applications, and Example were omitted because that specific information was not provided in the uploaded notes.)*",
+                "sources": [
+                    "Data Science.pdf",
+                    "Introduction to machine learning.pdf"
                 ]
             }
         ]

@@ -53,5 +53,23 @@
             "6. Introduction to machine learning.pdf"
         ],
         "date": "2026-08-05 09:24"
+    },
+    {
+        "id": "5f23aa07-3906-472b-9cb3-6268bfdee2e4",
+        "question": "What is DBMS?",
+        "answer": "# Definition\n\nA Database Management System (DBMS) is software designed to assist in maintaining, managing, and utilizing large collections of data.\n\n# Explanation\n\n* **Alternative to Ad-hoc Methods:** Without a DBMS, the alternative is to store data in operating system files and write specific application code to manage it. These ad-hoc approaches do not carry over from one application to another.\n* **Computer Science Microcosm:** The field of DBMS is a microcosm of computer science as a whole, covering topics such as languages and object-orientation.\n\n# Key Points\n\nA DBMS provides the following core features:\n* **Efficient Data Access:** Allows quick retrieval and management of data.\n* **Data Independence:** Separates data structure from application code.\n* **Data Integrity and Security:** Protects data accuracy and prevents unauthorized access.\n* **Concurrent Access Support:** Allows multiple users or processes to access data simultaneously.\n* **Failure Recovery:** Provides mechanisms to recover data from system failures.\n* **Quick Application Development:** Enables faster creation of data-driven applications.\n\n# Advantages\n\n* Storing data in a DBMS provides significant advantages compared to using traditional operating system files.\n* It eliminates the need to write non-reusable, application-specific code for managing data.\n\n# Example\n\nAn example of a database managed by a DBMS is a **University Database**:\n* **Entities:** Stores information about entities like students, faculty, courses, and classrooms.\n* **Relationships:** Tracks connections between entities, such as students enrolling in courses, faculty teaching courses, and the assignment of classrooms to courses.",
+        "sources": [
+            "Database Management Systems-Raghu ramakrishnan (2).pdf"
+        ],
+        "date": "2026-08-05 11:45"
+    },
+    {
+        "id": "7e13370c-fc0a-4df7-a6ec-d7a948f4f9cf",
+        "question": "What is DBMS?",
+        "answer": "### Definition\n* A **Database Management System (DBMS)** is software designed to assist in maintaining, utilizing, and supporting the management of large collections of data.\n\n---\n\n### Explanation\n* A DBMS provides a structured system to manage large datasets. \n* The alternative to using a DBMS is an ad hoc approach, which involves storing data in operating system files and writing application-specific code to manage it.\n\n---\n\n### Advantages\nUsing a DBMS offers several key advantages over storing data in standard operating system files:\n* **Efficient Data Access:** Allows effective retrieval and management of data.\n* **Data Independence:** Keeps data management separate from application code.\n* **Data Integrity:** Helps maintain the accuracy and quality of data.\n* **Security:** Provides protection for stored information.\n* **Quick Application Development:** Enables faster building of data-driven applications.\n* **Support for Concurrent Access:** Allows multiple users to access data simultaneously.\n* **Recovery from System Failures:** Restores data properly if a system crashes.\n\n---\n\n### Example\nA **university database** is an example of how a database system stores data:\n* **Entities:** Students, faculty, courses, and classrooms.\n* **Relationships:** \n  * Students enrolling in courses\n  * Faculty teaching courses\n  * The use of classrooms for courses\n\n---\n\n### Conclusion\n* A DBMS is a crucial tool for handling large collections of data safely and efficiently, offering major improvements over writing custom code for basic file storage.",
+        "sources": [
+            "Database Management Systems-Raghu ramakrishnan (2).pdf"
+        ],
+        "date": "2026-08-09 18:16"
     }
 ]

@@ -86,13 +86,61 @@ retriever = db.as_retriever(
 )
 
 # ==========================================================
-# Gemini Model
+# Gemini API Keys
 # ==========================================================
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-flash-latest",
-    temperature=0.2,
-)
+def get_google_api_keys():
+
+    keys = []
+
+    # Streamlit Cloud / deployed project
+    for key_name in [
+        "GOOGLE_API_KEY",
+        "GOOGLE_API_KEY_2",
+        "GOOGLE_API_KEY_3",
+        "GOOGLE_API_KEY_4",
+        "GOOGLE_API_KEY_5"
+    ]:
+
+        try:
+            key = st.secrets.get(key_name)
+        except Exception:
+            key = None
+
+        if key:
+            keys.append(key)
+
+    # Local .env
+    for key_name in [
+        "GOOGLE_API_KEY",
+        "GOOGLE_API_KEY_2",
+        "GOOGLE_API_KEY_3",
+        "GOOGLE_API_KEY_4",
+        "GOOGLE_API_KEY_5"
+    ]:
+
+        key = os.getenv(key_name)
+
+        if key and key not in keys:
+            keys.append(key)
+
+    return keys
+
+
+GOOGLE_API_KEYS = get_google_api_keys()
+
+
+# ==========================================================
+# Gemini Model Factory
+# ==========================================================
+
+def create_gemini_model(api_key):
+
+    return ChatGoogleGenerativeAI(
+        model="gemini-flash-latest",
+        temperature=0.2,
+        google_api_key=api_key
+    )
 
 # ==========================================================
 # Extract Gemini Response
@@ -189,11 +237,21 @@ Write the answer using this structure whenever applicable:
 Keep the answer detailed but concise.
 """
 
-    for attempt in range(3):
+    # ==========================================================
+    # Try Gemini API Keys
+    # ==========================================================
+
+    last_error = None
+
+    for key_number, api_key in enumerate(GOOGLE_API_KEYS, start=1):
 
         try:
 
-            response = llm.invoke(prompt)
+            print(f"\nTrying Gemini API Key {key_number}...")
+
+            current_llm = create_gemini_model(api_key)
+
+            response = current_llm.invoke(prompt)
 
             answer = extract_answer(response)
 
@@ -208,6 +266,8 @@ Keep the answer detailed but concise.
                 if pdf_name not in source_list:
                     source_list.append(pdf_name)
 
+            print(f"Gemini API Key {key_number} succeeded.")
+
             return {
                 "answer": answer,
                 "sources": source_list
@@ -215,12 +275,22 @@ Keep the answer detailed but concise.
 
         except Exception as e:
 
-            print(f"\nAttempt {attempt+1} failed.")
+            last_error = e
+
+            print(
+                f"\nGemini API Key {key_number} failed."
+            )
+
             print(e)
 
-            if attempt < 2:
-                print("\nRetrying in 5 seconds...\n")
-                time.sleep(5)
+            if key_number < len(GOOGLE_API_KEYS):
+
+                print(
+                    f"Trying Gemini API Key "
+                    f"{key_number + 1}..."
+                )
+
+                time.sleep(2)
 
     return {
         "answer": """⚠ Gemini server is currently busy.
@@ -231,6 +301,7 @@ Your documents are already loaded correctly.
 Only the Gemini server is temporarily unavailable.""",
         "sources": []
     }
+
 # ==========================================================
 # MODE 2 : Uploaded PDF Chat
 # ==========================================================
@@ -307,11 +378,27 @@ QUESTION
 ANSWER
 """
 
-    for attempt in range(3):
+    # ==========================================================
+    # Try Gemini API Keys
+    # ==========================================================
+
+    last_error = None
+
+    for key_number, api_key in enumerate(
+        GOOGLE_API_KEYS,
+        start=1
+    ):
 
         try:
 
-            response = llm.invoke(prompt)
+            print(
+                f"\nTrying Gemini API Key "
+                f"{key_number}..."
+            )
+
+            current_llm = create_gemini_model(api_key)
+
+            response = current_llm.invoke(prompt)
 
             answer = extract_answer(response)
 
@@ -319,13 +406,22 @@ ANSWER
 
             for doc in docs:
 
-                file_name = doc.metadata.get("source", "Uploaded PDF")
+                file_name = doc.metadata.get(
+                    "source",
+                    "Uploaded PDF"
+                )
 
                 file_name = file_name.split("\\")[-1]
                 file_name = file_name.split("/")[-1]
 
                 if file_name not in source_list:
+
                     source_list.append(file_name)
+
+            print(
+                f"Gemini API Key "
+                f"{key_number} succeeded."
+            )
 
             return {
                 "answer": answer,
@@ -334,11 +430,23 @@ ANSWER
 
         except Exception as e:
 
-            print(f"Attempt {attempt+1} failed.")
+            last_error = e
+
+            print(
+                f"\nGemini API Key "
+                f"{key_number} failed."
+            )
 
             print(e)
 
-            time.sleep(5)
+            if key_number < len(GOOGLE_API_KEYS):
+
+                print(
+                    f"Trying Gemini API Key "
+                    f"{key_number + 1}..."
+                )
+
+                time.sleep(2)
 
     return {
 
