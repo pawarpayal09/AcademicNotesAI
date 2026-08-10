@@ -11,17 +11,20 @@ html, body, [class*="css"] {
 }
 
 /* Hide Streamlit menu and footer */
+
 #MainMenu{
-    visibility:hidden;
+visibility:hidden;
 }
 
 footer{
-    visibility:hidden;
+visibility:hidden;
 }
 
+/* Keep header visible so sidebar toggle remains available */
 header{
-    visibility:hidden;
+background: transparent !important;
 }
+
 
 /* Header Card */
 .main-title{
@@ -40,11 +43,6 @@ header{
 .main-title p{
     margin-top:8px;
     font-size:17px;
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"]{
-    background:#ffffff;
 }
 
 /* Footer */
@@ -171,14 +169,17 @@ section[data-testid="stSidebar"]{
 
 }
 
-/* =======================================
-   SIDEBAR
-======================================= */
+/* ==========================================
+SIDEBAR
+========================================== */
 
-section[data-testid="stSidebar"]{
+section[data-testid="stSidebar"] {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb !important;
+}
 
-    border-right:1px solid rgba(255,255,255,.08);
-
+section[data-testid="stSidebar"] > div {
+    background: #ffffff !important;
 }
 
 /* =======================================
@@ -253,12 +254,6 @@ border-radius:16px;
 
 }
 
-div[data-testid="stVerticalBlock"]{
-
-gap:12px;
-
-}
-
 /* ==========================================
    Favourite Notes Page
 ========================================== */
@@ -270,20 +265,6 @@ div[data-testid="stMetric"]{
     background:white;
 
     box-shadow:0 6px 18px rgba(0,0,0,.08);
-
-}
-
-/* Saved Note Cards */
-
-div[data-testid="stVerticalBlock"] > div{
-
-    transition:.25s;
-
-}
-
-div[data-testid="stVerticalBlock"] > div:hover{
-
-    transform:translateY(-2px);
 
 }
 
@@ -530,4 +511,209 @@ div[data-testid="stAudioInput"] {
     transform: translateY(-3px) !important;
 
     box-shadow: 0 10px 24px rgba(37, 99, 235, 0.16) !important;
+}
+
+/* ==========================================
+   COPY + REGENERATE + FEEDBACK BUTTONS
+   SAME SIZE + SAME ALIGNMENT
+   ========================================== */
+
+/* Regenerate button */
+div[class*="st-key-regenerate_"] button {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #d9d9d9 !important;
+    background: #ffffff !important;
+
+    border-radius: 8px !important;
+
+    box-shadow: none !important;
+}
+
+
+/* ==========================================
+   FEEDBACK THUMBS
+   ========================================== */
+
+div[class*="st-key-feedback_rating_"] {
+    width: 40px !important;
+    height: 40px !important;
+
+    min-width: 40px !important;
+    max-width: 40px !important;
+
+    min-height: 40px !important;
+    max-height: 40px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* Feedback individual buttons */
+div[class*="st-key-feedback_rating_"] button {
+    width: 40px !important;
+    height: 40px !important;
+
+    min-width: 40px !important;
+    max-width: 40px !important;
+
+    min-height: 40px !important;
+    max-height: 40px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #d9d9d9 !important;
+    background: #ffffff !important;
+
+    border-radius: 8px !important;
+
+    box-shadow: none !important;
+}
+
+
+/* ==========================================
+   FEEDBACK ICONS
+   ========================================== */
+
+div[class*="st-key-feedback_rating_"] button svg {
+    width: 18px !important;
+    height: 18px !important;
+
+    color: #6b7280 !important;
+    stroke: #6b7280 !important;
+
+    transition: all 0.2s ease !important;
+}
+
+
+/* ==========================================
+   FEEDBACK HOVER
+   ========================================== */
+
+div[class*="st-key-feedback_rating_"] button:hover svg {
+    color: #f6a23a !important;
+    stroke: #f6a23a !important;
+
+    transform: scale(1.12);
+}
+
+
+/* ==========================================
+   SELECTED FEEDBACK
+   ONLY THUMB BECOMES GOLDEN
+   ========================================== */
+
+div[class*="st-key-feedback_rating_"]
+button[aria-pressed="true"] {
+    background: #ffffff !important;
+    border: 1px solid #d9d9d9 !important;
+    box-shadow: none !important;
+}
+
+
+div[class*="st-key-feedback_rating_"]
+button[aria-pressed="true"] svg {
+    color: #f6a23a !important;
+    stroke: #f6a23a !important;
+    fill: #f6a23a !important;
+
+    transform: scale(1.12);
+}
+
+
+/* ==========================================
+   REGENERATE ICON
+   ========================================== */
+
+div[class*="st-key-regenerate_"] button p {
+    font-size: 22px !important;
+    line-height: 1 !important;
+
+    margin: 0 !important;
+}
+
+
+/* ==========================================
+   COMMON COLUMN ALIGNMENT
+   ========================================== */
+
+div[data-testid="column"] {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+
+/* ==========================================
+   REMOVE EXTRA SPACE INSIDE BUTTON AREAS
+   ========================================== */
+
+div[class*="st-key-regenerate_"],
+div[class*="st-key-feedback_rating_"] {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* ==========================================
+   COPY BUTTON - MATCH REGENERATE + FEEDBACK
+   ========================================== */
+
+/* Copy button iframe/container */
+div[data-testid="stElementContainer"]:has(iframe[title="st.components.v1.html"]) {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+}
+
+
+/* Remove iframe extra spacing */
+div[data-testid="stElementContainer"]:has(iframe[title="st.components.v1.html"]) iframe {
+    width: 40px !important;
+    height: 40px !important;
+
+    min-width: 40px !important;
+    min-height: 40px !important;
+
+    max-width: 40px !important;
+    max-height: 40px !important;
+
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border: none !important;
 }

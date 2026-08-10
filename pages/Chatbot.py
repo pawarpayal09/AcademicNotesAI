@@ -1,15 +1,19 @@
 import os
 import time
 import streamlit as st
+import streamlit.components.v1 as components
 from datetime import datetime, timedelta
 from speech import text_to_speech
 from pdf_export import generate_chat_pdf
 from favourites_manager import add_favourite
 from speech_to_text import speech_to_text
 
-# =====================================================
-# LOAD SHARED CSS
-# =====================================================
+st.set_page_config(
+    page_title="Academic Notes AI",
+    page_icon="📚",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # =====================================================
 # LOAD SHARED CSS
@@ -53,13 +57,6 @@ from chat_history_manager import (
     add_chat,
     update_chat
 )
-
-st.set_page_config(
-    page_title="Academic Notes AI",
-    page_icon="📚",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
     
 # =====================================================
 # SESSION STATE
@@ -71,15 +68,17 @@ if "messages" not in st.session_state:
 if "uploaded_vectorstore" not in st.session_state:
     st.session_state.uploaded_vectorstore = None
 
-# =====================================================
-# CHAT HISTORY SESSION
-# =====================================================
-
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = load_chat_history()
 
 if "current_chat_id" not in st.session_state:
     st.session_state.current_chat_id = None
+
+if "regenerate_question" not in st.session_state:
+    st.session_state.regenerate_question = None
+
+if "regenerate_index" not in st.session_state:
+    st.session_state.regenerate_index = None
 
 # =====================================================
 # PROFESSIONAL HEADER
@@ -558,6 +557,220 @@ for i, message in enumerate(st.session_state.messages):
 
                         st.write(f"✅ {source}")
 
+            # ==========================================
+            # COPY + REGENERATE + FEEDBACK BUTTONS
+            # ==========================================
+            copy_col, regenerate_col, feedback_col, empty_col = st.columns(
+                [0.07, 0.07, 0.07, 0.79],
+                gap="small"
+            )
+
+            # ==========================================
+            # COMMON BUTTON SIZE
+            # ==========================================
+
+            BUTTON_SIZE = 40
+
+            # ==========================================
+            # COPY BUTTON
+            # ==========================================
+
+            with copy_col:
+
+                components.html(
+                    f"""
+                    <div style="
+                        width:40px;
+                        height:40px;
+                        padding:0;
+                        margin:0;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        box-sizing:border-box;
+                    ">
+
+                        <button
+                            onclick="copyAnswer()"
+                            title="Copy answer"
+                            style="
+                                width:40px;
+                                height:40px;
+
+                                min-width:40px;
+                                max-width:40px;
+                                min-height:40px;
+                                max-height:40px;
+
+                                padding:0;
+                                margin:0;
+
+                                box-sizing:border-box;
+
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+
+                                border:1px solid #d9d9d9;
+                                background:#ffffff;
+                                border-radius:8px;
+
+                                cursor:pointer;
+
+                                box-shadow:none;
+                                outline:none;
+                            "
+                            onmouseover="
+                                this.style.background='#f5f5f5';
+                            "
+                            onmouseout="
+                                this.style.background='#ffffff';
+                            "
+                        >
+
+                            <svg
+                                id="copyIcon"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+
+                                <rect
+                                    x="8"
+                                    y="8"
+                                    width="11"
+                                    height="11"
+                                    rx="2"
+                                    stroke="#6b7280"
+                                    stroke-width="1.8"
+                                />
+
+                                <path
+                                    d="M16 8V6C16 4.89543 15.1046 4 14 4H6C4.89543 4 4 4.89543 4 6V14C4 15.1046 4.89543 16 6 16H8"
+                                    stroke="#6b7280"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <script>
+
+                        function copyAnswer() {{
+
+                            const answer = {message["content"]!r};
+
+                            navigator.clipboard.writeText(answer);
+
+                            const icon =
+                                document.getElementById("copyIcon");
+
+                            icon.innerHTML = `
+                                <path
+                                    d="M5 12.5L9.5 17L19 7"
+                                    stroke="#22c55e"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    fill="none"
+                                />
+                            `;
+
+                            setTimeout(function() {{
+
+                                icon.innerHTML = `
+                                    <rect
+                                        x="8"
+                                        y="8"
+                                        width="11"
+                                        height="11"
+                                        rx="2"
+                                        stroke="#6b7280"
+                                        stroke-width="1.8"
+                                    />
+
+                                    <path
+                                        d="M16 8V6C16 4.89543 15.1046 4 14 4H6C4.89543 4 4 4.89543 4 6V14C4 15.1046 5.10457 16 6 16H8"
+                                        stroke="#6b7280"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                `;
+
+                            }}, 1500);
+
+                        }}
+
+                    </script>
+                    """,
+                    height=40,
+                    width=40,
+                    scrolling=False
+
+                )
+
+            # ==========================================
+            # REGENERATE BUTTON
+            # ==========================================
+
+            with regenerate_col:
+
+                if st.button(
+                    "↻",
+                    key=f"regenerate_{i}",
+                    help="Regenerate answer"
+                ):
+
+                    if i > 0:
+
+                        previous_message = (
+                            st.session_state.messages[i - 1]
+                        )
+
+                        if previous_message["role"] == "user":
+
+                            st.session_state.regenerate_question = (
+                                previous_message["content"]
+                            )
+
+                            st.session_state.regenerate_index = i
+
+                            st.rerun()
+
+            # ==========================================
+            # FEEDBACK
+            # ==========================================
+
+            with feedback_col:
+
+                feedback = st.feedback(
+                    "thumbs",
+                    key=f"feedback_rating_{i}"
+                )
+
+                if feedback is not None:
+
+                    if feedback == 1:
+
+                        st.toast(
+                            "👍 Thanks! Glad the answer was helpful."
+                        )
+
+                    else:
+
+                        st.toast(
+                            "👎 Thanks for feedback. We'll improve it."
+                        )
+                            
+
 # =====================================================
 # VOICE INPUT + CHAT INPUT
 # =====================================================
@@ -654,13 +867,19 @@ elif audio_value:
         "🎤 Please record your question again."
     )
 
-
 # =====================================================
 # FINAL QUESTION
 # =====================================================
 
 question = typed_question
 
+# -----------------------------------------------------
+# Check whether regeneration was requested
+# -----------------------------------------------------
+
+is_regenerating = (
+    st.session_state.get("regenerate_question") is not None
+)
 
 # -----------------------------------------------------
 # If no typed question, use voice question
@@ -672,72 +891,91 @@ if not question:
         "voice_question"
     )
 
+# -----------------------------------------------------
+# If no voice question, use regeneration question
+# -----------------------------------------------------
+
+if not question:
+
+    question = st.session_state.get(
+        "regenerate_question"
+    )
 
 # -----------------------------------------------------
-# Clear voice question after using it
+# Clear voice question
 # -----------------------------------------------------
 
 if question:
 
     st.session_state.voice_question = None
 
+
 # =====================================================
 # PROCESS USER QUESTION
 # =====================================================
 
 if question:
-    # Save first question as chat title
 
-    if len(st.session_state.messages) == 0:
+    # ==========================================
+    # SAVE USER MESSAGE
+    # ==========================================
 
-        st.session_state.chat_history.append(question[:40])
+    if not is_regenerating:
 
-    # -----------------------------
-    # Save User Message
-    # -----------------------------
+        st.session_state.messages.append(
+            {
+                "role": "user",
+                "content": question
+            }
+        )
 
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": question
-        }
-    )
 
-    # -----------------------------
-    # Display User Message
-    # -----------------------------
+    # ==========================================
+    # DISPLAY USER QUESTION
+    # Don't display it again during regeneration
+    # ==========================================
 
-    with st.chat_message("user"):
+    if not is_regenerating:
 
-        st.markdown(question)
+        with st.chat_message("user"):
 
-    # -----------------------------
-    # Assistant Response
-    # -----------------------------
+            st.markdown(question)
+
+
+    # ==========================================
+    # GENERATE ASSISTANT ANSWER
+    # ==========================================
 
     with st.chat_message("assistant"):
 
         with st.spinner(
             "🤖 Searching notes and generating answer..."
-        ):            
-                        
-            # ==========================================
-            # MODE 1 : Academic Notes
-            # ==========================================
+        ):
+
+            # --------------------------------------
+            # Academic Notes
+            # --------------------------------------
 
             if knowledge_mode == "📚 Academic Notes":
 
-                result = ask_question(question)
+                result = ask_question(
+                    question
+                )
 
-            # ==========================================
-            # MODE 2 : Uploaded PDF
-            # ==========================================
+            # --------------------------------------
+            # Uploaded PDF
+            # --------------------------------------
 
             else:
 
-                if st.session_state.uploaded_vectorstore is None:
+                if (
+                    st.session_state.uploaded_vectorstore
+                    is None
+                ):
 
-                    st.warning("⚠ Please upload a PDF first.")
+                    st.warning(
+                        "⚠️ Please upload a PDF first."
+                    )
 
                     st.stop()
 
@@ -746,46 +984,76 @@ if question:
                     st.session_state.uploaded_vectorstore
                 )
 
-            # ==========================================
-            # Extract Result
-            # ==========================================
+
+            # ======================================
+            # EXTRACT ANSWER
+            # ======================================
 
             answer = result["answer"]
+
             sources = result["sources"]
 
+
         # ==========================================
-        # Display Answer
+        # DISPLAY ANSWER
         # ==========================================
 
         st.markdown(answer)
 
+
         # ==========================================
-        # Source Documents
+        # SOURCE DOCUMENTS
         # ==========================================
 
         if sources:
 
-            with st.expander("📚 Source Documents Used"):
+            with st.expander(
+                "📚 Source Documents Used"
+            ):
 
                 for source in sources:
 
-                    st.write(f"✅ {source}")
+                    st.write(
+                        f"✅ {source}"
+                    )
 
-    # ==========================================
-    # Save Assistant Message
-    # ==========================================
 
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": answer,
-            "sources": sources
-        }
-    )
+    # =================================================
+    # SAVE / REPLACE ASSISTANT MESSAGE
+    # =================================================
 
-    # ==========================================
-    # SAVE CHAT
-    # ==========================================
+    if is_regenerating:
+
+        regenerate_index = (
+            st.session_state.get(
+                "regenerate_index"
+            )
+        )
+
+        if regenerate_index is not None:
+
+            st.session_state.messages[
+                regenerate_index
+            ] = {
+                "role": "assistant",
+                "content": answer,
+                "sources": sources
+            }
+
+    else:
+
+        st.session_state.messages.append(
+            {
+                "role": "assistant",
+                "content": answer,
+                "sources": sources
+            }
+        )
+
+
+    # =================================================
+    # SAVE CHAT HISTORY
+    # =================================================
 
     if st.session_state.current_chat_id is None:
 
@@ -796,11 +1064,15 @@ if question:
             st.session_state.messages
         )
 
-        st.session_state.chat_history = load_chat_history()
-
-        st.session_state.current_chat_id = (
-            st.session_state.chat_history[-1]["id"]
+        st.session_state.chat_history = (
+            load_chat_history()
         )
+
+        if st.session_state.chat_history:
+
+            st.session_state.current_chat_id = (
+                st.session_state.chat_history[-1]["id"]
+            )
 
     else:
 
@@ -809,7 +1081,21 @@ if question:
             st.session_state.messages
         )
 
-        st.session_state.chat_history = load_chat_history()
+        st.session_state.chat_history = (
+            load_chat_history()
+        )
+
+
+    # =================================================
+    # CLEAR REGENERATION STATE
+    # =================================================
+
+    if is_regenerating:
+
+        st.session_state.regenerate_question = None
+
+        st.session_state.regenerate_index = None
+
 
 # =====================================================
 # FOOTER
