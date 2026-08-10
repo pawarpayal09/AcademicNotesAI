@@ -573,55 +573,33 @@ if "voice_reset" not in st.session_state:
     st.session_state.voice_reset = 0
 
 # =====================================================
-# MICROPHONE + CHAT BOX
+# CHAT INPUT + MICROPHONE
 # =====================================================
 
-voice_col, chat_col = st.columns(
-    [0.75, 9.25],
-    gap="small",
-    vertical_alignment="bottom"
+chat_input_value = st.chat_input(
+    "Ask your academic question...",
+    key="main_chat_input",
+    accept_audio=True
 )
 
-
 # =====================================================
-# MICROPHONE
-# =====================================================
-
-with voice_col:
-
-    st.markdown(
-        '<div class="voice-mic-container">',
-        unsafe_allow_html=True
-    )
-
-    audio_value = st.audio_input(
-        "",
-        key=f"main_voice_input_{st.session_state.voice_reset}"
-    )
-
-    st.markdown(
-        '</div>',
-        unsafe_allow_html=True
-    )
-
-
-# =====================================================
-# CHAT / SEARCH BOX
+# GET TEXT INPUT
 # =====================================================
 
-with chat_col:
+typed_question = None
+audio_value = None
 
-    typed_question = st.chat_input(
-        "Ask your academic question..."
-    )
+if chat_input_value:
 
+    typed_question = chat_input_value.get("text")
+
+    audio_value = chat_input_value.get("audio")
 
 # =====================================================
 # PROCESS VOICE INPUT
 # =====================================================
 
 voice_question = None
-
 
 if audio_value:
 
@@ -642,8 +620,7 @@ if audio_value:
             st.error(
                 f"❌ Error converting voice: {e}"
             )
-
-
+            
 # =====================================================
 # SUCCESSFUL VOICE INPUT
 # =====================================================

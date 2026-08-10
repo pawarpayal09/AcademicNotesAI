@@ -345,5 +345,23 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "b2b4ea21-f5c0-464f-8e6c-14428ba5845b",
+        "title": "What is mean by Cloud Computing?",
+        "date": "2026-08-10",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is mean by Cloud Computing?"
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\nCloud computing is a system where software does not need to be installed on a local PC, and all computing processes are owned by another company. It uses remote servers to run programs and deliver services to client users.\n\n---\n\n### Explanation\nIn a cloud computing system, remote servers handle everything from basic daily tasks to complex computing processes. \n* Services can be delivered over both public and private networks, including WAN, LAN, or VPN.\n* It operates through a **cloud ecosystem**, which is a complex system of interdependent components working together. At the center of this ecosystem is a public cloud provider.\n\n---\n\n### Key Points\n* **Software Independency:** Users do not need to install software on their local computers.\n* **No Vendor Lock-in:** Clients can switch their business from one cloud to another without any restriction (similar to mobile number portability).\n* **Storage:** Provides a huge amount of capacity to store and manage data.\n* **Runtime Cloud:** Provides the execution and runtime environment for virtual machines.\n* **Infrastructure:** Supplies host-level, application-level, and network-level services using hardware and software like servers, network devices, and virtualization software.\n\n---\n\n### Advantages\n* **Back-up and Restore Data:** Once data is stored in the cloud, it is much easier to back up and restore using cloud computing technology.\n\n---\n\n### Applications\n* E-mail\n* Word processing\n* Complex data analysis programs\n* Web conferencing\n* Customer Relationship Management (CRM)\n\n---\n\n### Example\n* **IaaS Providers:** Amazon Web Services (AWS), Google Compute Engine (GCE)\n* **SaaS Vendors:** Salesforce\n* **Other Cloud Services:** Cisco Metapod\n\n---\n\n### Conclusion\nCloud computing allows client users to run applications, store large amounts of data, and utilize infrastructure over various networks via remote servers, offering flexibility and easy data recovery without locking users into a single vendor.",
+                "sources": [
+                    "Cloud-Computing.pdf"
+                ]
+            }
+        ]
     }
 ]

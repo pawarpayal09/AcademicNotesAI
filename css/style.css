@@ -155,10 +155,8 @@ section[data-testid="stSidebar"]{
    CHAT INPUT
 ======================================= */
 
-.stChatInput{
-
-    border-radius:18px;
-
+.stChatInput {
+    border-radius: 18px;
 }
 
 /* =======================================
@@ -289,12 +287,21 @@ div[data-testid="stVerticalBlock"] > div:hover{
 
 }
 
-/* Search Box */
+/* ==========================================
+   SAVED NOTES - SEARCH BY QUESTION
+   ========================================== */
 
-.stTextInput input{
+.stTextInput input {
+    border: 2px solid #f6b26b !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
 
-    border-radius:12px;
-
+/* Light orange border when the search box is clicked */
+.stTextInput input:focus {
+    border: 2px solid #f6b26b !important;
+    box-shadow: 0 0 0 2px rgba(246, 178, 107, 0.15) !important;
 }
 
 /* Footer */
@@ -308,78 +315,219 @@ div[data-testid="stVerticalBlock"] > div:hover{
 }
 
 /* =====================================================
-   CHATBOT - MICROPHONE ALIGNMENT
+   CHAT INPUT + MICROPHONE
+   ===================================================== */
+
+/* Main chat input container */
+
+[data-testid="stChatInputContainer"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+
+/* Chat input outer area */
+
+[data-testid="stChatInput"] {
+    background: #ffffff !important;
+    border: 2px solid #f6b26b !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 14px rgba(246, 178, 107, 0.18) !important;
+}
+
+
+/* Chat input focus */
+
+[data-testid="stChatInput"]:focus-within {
+    border-color: #f4a261 !important;
+    box-shadow: 0 0 0 3px rgba(246, 178, 107, 0.18) !important;
+}
+
+
+/* Text inside chat input */
+
+[data-testid="stChatInput"] input {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+}
+
+
+/* =====================================================
+   AUDIO / MICROPHONE CONTROL
    ===================================================== */
 
 /*
-   IMPORTANT:
-   st.audio_input() is rendered by Streamlit as a
-   separate component, so we target the actual component
-   directly instead of trying to place it inside
-   .voice-mic-container.
+   Streamlit's newer chat input contains the audio
+   recording control inside the chat input.
 */
 
-/* -----------------------------------------
-   MICROPHONE COMPONENT
-   ----------------------------------------- */
+[data-testid="stChatInput"] button {
+    border-radius: 12px !important;
+}
+
+
+/* Audio button hover */
+
+[data-testid="stChatInput"] button:hover {
+    background: #fff3e6 !important;
+}
+
+
+/* =====================================================
+   LIGHT ORANGE MICROPHONE THEME
+   ===================================================== */
+
+[data-testid="stChatInput"] button[aria-label*="audio"],
+[data-testid="stChatInput"] button[aria-label*="Audio"],
+[data-testid="stChatInput"] button[aria-label*="record"],
+[data-testid="stChatInput"] button[aria-label*="Record"] {
+
+    border: 2px solid #f6b26b !important;
+
+    background: #fffaf5 !important;
+
+    color: #e8893d !important;
+
+    border-radius: 12px !important;
+
+}
+
+
+/* Microphone hover */
+
+[data-testid="stChatInput"] button[aria-label*="audio"]:hover,
+[data-testid="stChatInput"] button[aria-label*="Audio"]:hover,
+[data-testid="stChatInput"] button[aria-label*="record"]:hover,
+[data-testid="stChatInput"] button[aria-label*="Record"]:hover {
+
+    background: #fff0df !important;
+
+    border-color: #f4a261 !important;
+
+}
+
+
+/* =====================================================
+   REMOVE OLD AUDIO INPUT POSITIONING
+   ===================================================== */
 
 div[data-testid="stAudioInput"] {
-
-    width: 56px !important;
-    min-width: 56px !important;
-
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
     margin: 0 !important;
     padding: 0 !important;
+}
 
-    /*
-       Move microphone DOWN to align its bottom
-       edge with the chat input.
-    */
-    position: relative !important;
-    top: 32px !important;
+/* =====================================================
+   HOME PAGE - FEATURE CARDS
+   ===================================================== */
+
+/* Make both feature card containers equal height */
+.st-key-academic_notes_card,
+.st-key-upload_pdf_card {
+
+    height: 100% !important;
+    min-height: 470px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+
+/* Make the actual information cards fill the container */
+.st-key-academic_notes_card div[data-testid="stAlert"],
+.st-key-upload_pdf_card div[data-testid="stAlert"] {
+
+    min-height: 470px !important;
+
+    height: 100% !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 16px !important;
+
+    padding: 22px !important;
+
+    background: #dbeafe !important;
+
+    border: 1px solid #93c5fd !important;
+
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.10) !important;
+}
+
+
+/* Remove the default blue/green alert colors */
+.st-key-academic_notes_card div[data-testid="stAlert"] *,
+.st-key-upload_pdf_card div[data-testid="stAlert"] * {
+
+    color: #075985 !important;
+}
+
+
+/* Card headings */
+.st-key-academic_notes_card h3,
+.st-key-upload_pdf_card h3 {
+
+    color: #075985 !important;
+
+    font-size: 27px !important;
+
+    font-weight: 700 !important;
+
+    margin-bottom: 12px !important;
+}
+
+
+/* Features heading */
+.st-key-academic_notes_card h4,
+.st-key-upload_pdf_card h4 {
+
+    color: #0369a1 !important;
+
+    font-size: 21px !important;
+
+    font-weight: 600 !important;
 
 }
 
 
-/* -----------------------------------------
-   MICROPHONE BUTTON
-   ----------------------------------------- */
+/* Card paragraph text */
+.st-key-academic_notes_card p,
+.st-key-upload_pdf_card p {
 
-div[data-testid="stAudioInput"] button {
+    color: #075985 !important;
 
-    width: 52px !important;
-    height: 52px !important;
-
-    min-width: 52px !important;
-    min-height: 52px !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    border-radius: 14px !important;
-
+    line-height: 1.7 !important;
 }
 
 
-/* -----------------------------------------
-   REMOVE INTERNAL SPACING
-   ----------------------------------------- */
+/* Card list */
+.st-key-academic_notes_card li,
+.st-key-upload_pdf_card li {
 
-div[data-testid="stAudioInput"] > div {
+    color: #075985 !important;
 
-    margin: 0 !important;
-    padding: 0 !important;
+    margin-bottom: 8px !important;
 
+    line-height: 1.5 !important;
 }
 
 
-/* -----------------------------------------
-   MICROPHONE INNER ELEMENTS
-   ----------------------------------------- */
+/* Slight hover effect */
+.st-key-academic_notes_card div[data-testid="stAlert"],
+.st-key-upload_pdf_card div[data-testid="stAlert"] {
 
-div[data-testid="stAudioInput"] > div > div {
+    transition: all 0.25s ease !important;
+}
 
-    margin: 0 !important;
-    padding: 0 !important;
 
+.st-key-academic_notes_card div[data-testid="stAlert"]:hover,
+.st-key-upload_pdf_card div[data-testid="stAlert"]:hover {
+
+    transform: translateY(-3px) !important;
+
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.16) !important;
 }

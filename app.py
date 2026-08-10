@@ -158,13 +158,15 @@ st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 # ------------------------------------------
-# CARD 1
+# CARD 1 - ACADEMIC NOTES
 # ------------------------------------------
 
 with col1:
 
-    st.info(
-        """
+    with st.container(key="academic_notes_card"):
+
+        st.info(
+            """
 ### 📚 Academic Notes
 
 Search across the academic notes that are already included in this project.
@@ -180,16 +182,19 @@ Search across the academic notes that are already included in this project.
 
 Perfect for revising your syllabus quickly and preparing for university examinations.
 """
-    )
+        )
+
 
 # ------------------------------------------
-# CARD 2
+# CARD 2 - UPLOAD PDF
 # ------------------------------------------
 
 with col2:
 
-    st.success(
-        """
+    with st.container(key="upload_pdf_card"):
+
+        st.info(
+            """
 ### 📄 Upload Your Own PDF
 
 Upload any PDF and instantly start chatting with your own document.
@@ -205,7 +210,7 @@ Upload any PDF and instantly start chatting with your own document.
 
 Perfect for studying your own notes, books, assignments, and research papers.
 """
-    )
+        )
 
 col1, col2, col3 = st.columns([1,2,1])
 
