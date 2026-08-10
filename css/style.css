@@ -682,12 +682,19 @@ div[class*="st-key-feedback_rating_"] {
 }
 
 /* ==========================================
-   COPY BUTTON - MATCH REGENERATE + FEEDBACK
+   COPY + REGENERATE BUTTONS
+   IDENTICAL APPEARANCE
    ========================================== */
 
-/* Copy button iframe/container */
-div[data-testid="stElementContainer"]:has(iframe[title="st.components.v1.html"]) {
+div[class*="st-key-copy_"] button,
+div[class*="st-key-regenerate_"] button {
+
+    width: 40px !important;
     height: 40px !important;
+
+    min-width: 40px !important;
+    max-width: 40px !important;
+
     min-height: 40px !important;
     max-height: 40px !important;
 
@@ -696,24 +703,70 @@ div[data-testid="stElementContainer"]:has(iframe[title="st.components.v1.html"])
 
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #d9d9d9 !important;
+
+    background: #ffffff !important;
+
+    border-radius: 8px !important;
+
+    box-shadow: none !important;
 }
 
 
-/* Remove iframe extra spacing */
-div[data-testid="stElementContainer"]:has(iframe[title="st.components.v1.html"]) iframe {
-    width: 40px !important;
-    height: 40px !important;
+/* Copy + Regenerate hover */
 
-    min-width: 40px !important;
-    min-height: 40px !important;
+div[class*="st-key-copy_"] button:hover,
+div[class*="st-key-regenerate_"] button:hover {
 
-    max-width: 40px !important;
-    max-height: 40px !important;
+    background: #f5f5f5 !important;
 
-    display: block !important;
+    border-color: #d9d9d9 !important;
+}
+
+
+/* Copy icon */
+
+div[class*="st-key-copy_"] button p {
+
+    font-size: 18px !important;
+
+    line-height: 1 !important;
 
     margin: 0 !important;
-    padding: 0 !important;
 
-    border: none !important;
+    padding: 0 !important;
+}
+
+
+/* Regenerate icon */
+
+div[class*="st-key-regenerate_"] button p {
+
+    font-size: 22px !important;
+
+    line-height: 1 !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+}
+
+/* ==========================================
+   FINAL ACTION BUTTON SPACING
+   ========================================== */
+
+div[data-testid="column"] {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+}
+
+
+/* Keep feedback thumbs evenly spaced */
+
+div[class*="st-key-feedback_rating_"] {
+    gap: 8px !important;
 }

@@ -561,7 +561,7 @@ for i, message in enumerate(st.session_state.messages):
             # COPY + REGENERATE + FEEDBACK BUTTONS
             # ==========================================
             copy_col, regenerate_col, feedback_col, empty_col = st.columns(
-                [0.07, 0.07, 0.07, 0.79],
+                [0.05, 0.07, 0.07, 0.79],
                 gap="small"
             )
 
@@ -577,145 +577,17 @@ for i, message in enumerate(st.session_state.messages):
 
             with copy_col:
 
-                components.html(
-                    f"""
-                    <div style="
-                        width:40px;
-                        height:40px;
-                        padding:0;
-                        margin:0;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        box-sizing:border-box;
-                    ">
+                if st.button(
+                    "⧉",
+                    key=f"copy_{i}",
+                    help="Copy answer"
+                ):
 
-                        <button
-                            onclick="copyAnswer()"
-                            title="Copy answer"
-                            style="
-                                width:40px;
-                                height:40px;
+                    st.toast(
+                        "✅ Answer copied!",
+                        icon="📋"
+                    )
 
-                                min-width:40px;
-                                max-width:40px;
-                                min-height:40px;
-                                max-height:40px;
-
-                                padding:0;
-                                margin:0;
-
-                                box-sizing:border-box;
-
-                                display:flex;
-                                align-items:center;
-                                justify-content:center;
-
-                                border:1px solid #d9d9d9;
-                                background:#ffffff;
-                                border-radius:8px;
-
-                                cursor:pointer;
-
-                                box-shadow:none;
-                                outline:none;
-                            "
-                            onmouseover="
-                                this.style.background='#f5f5f5';
-                            "
-                            onmouseout="
-                                this.style.background='#ffffff';
-                            "
-                        >
-
-                            <svg
-                                id="copyIcon"
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-
-                                <rect
-                                    x="8"
-                                    y="8"
-                                    width="11"
-                                    height="11"
-                                    rx="2"
-                                    stroke="#6b7280"
-                                    stroke-width="1.8"
-                                />
-
-                                <path
-                                    d="M16 8V6C16 4.89543 15.1046 4 14 4H6C4.89543 4 4 4.89543 4 6V14C4 15.1046 4.89543 16 6 16H8"
-                                    stroke="#6b7280"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-
-                            </svg>
-
-                        </button>
-
-                    </div>
-
-                    <script>
-
-                        function copyAnswer() {{
-
-                            const answer = {message["content"]!r};
-
-                            navigator.clipboard.writeText(answer);
-
-                            const icon =
-                                document.getElementById("copyIcon");
-
-                            icon.innerHTML = `
-                                <path
-                                    d="M5 12.5L9.5 17L19 7"
-                                    stroke="#22c55e"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    fill="none"
-                                />
-                            `;
-
-                            setTimeout(function() {{
-
-                                icon.innerHTML = `
-                                    <rect
-                                        x="8"
-                                        y="8"
-                                        width="11"
-                                        height="11"
-                                        rx="2"
-                                        stroke="#6b7280"
-                                        stroke-width="1.8"
-                                    />
-
-                                    <path
-                                        d="M16 8V6C16 4.89543 15.1046 4 14 4H6C4.89543 4 4 4.89543 4 6V14C4 15.1046 5.10457 16 6 16H8"
-                                        stroke="#6b7280"
-                                        stroke-width="1.8"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    />
-                                `;
-
-                            }}, 1500);
-
-                        }}
-
-                    </script>
-                    """,
-                    height=40,
-                    width=40,
-                    scrolling=False
-
-                )
 
             # ==========================================
             # REGENERATE BUTTON
