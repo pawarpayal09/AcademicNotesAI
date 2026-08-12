@@ -99,7 +99,7 @@ def get_google_api_keys():
         "IMAGE_STUDY_API_KEY_4",
         "Text_to_Speech_API_KEY_3",
         "Speech_to_Text_API_KEY_2",
-        "EMBEDDING_MODEL_API_KEY"
+        "MAIN_CHAT_API_KEY_1"
     ]:
 
         try:
@@ -116,7 +116,7 @@ def get_google_api_keys():
         "IMAGE_STUDY_API_KEY_4",
         "Text_to_Speech_API_KEY_3",
         "Speech_to_Text_API_KEY_2",
-        "EMBEDDING_MODEL_API_KEY"
+        "MAIN_CHAT_API_KEY_1"
     ]:
 
         key = os.getenv(key_name)
