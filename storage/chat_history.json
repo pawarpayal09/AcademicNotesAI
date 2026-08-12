@@ -322,5 +322,53 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "615b5231-3981-463c-a757-f04507b66538",
+        "title": "Explain the concept of Data Stucture.",
+        "date": "2026-08-11",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Explain the concept of Data Stucture."
+            },
+            {
+                "role": "assistant",
+                "content": "I couldn't find this information in the uploaded notes.",
+                "sources": [
+                    "Data Structures.pdf",
+                    "Database Management Systems-Raghu ramakrishnan (2).pdf"
+                ]
+            },
+            {
+                "role": "user",
+                "content": "What are the components of Operating System?"
+            },
+            {
+                "role": "assistant",
+                "content": "Based on the provided notes, the structure/components of an Operating System are described through its 4 main layers.\n\n### Definition\nThe structure of an Operating System comprises 4 main layers that connect user programs to the computer hardware.\n\n### Explanation\nThe 4 layers in the structure of an Operating System are:\n* **Hardware**\n* **Kernel**\n* **System call interface (shell)**\n* **Application programs**\n\n### Key Points\n* **Kernel:** \n  * It is the most vital part of the operating system.\n  * It interacts directly with the computer hardware.\n  * Programs interact with the kernel through system calls.\n\n* **System Call Interface (Shell) & System Calls:**\n  * The system call provides an interface to access operating system services.\n  * It instructs the kernel to perform various tasks for a program, including:\n    * Opening a file\n    * Writing to a file\n    * Obtaining information about a file\n    * Executing a program\n    * Terminating a process\n\n*(Note: Information regarding Advantages, Disadvantages, Applications, and Examples for the components/structure is not provided in the notes.)*",
+                "sources": [
+                    "Operating System.pdf"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "e0b45ed2-20b1-45d9-ae13-f85e487bbc09",
+        "title": "what are the roles in data science",
+        "date": "2026-08-12",
+        "messages": [
+            {
+                "role": "user",
+                "content": "what are the roles in data science"
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\nData science roles refer to specialized jobs responsible for managing, collecting, analyzing, and structuring data to help organizations improve processes and make informed decisions.\n\n---\n\n### Explanation\nThe provided notes outline four specific roles in the data science field. Each role carries distinct responsibilities ranging from creating system blueprints to analyzing statistical trends and separating high-value data.\n\n---\n\n### Key Points\n\n#### 1. Data Scientist\n* **Roles and Responsibilities:**\n  * Identifying data collection sources for business needs.\n  * Processing, cleansing, and integrating data.\n  * Automating data collection and management processes.\n  * Using Data Science techniques and tools to improve processes.\n* **Required Skills:** Expertise in R, MatLab, SQL, Python, and other complementary technologies.\n\n#### 2. Data Architect\n* **Roles and Responsibilities:**\n  * Creating blueprints for data management so databases can be easily integrated, centralized, and protected with the best security measures.\n  * Ensuring that data engineers have the best tools and systems to work with.\n\n#### 3. Statistician\n* **Roles and Responsibilities:**\n  * Collecting, analyzing, and interpreting data.\n  * Assessing results and predicting trends or relationships using statistical methodologies and tools.\n  * Designing data collection processes.\n* **Required Skills:** SQL, data mining, and various machine learning technologies.\n\n#### 4. Business Analyst\n* **Roles and Responsibilities:**\n  * Understanding how data-oriented technologies work and handling large volumes of data.\n  * Separating high-value data from low-value data.\n\n---\n\n### Conclusion\nThe roles in data science\u2014such as Data Scientist, Data Architect, Statistician, and Business Analyst\u2014work together using technical tools, statistical methods, and system blueprints to efficiently collect, secure, and analyze data.",
+                "sources": [
+                    "Data Science.pdf"
+                ]
+            }
+        ]
     }
 ]

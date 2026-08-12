@@ -545,125 +545,14 @@ div[class*="st-key-regenerate_"] button {
 }
 
 
-/* ==========================================
-   FEEDBACK THUMBS
-   ========================================== */
+/* ==========================================================
+   FINAL IMAGE STUDY + CHATBOT ACTION BUTTON ALIGNMENT
+   COPY | REGENERATE | 👍 | 👎
+   ========================================================== */
 
-div[class*="st-key-feedback_rating_"] {
-    width: 40px !important;
-    height: 40px !important;
-
-    min-width: 40px !important;
-    max-width: 40px !important;
-
-    min-height: 40px !important;
-    max-height: 40px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    box-sizing: border-box !important;
-}
-
-
-/* Feedback individual buttons */
-div[class*="st-key-feedback_rating_"] button {
-    width: 40px !important;
-    height: 40px !important;
-
-    min-width: 40px !important;
-    max-width: 40px !important;
-
-    min-height: 40px !important;
-    max-height: 40px !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    box-sizing: border-box !important;
-
-    border: 1px solid #d9d9d9 !important;
-    background: #ffffff !important;
-
-    border-radius: 8px !important;
-
-    box-shadow: none !important;
-}
-
-
-/* ==========================================
-   FEEDBACK ICONS
-   ========================================== */
-
-div[class*="st-key-feedback_rating_"] button svg {
-    width: 18px !important;
-    height: 18px !important;
-
-    color: #6b7280 !important;
-    stroke: #6b7280 !important;
-
-    transition: all 0.2s ease !important;
-}
-
-
-/* ==========================================
-   FEEDBACK HOVER
-   ========================================== */
-
-div[class*="st-key-feedback_rating_"] button:hover svg {
-    color: #f6a23a !important;
-    stroke: #f6a23a !important;
-
-    transform: scale(1.12);
-}
-
-
-/* ==========================================
-   SELECTED FEEDBACK
-   ONLY THUMB BECOMES GOLDEN
-   ========================================== */
-
-div[class*="st-key-feedback_rating_"]
-button[aria-pressed="true"] {
-    background: #ffffff !important;
-    border: 1px solid #d9d9d9 !important;
-    box-shadow: none !important;
-}
-
-
-div[class*="st-key-feedback_rating_"]
-button[aria-pressed="true"] svg {
-    color: #f6a23a !important;
-    stroke: #f6a23a !important;
-    fill: #f6a23a !important;
-
-    transform: scale(1.12);
-}
-
-
-/* ==========================================
-   REGENERATE ICON
-   ========================================== */
-
-div[class*="st-key-regenerate_"] button p {
-    font-size: 22px !important;
-    line-height: 1 !important;
-
-    margin: 0 !important;
-}
-
-
-/* ==========================================
+/* ------------------------------------------
    COMMON COLUMN ALIGNMENT
-   ========================================== */
+   ------------------------------------------ */
 
 div[data-testid="column"] {
     padding-top: 0 !important;
@@ -671,20 +560,9 @@ div[data-testid="column"] {
 }
 
 
-/* ==========================================
-   REMOVE EXTRA SPACE INSIDE BUTTON AREAS
-   ========================================== */
-
-div[class*="st-key-regenerate_"],
-div[class*="st-key-feedback_rating_"] {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* ==========================================
-   COPY + REGENERATE BUTTONS
-   IDENTICAL APPEARANCE
-   ========================================== */
+/* ------------------------------------------
+   COPY + REGENERATE
+   ------------------------------------------ */
 
 div[class*="st-key-copy_"] button,
 div[class*="st-key-regenerate_"] button {
@@ -698,6 +576,8 @@ div[class*="st-key-regenerate_"] button {
     min-height: 40px !important;
     max-height: 40px !important;
 
+    box-sizing: border-box !important;
+
     padding: 0 !important;
     margin: 0 !important;
 
@@ -705,10 +585,7 @@ div[class*="st-key-regenerate_"] button {
     align-items: center !important;
     justify-content: center !important;
 
-    box-sizing: border-box !important;
-
     border: 1px solid #d9d9d9 !important;
-
     background: #ffffff !important;
 
     border-radius: 8px !important;
@@ -737,7 +614,6 @@ div[class*="st-key-copy_"] button p {
     line-height: 1 !important;
 
     margin: 0 !important;
-
     padding: 0 !important;
 }
 
@@ -751,22 +627,149 @@ div[class*="st-key-regenerate_"] button p {
     line-height: 1 !important;
 
     margin: 0 !important;
-
     padding: 0 !important;
 }
 
-/* ==========================================
-   FINAL ACTION BUTTON SPACING
-   ========================================== */
 
-div[data-testid="column"] {
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-}
+/* ==========================================================
+   FEEDBACK COMPONENT
+   ========================================================== */
 
+/* Feedback wrapper */
 
-/* Keep feedback thumbs evenly spaced */
+[data-testid="stFeedback"] {
 
-div[class*="st-key-feedback_rating_"] {
+    height: 40px !important;
+    min-height: 40px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
     gap: 8px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
 }
+
+
+/* Actual feedback buttons */
+
+[data-testid="stFeedback"] button {
+
+    width: 40px !important;
+    height: 40px !important;
+
+    min-width: 40px !important;
+    max-width: 40px !important;
+
+    min-height: 40px !important;
+    max-height: 40px !important;
+
+    box-sizing: border-box !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border: 1px solid #d9d9d9 !important;
+
+    background: #ffffff !important;
+
+    border-radius: 8px !important;
+
+    box-shadow: none !important;
+
+    transition: background 0.2s ease,
+                border-color 0.2s ease !important;
+}
+
+
+/* Feedback button hover */
+
+[data-testid="stFeedback"] button:hover {
+
+    background: #f5f5f5 !important;
+
+    border-color: #d9d9d9 !important;
+}
+
+
+/* Feedback icons */
+
+[data-testid="stFeedback"] button svg {
+
+    width: 18px !important;
+    height: 18px !important;
+
+    color: #6b7280 !important;
+
+    stroke: #6b7280 !important;
+
+    fill: none !important;
+
+    transition: all 0.2s ease !important;
+}
+
+
+/* Feedback icon hover */
+
+[data-testid="stFeedback"] button:hover svg {
+
+    color: #f6a23a !important;
+
+    stroke: #f6a23a !important;
+
+    transform: scale(1.10) !important;
+}
+
+
+/* Selected feedback button */
+
+[data-testid="stFeedback"]
+button[aria-pressed="true"] {
+
+    background: #ffffff !important;
+
+    border: 1px solid #d9d9d9 !important;
+
+    box-shadow: none !important;
+}
+
+
+/* Selected thumb becomes golden */
+
+[data-testid="stFeedback"]
+button[aria-pressed="true"] svg {
+
+    color: #f6a23a !important;
+
+    stroke: #f6a23a !important;
+
+    fill: #f6a23a !important;
+
+    transform: scale(1.10) !important;
+}
+
+
+/* ------------------------------------------
+   IMAGE STUDY FEEDBACK WRAPPER
+   ------------------------------------------ */
+
+div[class*="st-key-feedback_rating_image"] {
+
+    height: 40px !important;
+    min-height: 40px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}
+

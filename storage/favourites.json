@@ -1,14 +1,5 @@
 [
     {
-        "id": "a31573ed-dca8-4e3b-bdb8-8cdc9b2d15f2",
-        "question": "what is operating system?",
-        "answer": "# Definition\n\nBased on the uploaded PDF, an operating system acts as a **Command Interpreter** that translates human-understandable commands given by a user into machine language (m/c) that the CPU can understand.\n\n# Explanation\n\nThe CPU cannot directly understand commands given by a user. The operating system performs the function of translating these user commands into machine code. Additionally, it handles the operational details of the computer hardware to allow efficient usage, makes the computer convenient to use, and allows new system functions to be added and tested without interfering with existing services.\n\n# Key Points\n\n*   **Command Interpretation:** Translates user commands into machine language for the CPU.\n*   **Convenience:** Makes the computer system convenient and easy for the user to use.\n*   **Efficiency:** Handles hardware operation details so the computer hardware is used in an efficient way.\n*   **Ability to Evolve:** Permits effective development, testing, and introduction of new system functions without interfering with current services.\n\n# Advantages\n\n*   **Higher CPU Utilization:** Keeps the CPU busy most of the time.\n\n# Disadvantages\n\n*   Information regarding disadvantages is not provided in the uploaded PDF.\n\n# Applications\n\n*   Information regarding specific applications is not explicitly provided in the uploaded PDF.\n\n# Example\n\n*   Windows operating system.\n\n# Conclusion\n\nAccording to the provided document, an operating system is a system component that bridges the gap between the user and the CPU by interpreting commands, while maintaining user convenience, hardware efficiency, and the system's ability to evolve.",
-        "sources": [
-            "tmpifwurtg8.pdf"
-        ],
-        "date": "2026-08-04 22:29"
-    },
-    {
         "id": "03475f96-dd03-48f7-b584-da12f7ab3e28",
         "question": "Explain the Data Science Lifecycle",
         "answer": "# Definition\n\nThe Data Science Lifecycle consists of five distinct stages, each with its own specific tasks. It provides a structured process to gather raw data, transform it into a usable format, examine its characteristics, and perform deep analysis to find unseen patterns and guide business decisions.\n\n---\n\n# Explanation\n\nAccording to the PDF, the Data Science Lifecycle involves the following detailed stages (the text notes there are five distinct stages, and describes four of them):\n\n*   **1. Capture:**\n    *   **Focus:** Gathering raw structured and unstructured data.\n    *   **Tasks:** Data Acquisition, Data Entry, Signal Reception, and Data Extraction.\n*   **2. Maintain:**\n    *   **Focus:** Taking the raw data and putting it into a form that can be used.\n    *   **Tasks:** Data Warehousing, Data Cleansing, Data Staging, Data Processing, and Data Architecture.\n*   **3. Process:**\n    *   **Focus:** Taking the prepared data and examining its patterns, ranges, and biases to determine how useful it will be in predictive analysis.\n    *   **Tasks:** Data Mining, Clustering/Classification, Data Modeling, and Data Summarization.\n*   **4. Analyze:**\n    *   **Focus:** Referred to as the \"real meat of the lifecycle,\" this stage involves performing various analyses on the data.\n    *   **Tasks:** Exploratory/Confirmatory analysis, Predictive Analysis, Regression, Text Mining, and Qualitative Analysis.\n\n*(Note: The uploaded PDF text states there are five distinct stages, but only provides the specific details for the four stages listed above).*\n\n---\n\n# Key Points\n\n*   **Multi-Stage Process:** It breaks data science work into distinct stages with unique tasks.\n*   **Data Handling:** Moves raw data from initial collection (Capture) to structured management (Maintain).\n*   **Evaluation:** Evaluates data for patterns, ranges, and biases (Process) before running major analytical routines.\n*   **Insight Generation:** Executes deeper analytical methods (Analyze) to evaluate and extract meaningful information.\n\n---\n\n# Advantages (if applicable)\n\n*   Not mentioned in the uploaded PDF.\n\n---\n\n# Disadvantages (if applicable)\n\n*   Not mentioned in the uploaded PDF.\n\n---\n\n# Applications (if applicable)\n\n*   Building complex machine learning predictive models.\n*   Finding unseen patterns and deriving meaningful information from vast volumes of data.\n*   Making informed business decisions.\n\n---\n\n# Example (if available)\n\n*   Not provided in the PDF.\n\n---\n\n# Conclusion\n\nThe Data Science Lifecycle is a systematic approach to handling data from start to finish. By systematically moving through stages like Capture, Maintain, Process, and Analyze, organizations can successfully turn raw, multi-source data into actionable insights and predictive models.",
@@ -16,16 +7,6 @@
             "tmp1eucrbg1.pdf"
         ],
         "date": "2026-08-04 22:40"
-    },
-    {
-        "id": "c4445c8a-fcf4-436e-a6fa-e5c3a1847ae6",
-        "question": "Explain IaaS.",
-        "answer": "# Definition\nIaaS (Infrastructure as a Service) is a cloud service model under the SPI model (alongside PaaS and SaaS), as defined by the U.S. National Institute of Standards and Technology.\n\n# Explanation\nIaaS allows cloud providers to locate infrastructure over the Internet in a cost-effective way. In this model, IaaS providers supply essential assets, which include network, computing, and storage resources.\n\n# Key Points\n* **Resource Inclusion:** IaaS providers supply computing, storage, and network resources.\n* **Rentable Hardware:** Computer hardware assets—such as virtual machines, storage devices, bandwidth, IP addresses, and firewalls—are provided to customers on rent.\n* **Administrative Access:** Customers are given administrative rights over their virtual machines, enabling them to run any type of software they need.\n\n# Advantages\n* **Full Control Over Computing Resources:** Customers get administrative rights to access and manage virtual machines directly.\n* **Flexible and Efficient Renting:** Hardware and networking tools (virtual machines, storage, bandwidth, IP addresses, firewalls) can be rented efficiently and flexibly.\n* **Cost-Effective Infrastructure:** It allows cloud providers to freely position infrastructure over the Internet in a cost-effective manner.\n\n# Conclusion\nIaaS offers a cost-effective way for cloud providers to deliver rented computer hardware, storage, and networking resources over the Internet, while granting users full administrative control over their virtual environments.",
-        "sources": [
-            "Cloud-Computing.pdf",
-            "Building the Infrastructure for Cloud Security - A Solutions View, Apress.pdf"
-        ],
-        "date": "2026-08-04 22:58"
     },
     {
         "id": "bee34551-bdf7-4c70-85e8-e0c60eb7598b",
@@ -71,5 +52,15 @@
             "Artificial Intelligence.pdf"
         ],
         "date": "2026-08-10 11:22"
+    },
+    {
+        "id": "5aae6bb3-bb5f-4922-ad72-1c41006cfad5",
+        "question": "Explain IaaS.",
+        "answer": "### Definition\nIaaS (Infrastructure as a Service) allows a cloud provider to freely locate infrastructure over the Internet in a cost-effective manner.\n\n---\n\n### Explanation\nIaaS enables customers to rent computer hardware and computing resources provided over the Internet. Customers get administrative access to virtual machines (VMs), allowing them to install, manage, and run any type of software on the provider's infrastructure.\n\n---\n\n### Advantages\n* **Full control over computing resources:** Customers get administrative rights from virtual machines to access and manage their computing resources.\n* **Flexible and efficient renting of hardware:** Essential resources—such as virtual machines, storage devices, bandwidth, IP addresses, and firewalls—are provided to customers on rent. \n* **Portability and interoperability:** Users can switch applications and resources between different IaaS clouds easily.\n\n---\n\n### Disadvantages (Issues)\n* **Compatibility with legacy security vulnerabilities:** Running legacy software on the cloud provider's infrastructure can expose customers to security vulnerabilities.\n* **Virtual Machine sprawl:** Virtual machines can easily become out-of-date if security updates are not properly managed.\n\n---\n\n### Example / Applications\nNetwork applications like a **web server** or **e-mail server**, which typically run on a customer's own physical hardware, can instead be run inside Virtual Machines (VMs) within an IaaS cloud.\n\n---\n\n### Conclusion\nIaaS provides a cost-effective way to access and control computing infrastructure remotely over the Internet with full administrative control, though care must be taken regarding security updates and legacy software vulnerabilities.",
+        "sources": [
+            "Cloud-Computing.pdf",
+            "Database Management Systems-Raghu ramakrishnan (2).pdf"
+        ],
+        "date": "2026-08-11 20:38"
     }
 ]
