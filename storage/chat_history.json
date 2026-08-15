@@ -409,22 +409,9 @@
     },
     {
         "id": "a27879e9-9813-40c6-87aa-8f4eb595f718",
-        "title": "what are the",
+        "title": "Structure of Operating System.",
         "date": "2026-08-15",
         "messages": [
-            {
-                "role": "user",
-                "content": "what are the"
-            },
-            {
-                "role": "assistant",
-                "content": "I couldn't find this information in the uploaded notes.",
-                "sources": [
-                    "COMPUTER NETWORKS.pdf",
-                    "Introduction to cyber security.pdf",
-                    "Database Management Systems-Raghu ramakrishnan (2).pdf"
-                ]
-            },
             {
                 "role": "user",
                 "content": "Explain the structure of Operating System."
