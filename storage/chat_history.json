@@ -370,5 +370,23 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "8f580a5c-d2ac-400b-acd1-3cad75266f93",
+        "title": "What is AI?",
+        "date": "2026-08-15",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is AI?"
+            },
+            {
+                "role": "assistant",
+                "content": "Based on the provided notes, here is the explanation of Artificial Intelligence (AI):\n\n### Definition\nArtificial Intelligence (AI) can be defined in several ways:\n* It is the study of systems that act in a way that appears intelligent to any observer.\n* It is the use of methods based on the intelligent behavior of humans and other animals to solve complex problems.\n* It is the study of human intelligence and actions replicated artificially, designed so the system can think and act like human rationality (doing the right thing).\n* It is a new electronic machine that stores large amounts of information and processes it at a very high speed.\n\n---\n\n### Explanation\nTo understand AI, it is necessary to have a background understanding of several subjects:\n* **Related Fields:** Philosophy, linguistics, psychology, and biology.\n* **Related Concepts:** Intelligence (the ability to acquire, understand, and apply knowledge, or exercise thought and reason), knowledge, reasoning, thought, cognition (*gyan* or *bodh*), and learning.\n\n---\n\n### Key Points\n* **Early Programming:** PROLOG (Program Logic), developed in the 1970s, is an early programming language strongly associated with AI.\n* **Importance:** AI may be one of the most important developments of this century.\n* **Research Growth:** Organizations like DARPA (Defense Advanced Research Projects Agency) and techniques like VLSI have increased AI research.\n\n---\n\n### Applications\nAccording to the notes, AI is applied in programs such as:\n* **Autonomous Land Vehicle (ALV):** A driverless military vehicle.\n* **Pilot\u2019s Associate:** An expert system that provides assistance to fighter pilots.\n* **Strategic Computing Program:** An AI-based military supercomputer project.",
+                "sources": [
+                    "Artificial Intelligence.pdf"
+                ]
+            }
+        ]
     }
 ]

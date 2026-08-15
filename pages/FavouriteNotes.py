@@ -1,6 +1,79 @@
 import streamlit as st
 from pathlib import Path
-from favourites_manager import load_favourites, remove_favourite
+from firebase_manager import require_login
+
+require_login()
+
+from favourites_manager import (
+    load_favourites,
+    remove_favourite
+)
+
+from firebase_manager import (
+    is_authenticated,
+    get_current_user,
+    logout_user
+)
+
+# =====================================================
+# LOGGED-IN USER PROFILE
+# TOP-RIGHT PROFESSIONAL PROFILE BAR
+# =====================================================
+
+if is_authenticated():
+
+    current_user = get_current_user()
+
+    profile_spacer, profile_area = st.columns(
+        [5.8, 1.8],
+        gap="small"
+    )
+
+    with profile_area:
+
+        with st.container(
+            key="home_user_profile"
+        ):
+
+            # -----------------------------------------
+            # USER NAME
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-name">
+                    👤 {current_user['name']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # USER EMAIL
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-email">
+                    {current_user['email']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # LOGOUT
+            # -----------------------------------------
+
+            if st.button(
+                "🚪 Logout",
+                key="home_logout_button",
+                use_container_width=True
+            ):
+
+                logout_user()
+
+                st.rerun()
 
 # =====================================================
 # PAGE CONFIG
@@ -13,20 +86,28 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
 # =====================================================
-# LOAD CUSTOM CSS
+# LOAD SHARED CSS
 # =====================================================
 
-css_file = Path("css/style.css")
+css_file = Path(
+    "css/style.css"
+)
 
 if css_file.exists():
 
-    with open(css_file, "r", encoding="utf-8") as f:
+    with open(
+        css_file,
+        "r",
+        encoding="utf-8"
+    ) as f:
 
         st.markdown(
             f"<style>{f.read()}</style>",
             unsafe_allow_html=True
         )
+
 
 # =====================================================
 # SIDEBAR
@@ -35,23 +116,23 @@ if css_file.exists():
 with st.sidebar:
 
     st.markdown("""
-# 📚 Academic Notes AI
+    # 📚 Academic Notes AI
 
-### Learn Smarter with AI
-""")
+    ### Learn Smarter with AI
+    """)
 
     st.divider()
 
     st.info("""
-### 🤖 About
+    ### 🤖 About
 
-An AI-powered academic assistant that helps students:
+    An AI-powered academic assistant that helps students:
 
-- 📚 Search academic notes
-- 📄 Chat with uploaded PDFs
-- 🧠 Learn difficult concepts
-- ⚡ Get instant answers
-""")
+    - 📚 Search academic notes
+    - 📄 Chat with uploaded PDFs
+    - 🧠 Learn difficult concepts
+    - ⚡ Get instant answers
+    """)
 
     st.divider()
 
@@ -68,367 +149,489 @@ An AI-powered academic assistant that helps students:
     st.markdown("### 👩‍💻 Developer")
 
     st.info("""
-**Payal Pawar**
+    **Payal Pawar**
 
-🎓 MCA Student
+    🎓 MCA Student
 
-Academic Notes AI
+    Academic Notes AI
 
-Version 1.0
-""")
+    Version 1.0
+    """)
 
-# ==========================================
-# Load Favorites
-# ==========================================
 
-favorites = load_favourites()
+# =====================================================
+# MAIN PAGE CONTAINER
+# =====================================================
 
-# Latest first
-favorites = list(reversed(favorites))
+with st.container(
+    key="saved_notes_page"
+):
 
-# ==========================================
-# Empty State
-# ==========================================
+    # =================================================
+    # LOAD FAVORITES
+    # =================================================
 
-if len(favorites) == 0:
+    favorites = load_favourites()
 
-    st.info("⭐ No favorite notes saved yet.")
-
-    st.stop()
-
-# ==========================================
-# Header
-# ==========================================
-
-st.markdown("""
-<div style="
-padding:30px;
-border-radius:20px;
-background:linear-gradient(135deg,#2563EB,#4F46E5);
-color:white;
-box-shadow:0px 12px 28px rgba(0,0,0,.18);
-text-align:center;
-">
-
-<h1>⭐ Saved Notes Library</h1>
-
-<p style="font-size:18px;">
-
-Quickly access every important AI answer you've saved.
-
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-st.write("")
-
-col1,col2,col3=st.columns(3)
-
-with col1:
-    st.metric(
-        "📚 Saved Notes",
-        len(favorites)
+    favorites = list(
+        reversed(favorites)
     )
 
-with col2:
 
-    latest = favorites[0]["date"] if favorites else "-"
+    # =================================================
+    # EMPTY STATE
+    # =================================================
 
-    st.metric(
-        "🕒 Latest Save",
-        latest
-    )
+    if not favorites:
 
-with col3:
+        st.title("📌 Saved Notes")
 
-    st.metric(
-        "🤖 AI Model",
-        "Gemini"
-    )
-
-st.divider()
-
-search = st.text_input(
-    "",
-    placeholder="🔍 Search by question...",
-    help="Search saved notes instantly"
-)
-
-st.divider()
-
-# ==========================================
-# Filter Saved Notes
-# ==========================================
-
-filtered = []
-
-for fav in favorites:
-
-    # Show everything when search box is empty
-    if search.strip() == "":
-        filtered.append(fav)
-
-    # Otherwise filter by question
-    elif search.lower() in fav["question"].lower():
-        filtered.append(fav)
-
-# ==========================================
-# Initialize selected note
-# ==========================================
-
-if "selected_favorite" not in st.session_state:
-    st.session_state.selected_favorite = None
-
-# ==========================================
-# Layout
-# ==========================================
-
-left, right = st.columns([1, 2])
-
-# ==========================================
-# LEFT PANEL
-# ==========================================
-
-with left:
-
-    st.markdown("## 📚 Saved Notes")
-
-    st.caption(f"Total Saved : {len(filtered)}")
-
-    st.write("")
-
-    if len(filtered) == 0:
-
-        st.warning("No matching notes found.")
-
-    for fav in filtered:
-
-        with st.container(border=True):
-
-            st.markdown(
-                f"""
-### 📘 {fav['question']}
-
-📅 **{fav['date']}**
-"""
-            )
-
-            col1, col2 = st.columns([3, 1])
-
-            with col1:
-
-                if st.button(
-                    "📖 Open",
-                    key=f"open_{fav['id']}",
-                    use_container_width=True
-                ):
-
-                    st.session_state.selected_favorite = fav
-
-            with col2:
-
-                if st.button(
-                    "🗑",
-                    key=f"delete_{fav['id']}",
-                    use_container_width=True
-                ):
-
-                    remove_favourite(fav["id"])
-
-                    if (
-                        st.session_state.selected_favorite
-                        and
-                        st.session_state.selected_favorite["id"] == fav["id"]
-                    ):
-
-                        st.session_state.selected_favorite = None
-
-                    st.success("Removed successfully.")
-
-                    st.rerun()
-
-            st.write("")
-
-# ==========================================
-# RIGHT PANEL
-# ==========================================
-
-with right:
-
-    if st.session_state.selected_favorite:
-
-        fav = st.session_state.selected_favorite
-
-        # ===================================
-        # Hero Card
-        # ===================================
-
-        st.markdown("""
-<div style="
-padding:20px;
-border-radius:18px;
-background:linear-gradient(135deg,#2563EB,#4F46E5);
-color:white;
-box-shadow:0px 8px 20px rgba(0,0,0,.15);
-">
-
-<h2>🤖 AI Saved Answer</h2>
-
-<p>
-This answer has been saved for quick future reference.
-</p>
-
-</div>
-""", unsafe_allow_html=True)
-
-        st.write("")
-
-        # ===================================
-        # Question
-        # ===================================
-
-        st.markdown("## 📘 Question")
-
-        st.info(fav["question"])
-
-        st.write("")
-
-        # ===================================
-        # Answer
-        # ===================================
-
-        st.markdown("### 📚 AI Answer")
-
-        st.markdown(
-            f"""
-        <div style="
-        background:white;
-        padding:22px;
-        border-radius:18px;
-        box-shadow:0px 8px 18px rgba(0,0,0,.08);
-        line-height:1.8;
-        font-size:16px;
-        ">
-
-        {fav["answer"]}
-
-  
-        """,
-        unsafe_allow_html=True
+        st.info(
+            "⭐ No favorite notes saved yet."
         )
 
-        st.write("")
+        st.stop()
 
-        # ===================================
-        # Sources
-        # ===================================
 
-        st.markdown("## 📄 Source Documents")
+    # =================================================
+    # SESSION STATE
+    # =================================================
 
-        if fav["sources"]:
-            for src in fav["sources"]:
+    if "selected_favorite" not in st.session_state:
 
-                st.markdown(
-                    f"""
-            <div style="
-            padding:12px;
-            margin-bottom:8px;
-            border-radius:12px;
-            background:#F8FAFC;
-            border-left:5px solid #2563EB;
-            ">
+        st.session_state.selected_favorite = None
 
-            📄 {src}
 
-            </div>
-            """,
-            unsafe_allow_html=True
+    # =================================================
+    # PAGE HEADER
+    # =================================================
+
+    header_left, header_right = st.columns(
+        [4, 1],
+        gap="large"
+    )
+
+    with header_left:
+
+        st.title("📌 Saved Notes")
+
+        st.caption(
+            "Your personal library of important AI answers."
+        )
+
+
+    # =================================================
+    # SUMMARY BAR
+    # =================================================
+
+    summary1, summary2, summary3 = st.columns(
+        [1, 1, 1],
+        gap="medium"
+    )
+
+    with summary1:
+
+        st.metric(
+            "🗂️ Total Notes",
+            len(favorites)
+        )
+
+    with summary2:
+
+        latest_date = favorites[0]["date"]
+
+        st.metric(
+            "🕒 Latest Save",
+            latest_date
+        )
+
+    with summary3:
+
+        st.metric(
+            "🤖 Generated By",
+            "Gemini"
+        )
+
+
+    # =================================================
+    # SEARCH
+    # =================================================
+
+    st.markdown(
+        "### 🔎 Find a saved note"
+    )
+
+    search = st.text_input(
+        "Search",
+        placeholder=(
+            "Search by question..."
+        ),
+        label_visibility="collapsed"
+    )
+
+
+    # =================================================
+    # FILTER
+    # =================================================
+
+    filtered = []
+
+    for fav in favorites:
+
+        question = fav.get(
+            "question",
+            ""
+        )
+
+        if not search.strip():
+
+            filtered.append(fav)
+
+        elif (
+            search.lower()
+            in question.lower()
+        ):
+
+            filtered.append(fav)
+
+
+    # =================================================
+    # TWO PANEL LAYOUT
+    # =================================================
+
+    left_panel, right_panel = st.columns(
+        [1.15, 1.85],
+        gap="large"
+    )
+
+
+    # =================================================
+    # LEFT - SAVED NOTES
+    # =================================================
+
+    with left_panel:
+
+        st.markdown(
+            "### 📚 Saved Notes"
+        )
+
+        st.caption(
+            f"{len(filtered)} note(s) available"
+        )
+
+
+        if not filtered:
+
+            st.warning(
+                "No matching notes found."
             )
+
 
         else:
 
-            st.warning("No source documents available.")
+            for fav in filtered:
 
-        st.write("")
+                note_col1, note_col2, note_col3 = (
+                    st.columns(
+                        [5, 2.2, 1.6],
+                        gap="small"
+                    )
+                )
 
-        # ===================================
-        # Information Cards
-        # ===================================
 
-        c1, c2 = st.columns(2)
+                # -----------------------------------------
+                # NOTES TITLE
+                # -----------------------------------------
 
-        with c1:
+                with note_col1:
 
-            st.metric(
-                "📅 Saved On",
-                fav["date"]
+                    question = fav.get(
+                        "question",
+                        ""
+                    ).strip()
+
+
+                    if len(question) > 58:
+
+                        display_question = (
+                            question[:58]
+                            + "..."
+                        )
+
+                    else:
+
+                        display_question = (
+                            question
+                        )
+
+
+                    st.markdown(
+                        f"**📘 {display_question}**"
+                    )
+
+                    st.caption(
+                        "Saved note"
+                    )
+
+
+                # -----------------------------------------
+                # DATE
+                # -----------------------------------------
+
+                with note_col2:
+
+                    st.caption(
+                        f"📅 {fav['date']}"
+                    )
+
+
+                # ---------------------------------------------
+                # ACTIONS
+                # ---------------------------------------------
+
+                with note_col3:
+
+                    with st.container(key=f"saved_note_actions_{fav['id']}"):
+
+                        action_open, action_remove = st.columns(
+                            [1, 1],
+                            gap="small"
+                        )
+
+                        with action_open:
+
+                            open_clicked = st.button(
+                                "📖",
+                                key=f"open_{fav['id']}",
+                                help="Open saved note",
+                                use_container_width=True
+                            )
+
+                        with action_remove:
+
+                            remove_clicked = st.button(
+                                "🗑️",
+                                key=f"remove_{fav['id']}",
+                                help="Remove saved note",
+                                use_container_width=True
+                            )
+
+
+                    if open_clicked:
+
+                        st.session_state.selected_favorite = fav
+
+                        st.rerun()
+
+
+                    if remove_clicked:
+
+                        remove_favourite(
+                            fav["id"]
+                        )
+
+                        if (
+                            st.session_state.selected_favorite
+                            and
+                            st.session_state.selected_favorite["id"] == fav["id"]
+                        ):
+
+                            st.session_state.selected_favorite = None
+
+                        st.toast(
+                            "Note removed",
+                            icon="🗑️"
+                        )
+
+                        st.rerun()
+
+                st.divider()
+
+
+    # =================================================
+    # RIGHT - SELECTED NOTE
+    # =================================================
+
+    with right_panel:
+
+        selected = (
+            st.session_state.selected_favorite
+        )
+
+
+        if selected:
+
+            fav = selected
+
+
+            # -----------------------------------------
+            # SELECTED NOTE HEADER
+            # -----------------------------------------
+
+            st.markdown(
+                "### 🤖 AI Saved Answer"
             )
 
-        with c2:
-
-            st.metric(
-                "🤖 Generated By",
-                "Gemini AI"
+            st.caption(
+                "Your complete saved response."
             )
 
-        st.write("")
 
-        # ===================================
-        # Remove Button
-        # ===================================
+            # -----------------------------------------
+            # QUESTION
+            # -----------------------------------------
 
-        st.write("")
+            st.markdown(
+                "#### 📘 Question"
+            )
 
-        if st.button(
-            "🗑 Remove From Saved Notes",
-            use_container_width=True,
-            type="primary"
-        ):
+            st.info(
+                fav["question"]
+            )
 
-            remove_favourite(fav["id"])
 
-            st.session_state.selected_favorite = None
+            # -----------------------------------------
+            # ANSWER
+            # -----------------------------------------
 
-            st.success("✅ Removed Successfully")
+            st.markdown(
+                "#### 📚 AI Answer"
+            )
 
-            st.rerun()
+            with st.container(
+                border=True
+            ):
 
-    else:
+                st.markdown(
+                    fav["answer"]
+                )
 
-        st.markdown("""
-<div style="
-padding:60px;
-text-align:center;
-border:2px dashed #CBD5E1;
-border-radius:18px;
-background:#F8FAFC;
-">
 
-<h2>📚 No Note Selected</h2>
+            # -----------------------------------------
+            # SOURCES
+            # -----------------------------------------
 
-<p>
-Choose any saved note from the left panel.
+            st.markdown(
+                "#### 📄 Source Documents"
+            )
 
-The complete AI answer will appear here.
 
-</p>
+            sources = fav.get(
+                "sources",
+                []
+            )
 
-</div>
-""", unsafe_allow_html=True)
 
-st.write("")
+            if sources:
 
-st.divider()
+                for source in sources:
 
-st.markdown(
-    """
-<div style="text-align:center;color:gray;padding:10px;">
+                    st.caption(
+                        f"📄 {source}"
+                    )
 
-Made with ❤️ using
-<b>Gemini • LangChain • FAISS • Streamlit</b>
+            else:
 
-</div>
-""",
-unsafe_allow_html=True
-)
+                st.caption(
+                    "No source documents available."
+                )
+
+
+            # -----------------------------------------
+            # NOTE INFORMATION
+            # -----------------------------------------
+
+            info_col1, info_col2 = st.columns(
+                2,
+                gap="small"
+            )
+
+
+            with info_col1:
+
+                st.metric(
+                    "📅 Saved On",
+                    fav["date"]
+                )
+
+
+            with info_col2:
+
+                st.metric(
+                    "🤖 Model",
+                    "Gemini"
+                )
+
+
+            # -----------------------------------------
+            # REMOVE
+            # -----------------------------------------
+
+            if st.button(
+                "🗑 Remove From Saved Notes",
+                type="primary",
+                use_container_width=True
+            ):
+
+                remove_favourite(
+                    fav["id"]
+                )
+
+                st.session_state.selected_favorite = (
+                    None
+                )
+
+                st.toast(
+                    "Note removed successfully",
+                    icon="✅"
+                )
+
+                st.rerun()
+
+
+        else:
+
+            # -----------------------------------------
+            # NO SELECTION
+            # -----------------------------------------
+
+            st.markdown(
+                "### 📚 Select a Note"
+            )
+
+            st.info(
+                """
+                Choose a saved note from the left.
+
+                The complete question, AI answer,
+                source documents and saved date
+                will appear here.
+                """
+            )
+
+
+    # =================================================
+    # FOOTER
+    # =================================================
+
+    st.divider()
+
+    footer1, footer2, footer3 = st.columns(3)
+
+    with footer1:
+
+        st.caption(
+            "📌 Saved Notes"
+        )
+
+    with footer2:
+
+        st.caption(
+            "⚡ Gemini • LangChain • FAISS"
+        )
+
+    with footer3:
+
+        st.caption(
+            "👩‍💻 Academic Notes AI"
+        )

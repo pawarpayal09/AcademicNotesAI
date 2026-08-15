@@ -1,7 +1,74 @@
 import streamlit as st
-
 from quiz_generator import generate_quiz
+from firebase_manager import require_login
 
+require_login()
+
+from firebase_manager import (
+    is_authenticated,
+    get_current_user,
+    logout_user
+)
+
+# =====================================================
+# LOGGED-IN USER PROFILE
+# TOP-RIGHT PROFESSIONAL PROFILE BAR
+# =====================================================
+
+if is_authenticated():
+
+    current_user = get_current_user()
+
+    profile_spacer, profile_area = st.columns(
+        [5.8, 1.8],
+        gap="small"
+    )
+
+    with profile_area:
+
+        with st.container(
+            key="home_user_profile"
+        ):
+
+            # -----------------------------------------
+            # USER NAME
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-name">
+                    👤 {current_user['name']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # USER EMAIL
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-email">
+                    {current_user['email']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # LOGOUT
+            # -----------------------------------------
+
+            if st.button(
+                "🚪 Logout",
+                key="home_logout_button",
+                use_container_width=True
+            ):
+
+                logout_user()
+
+                st.rerun()
 
 # ==========================================================
 # PAGE CONFIG
@@ -16,27 +83,55 @@ st.set_page_config(
 
 
 # ==========================================================
+# LOAD SHARED CSS
+# ==========================================================
+
+import os
+
+css_path = os.path.join(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    ),
+    "css",
+    "style.css"
+)
+
+if os.path.exists(css_path):
+
+    with open(
+        css_path,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
+
+# ==========================================================
 # SESSION STATE
 # ==========================================================
 
 if "quiz_data" not in st.session_state:
-
     st.session_state.quiz_data = None
 
 
 if "quiz_submitted" not in st.session_state:
-
     st.session_state.quiz_submitted = False
 
 
 if "quiz_score" not in st.session_state:
-
     st.session_state.quiz_score = None
 
 
 if "quiz_topic" not in st.session_state:
-
     st.session_state.quiz_topic = ""
+
+
+if "quiz_difficulty" not in st.session_state:
+    st.session_state.quiz_difficulty = "Medium"
 
 
 # ==========================================================
@@ -112,7 +207,10 @@ st.markdown("### ⚙️ Quiz Settings")
 
 
 settings_col1, settings_col2, settings_col3 = (
-    st.columns([3, 1, 1])
+    st.columns(
+        [3, 1, 1],
+        gap="medium"
+    )
 )
 
 
@@ -146,19 +244,33 @@ with settings_col3:
             "Medium",
             "Hard"
         ],
-        index=1
+        index=[
+            "Easy",
+            "Medium",
+            "Hard"
+        ].index(
+            st.session_state.quiz_difficulty
+        )
     )
+
+
+# Keep selected settings
+st.session_state.quiz_topic = topic
+st.session_state.quiz_difficulty = difficulty
 
 
 # ==========================================================
 # QUICK TOPICS
 # ==========================================================
 
-st.markdown("#### 💡 Popular Topics")
+st.markdown(
+    "#### 💡 Popular Topics"
+)
 
 
-quick1, quick2, quick3, quick4 = (
-    st.columns(4)
+quick1, quick2, quick3, quick4 = st.columns(
+    4,
+    gap="small"
 )
 
 
@@ -175,6 +287,7 @@ with quick1:
 
         st.session_state.quiz_data = None
         st.session_state.quiz_submitted = False
+        st.session_state.quiz_score = None
 
         st.rerun()
 
@@ -190,6 +303,7 @@ with quick2:
 
         st.session_state.quiz_data = None
         st.session_state.quiz_submitted = False
+        st.session_state.quiz_score = None
 
         st.rerun()
 
@@ -207,6 +321,7 @@ with quick3:
 
         st.session_state.quiz_data = None
         st.session_state.quiz_submitted = False
+        st.session_state.quiz_score = None
 
         st.rerun()
 
@@ -222,18 +337,23 @@ with quick4:
 
         st.session_state.quiz_data = None
         st.session_state.quiz_submitted = False
+        st.session_state.quiz_score = None
 
         st.rerun()
 
 
 # ==========================================================
-# GENERATE QUIZ BUTTON
+# GENERATE QUIZ
 # ==========================================================
+
+st.markdown("")
+
 
 if st.button(
     "🧠 Generate Quiz",
     type="primary",
-    use_container_width=True
+    use_container_width=True,
+    key="generate_quiz_button"
 ):
 
     if not topic.strip():
@@ -244,8 +364,13 @@ if st.button(
 
     else:
 
+        st.session_state.quiz_topic = topic
+
+        st.session_state.quiz_difficulty = difficulty
+
         with st.spinner(
-            "🧠 Creating your quiz..."
+            f"🧠 Creating {difficulty.lower()} "
+            "difficulty quiz..."
         ):
 
             result = generate_quiz(
@@ -267,11 +392,18 @@ if st.button(
                 result["quiz"]
             )
 
-            st.session_state.quiz_topic = topic
-
             st.session_state.quiz_submitted = False
 
             st.session_state.quiz_score = None
+
+            # Clear old answers
+            for index in range(15):
+
+                key = f"quiz_answer_{index}"
+
+                if key in st.session_state:
+
+                    del st.session_state[key]
 
             st.rerun()
 
@@ -284,7 +416,10 @@ if st.session_state.quiz_data:
 
     quiz = st.session_state.quiz_data
 
-    questions = quiz["questions"]
+    questions = quiz.get(
+        "questions",
+        []
+    )
 
 
     # ======================================================
@@ -293,51 +428,92 @@ if st.session_state.quiz_data:
 
     st.divider()
 
-    st.markdown(
-        f"### 📝 Quiz: {quiz['topic']}"
+    st.subheader(
+        f"📝 Quiz: {quiz.get('topic', topic)}"
     )
 
     st.caption(
         f"{len(questions)} questions • "
-        f"Difficulty: {difficulty}"
+        f"Difficulty: "
+        f"{st.session_state.quiz_difficulty}"
     )
 
 
     # ======================================================
-    # ALREADY SUBMITTED
+    # SUBMITTED
     # ======================================================
 
     if st.session_state.quiz_submitted:
 
-        score = st.session_state.quiz_score
+        score = st.session_state.quiz_score or 0
+
+        total = len(questions)
 
         percentage = round(
-            (score / len(questions)) * 100
+            (score / total) * 100
+        ) if total else 0
+
+
+        # ==================================================
+        # BROAD SCORE DISPLAY
+        # ==================================================
+
+        score1, score2, score3 = st.columns(
+            3,
+            gap="medium"
         )
 
+
+        with score1:
+
+            st.metric(
+                "🏆 Your Score",
+                f"{score} / {total}"
+            )
+
+
+        with score2:
+
+            st.metric(
+                "📊 Accuracy",
+                f"{percentage}%"
+            )
+
+
+        with score3:
+
+            correct_count = score
+            wrong_count = total - score
+
+            st.metric(
+                "✅ Correct / ❌ Wrong",
+                f"{correct_count} / {wrong_count}"
+            )
+
+
+        # --------------------------------------------------
+        # Large result message
+        # --------------------------------------------------
 
         if percentage >= 80:
 
             st.success(
-                f"🎉 Excellent! Your score is "
-                f"**{score}/{len(questions)} "
-                f"({percentage}%)**"
+                f"🎉 Excellent performance! "
+                f"You scored {score}/{total} ({percentage}%)."
             )
 
         elif percentage >= 50:
 
             st.info(
-                f"👍 Good attempt! Your score is "
-                f"**{score}/{len(questions)} "
-                f"({percentage}%)**"
+                f"👍 Good attempt! "
+                f"You scored {score}/{total} ({percentage}%)."
             )
 
         else:
 
             st.warning(
-                f"📚 Keep practicing! Your score is "
-                f"**{score}/{len(questions)} "
-                f"({percentage}%)**"
+                f"📚 Keep practicing! "
+                f"You scored {score}/{total} ({percentage}%)."
             )
 
 
@@ -347,10 +523,12 @@ if st.session_state.quiz_data:
 
 
         # ==================================================
-        # REVIEW ANSWERS
+        # ANSWER REVIEW
         # ==================================================
 
-        st.markdown("### 📖 Answer Review")
+        st.markdown(
+            "### 📖 Answer Review"
+        )
 
 
         for index, question in enumerate(
@@ -358,51 +536,63 @@ if st.session_state.quiz_data:
         ):
 
             user_answer = st.session_state.get(
-                f"quiz_answer_{index}",
-                ""
+                f"quiz_answer_{index}"
             )
 
 
-            st.markdown(
-                f"**Question {index + 1}: "
-                f"{question['question']}**"
-            )
+            with st.container(
+                border=True
+            ):
 
-
-            if user_answer == question["correct_answer"]:
-
-                st.success(
-                    f"✅ Your answer: {user_answer}"
+                st.markdown(
+                    f"**Question {index + 1}**"
                 )
 
-            else:
-
-                st.error(
-                    f"❌ Your answer: "
-                    f"{user_answer or 'Not answered'}"
-                )
-
-                st.success(
-                    f"✅ Correct answer: "
-                    f"{question['correct_answer']}"
+                st.write(
+                    question["question"]
                 )
 
 
-            st.info(
-                f"💡 {question['explanation']}"
-            )
+                if (
+                    user_answer
+                    == question["correct_answer"]
+                ):
 
-            st.divider()
+                    st.success(
+                        f"✅ Your answer: "
+                        f"{user_answer}"
+                    )
+
+                else:
+
+                    st.error(
+                        f"❌ Your answer: "
+                        f"{user_answer or 'Not answered'}"
+                    )
+
+                    st.success(
+                        f"✅ Correct answer: "
+                        f"{question['correct_answer']}"
+                    )
+
+
+                st.info(
+                    f"💡 {question['explanation']}"
+                )
 
 
         # ==================================================
         # NEW QUIZ
         # ==================================================
 
+        st.markdown("")
+
+
         if st.button(
             "🔄 Generate New Quiz",
             type="primary",
-            use_container_width=True
+            use_container_width=True,
+            key="new_quiz_button"
         ):
 
             st.session_state.quiz_data = None
@@ -411,9 +601,7 @@ if st.session_state.quiz_data:
 
             st.session_state.quiz_score = None
 
-            for index in range(
-                len(questions)
-            ):
+            for index in range(15):
 
                 key = f"quiz_answer_{index}"
 
@@ -431,54 +619,51 @@ if st.session_state.quiz_data:
     else:
 
         st.markdown(
-            "### ✍️ Answer the questions"
+            "### ✍️ Answer the Questions"
         )
 
-
-        # --------------------------------------------------
-        # Display questions
-        # --------------------------------------------------
 
         for index, question in enumerate(
             questions
         ):
 
-            st.markdown(
-                f"### Question {index + 1}"
-            )
+            with st.container(
+                border=True
+            ):
 
-            st.write(
-                question["question"]
-            )
+                st.markdown(
+                    f"### Question {index + 1}"
+                )
 
-
-            st.radio(
-                "Choose your answer:",
-                question["options"],
-                key=f"quiz_answer_{index}",
-                index=None
-            )
+                st.write(
+                    question["question"]
+                )
 
 
-            st.markdown("---")
+                st.radio(
+                    "Choose your answer:",
+                    question["options"],
+                    key=f"quiz_answer_{index}",
+                    index=None
+                )
+
+
+        st.markdown("")
 
 
         # ==================================================
-        # SUBMIT QUIZ
+        # SUBMIT
         # ==================================================
 
         if st.button(
             "✅ Submit Quiz",
             type="primary",
-            use_container_width=True
+            use_container_width=True,
+            key="submit_quiz_button"
         ):
 
             score = 0
 
-
-            # ------------------------------------------------
-            # Calculate score
-            # ------------------------------------------------
 
             for index, question in enumerate(
                 questions
@@ -534,20 +719,17 @@ st.divider()
 
 footer1, footer2, footer3 = st.columns(3)
 
-
 with footer1:
 
     st.caption(
         "🧠 Automatic Quiz Generator"
     )
 
-
 with footer2:
 
     st.caption(
         "⚡ Powered by Gemini"
     )
-
 
 with footer3:
 

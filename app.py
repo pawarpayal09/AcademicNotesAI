@@ -1,6 +1,72 @@
 import streamlit as st
 from pathlib import Path
 
+from firebase_manager import (
+    is_authenticated,
+    get_current_user,
+    logout_user
+)
+
+# =====================================================
+# LOGGED-IN USER PROFILE
+# TOP-RIGHT PROFESSIONAL PROFILE BAR
+# =====================================================
+
+if is_authenticated():
+
+    current_user = get_current_user()
+
+    profile_spacer, profile_area = st.columns(
+        [5.8, 1.8],
+        gap="small"
+    )
+
+    with profile_area:
+
+        with st.container(
+            key="home_user_profile"
+        ):
+
+            # -----------------------------------------
+            # USER NAME
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-name">
+                    👤 {current_user['name']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # USER EMAIL
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-email">
+                    {current_user['email']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # LOGOUT
+            # -----------------------------------------
+
+            if st.button(
+                "🚪 Logout",
+                key="home_logout_button",
+                use_container_width=True
+            ):
+
+                logout_user()
+
+                st.rerun()
+
 # =====================================================
 # PAGE CONFIG
 # =====================================================
@@ -221,7 +287,16 @@ with col2:
         use_container_width=True,
         type="primary"
     ):
-        
-        st.switch_page("pages/Chatbot.py")
 
-    
+        if is_authenticated():
+
+            st.switch_page(
+                "pages/Chatbot.py"
+            )
+
+        else:
+
+            st.switch_page(
+                "pages/Login.py"
+            )
+        

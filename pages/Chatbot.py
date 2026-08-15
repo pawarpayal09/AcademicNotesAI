@@ -7,7 +7,76 @@ from speech import text_to_speech
 from pdf_export import generate_chat_pdf
 from favourites_manager import add_favourite
 from speech_to_text import speech_to_text
+from firebase_manager import require_login
 
+require_login()
+
+from firebase_manager import (
+    is_authenticated,
+    get_current_user,
+    logout_user
+)
+
+# =====================================================
+# LOGGED-IN USER PROFILE
+# TOP-RIGHT PROFESSIONAL PROFILE BAR
+# =====================================================
+
+if is_authenticated():
+
+    current_user = get_current_user()
+
+    profile_spacer, profile_area = st.columns(
+        [5.8, 1.8],
+        gap="small"
+    )
+
+    with profile_area:
+
+        with st.container(
+            key="home_user_profile"
+        ):
+
+            # -----------------------------------------
+            # USER NAME
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-name">
+                    👤 {current_user['name']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # USER EMAIL
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-email">
+                    {current_user['email']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # LOGOUT
+            # -----------------------------------------
+
+            if st.button(
+                "🚪 Logout",
+                key="home_logout_button",
+                use_container_width=True
+            ):
+
+                logout_user()
+
+                st.rerun()
+                
 st.set_page_config(
     page_title="Academic Notes AI",
     page_icon="📚",

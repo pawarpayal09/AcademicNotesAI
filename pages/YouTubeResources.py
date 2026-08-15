@@ -1,9 +1,77 @@
 import streamlit as st
+from firebase_manager import require_login
+
+require_login()
 
 from youtube_service import (
     search_youtube_videos
 )
 
+from firebase_manager import (
+    is_authenticated,
+    get_current_user,
+    logout_user
+)
+
+# =====================================================
+# LOGGED-IN USER PROFILE
+# TOP-RIGHT PROFESSIONAL PROFILE BAR
+# =====================================================
+
+if is_authenticated():
+
+    current_user = get_current_user()
+
+    profile_spacer, profile_area = st.columns(
+        [5.8, 1.8],
+        gap="small"
+    )
+
+    with profile_area:
+
+        with st.container(
+            key="home_user_profile"
+        ):
+
+            # -----------------------------------------
+            # USER NAME
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-name">
+                    👤 {current_user['name']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # USER EMAIL
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-email">
+                    {current_user['email']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # LOGOUT
+            # -----------------------------------------
+
+            if st.button(
+                "🚪 Logout",
+                key="home_logout_button",
+                use_container_width=True
+            ):
+
+                logout_user()
+
+                st.rerun()
 
 # ==========================================================
 # PAGE CONFIG
@@ -16,6 +84,32 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ==========================================================
+# LOAD SHARED CSS
+# ==========================================================
+
+import os
+
+css_path = os.path.join(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    ),
+    "css",
+    "style.css"
+)
+
+if os.path.exists(css_path):
+
+    with open(
+        css_path,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
 
 # ==========================================================
 # SIDEBAR

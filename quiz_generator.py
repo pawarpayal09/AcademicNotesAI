@@ -21,15 +21,15 @@ load_dotenv()
 class QuizQuestion(BaseModel):
 
     question: str = Field(
-        description="The multiple-choice question."
+        description="A clear academic multiple-choice question."
     )
 
     options: list[str] = Field(
-        description="Exactly four answer options."
+        description="Exactly four concise answer options."
     )
 
     correct_answer: str = Field(
-        description="The exact correct option text."
+        description="The exact text of the correct option."
     )
 
     explanation: str = Field(
@@ -40,11 +40,11 @@ class QuizQuestion(BaseModel):
 class QuizResponse(BaseModel):
 
     topic: str = Field(
-        description="The quiz topic."
+        description="The requested quiz topic."
     )
 
     questions: list[QuizQuestion] = Field(
-        description="The generated quiz questions."
+        description="The generated multiple-choice questions."
     )
 
 
@@ -81,7 +81,7 @@ def get_quiz_api_key():
 
 
     # ------------------------------------------------------
-    # Clean API key
+    # Clean key
     # ------------------------------------------------------
 
     if api_key:
@@ -90,6 +90,144 @@ def get_quiz_api_key():
 
 
     return api_key
+
+
+# ==========================================================
+# DIFFICULTY INSTRUCTIONS
+# ==========================================================
+
+def get_difficulty_instruction(difficulty):
+
+    if difficulty == "Easy":
+
+        return """
+Difficulty requirements:
+
+- Ask basic definition and recognition questions.
+- Test fundamental concepts.
+- Use direct and simple wording.
+- Do not require calculations unless very simple.
+- Options should be clearly distinguishable.
+"""
+
+    if difficulty == "Medium":
+
+        return """
+Difficulty requirements:
+
+- Test understanding, not only memorization.
+- Ask conceptual application questions.
+- Include comparisons, relationships, or simple scenarios.
+- Make distractors plausible but clearly incorrect.
+- Avoid overly advanced calculations.
+- Keep the questions suitable for MCA/college students.
+"""
+
+    return """
+Difficulty requirements:
+
+- Test deeper conceptual understanding.
+- Use application-based or scenario-based questions.
+- Ask students to analyze, compare, infer, or choose the best solution.
+- Distractors should be plausible and require careful thinking.
+- Avoid ambiguous wording.
+- Do not make questions unnecessarily long.
+- Keep the questions suitable for MCA/college-level study.
+"""
+
+
+# ==========================================================
+# VALIDATE GENERATED QUESTIONS
+# ==========================================================
+
+def validate_questions(
+    questions,
+    requested_count
+):
+
+    valid_questions = []
+
+    seen_questions = set()
+
+
+    for question in questions:
+
+        # --------------------------------------------------
+        # Clean values
+        # --------------------------------------------------
+
+        question.question = question.question.strip()
+
+        question.correct_answer = (
+            question.correct_answer.strip()
+        )
+
+        question.explanation = (
+            question.explanation.strip()
+        )
+
+        question.options = [
+            option.strip()
+            for option in question.options
+        ]
+
+
+        # --------------------------------------------------
+        # Exactly four options
+        # --------------------------------------------------
+
+        if len(question.options) != 4:
+            continue
+
+
+        # --------------------------------------------------
+        # Remove empty options
+        # --------------------------------------------------
+
+        if any(
+            not option
+            for option in question.options
+        ):
+            continue
+
+
+        # --------------------------------------------------
+        # Correct answer must exist
+        # --------------------------------------------------
+
+        if (
+            question.correct_answer
+            not in question.options
+        ):
+            continue
+
+
+        # --------------------------------------------------
+        # Avoid duplicate questions
+        # --------------------------------------------------
+
+        normalized_question = (
+            question.question.lower()
+            .strip()
+        )
+
+        if normalized_question in seen_questions:
+            continue
+
+        seen_questions.add(
+            normalized_question
+        )
+
+        valid_questions.append(
+            question
+        )
+
+
+        if len(valid_questions) >= requested_count:
+            break
+
+
+    return valid_questions
 
 
 # ==========================================================
@@ -106,7 +244,8 @@ def generate_quiz(
     # Validate topic
     # ------------------------------------------------------
 
-    topic = topic.strip()
+    topic = str(topic).strip()
+
 
     if not topic:
 
@@ -123,6 +262,7 @@ def generate_quiz(
 
     api_key = get_quiz_api_key()
 
+
     if not api_key:
 
         return {
@@ -138,10 +278,21 @@ def generate_quiz(
     # Safe question count
     # ------------------------------------------------------
 
+    try:
+
+        number_of_questions = int(
+            number_of_questions
+        )
+
+    except (TypeError, ValueError):
+
+        number_of_questions = 5
+
+
     number_of_questions = max(
         3,
         min(
-            int(number_of_questions),
+            number_of_questions,
             15
         )
     )
@@ -151,15 +302,23 @@ def generate_quiz(
     # Validate difficulty
     # ------------------------------------------------------
 
-    allowed_difficulties = [
+    allowed_difficulties = {
         "Easy",
         "Medium",
         "Hard"
-    ]
+    }
+
 
     if difficulty not in allowed_difficulties:
 
         difficulty = "Medium"
+
+
+    difficulty_instruction = (
+        get_difficulty_instruction(
+            difficulty
+        )
+    )
 
 
     try:
@@ -174,41 +333,43 @@ def generate_quiz(
 
 
         # ==================================================
-        # QUIZ PROMPT
+        # PROMPT
         # ==================================================
 
         prompt = f"""
-Create a high-quality academic multiple-choice quiz.
+Create an academic multiple-choice quiz.
 
-Topic:
+TOPIC:
 {topic}
 
-Number of questions:
+QUESTION COUNT:
 {number_of_questions}
 
-Difficulty:
+DIFFICULTY:
 {difficulty}
 
-IMPORTANT RULES:
+{difficulty_instruction}
 
-1. Questions must be directly related to the given topic.
-2. Target college/MCA students.
-3. Questions must test actual understanding.
-4. Create exactly four options for every question.
-5. Only one option must be correct.
-6. The correct_answer must exactly match one of the four options.
-7. Do not create duplicate questions.
-8. Avoid ambiguous questions.
-9. Keep questions concise and clear.
-10. Provide a short explanation for every answer.
-11. Do not use information unrelated to the requested topic.
-12. Do not include question numbers inside the question text.
-13. Return exactly {number_of_questions} questions.
+GENERAL RULES:
+
+1. Create exactly four options per question.
+2. Only one option can be correct.
+3. The correct_answer must exactly match one option.
+4. Do not repeat questions.
+5. Do not create trick questions.
+6. Do not use ambiguous wording.
+7. Questions must stay focused on the requested topic.
+8. Use concise wording.
+9. Keep each explanation short and useful.
+10. Do not include question numbers in the question field.
+11. Do not add any text outside the requested structured output.
+12. Return as many valid questions as possible, up to the requested count.
+13. The quiz is for MCA/college students.
 """
 
 
         # ==================================================
-        # STRUCTURED GEMINI RESPONSE
+        # STRUCTURED RESPONSE
         # ==================================================
 
         response = client.models.generate_content(
@@ -223,87 +384,103 @@ IMPORTANT RULES:
 
                 response_schema=QuizResponse,
 
-                max_output_tokens=6000
+                temperature=0.3,
+
+                max_output_tokens=8000
             )
         )
 
 
         # ==================================================
-        # CHECK RESPONSE
+        # EMPTY RESPONSE
         # ==================================================
 
-        if not response or not response.text:
+        if not response:
 
             return {
                 "success": False,
                 "error": (
-                    "Gemini returned an empty quiz response."
+                    "Gemini returned no response."
+                ),
+                "quiz": None
+            }
+
+
+        if not response.text:
+
+            return {
+                "success": False,
+                "error": (
+                    "Gemini returned an empty quiz response. "
+                    "Please try again."
                 ),
                 "quiz": None
             }
 
 
         # ==================================================
-        # PARSE STRUCTURED RESPONSE
+        # PARSE RESPONSE
         # ==================================================
 
-        quiz = QuizResponse.model_validate_json(
-            response.text
-        )
+        try:
+
+            quiz = QuizResponse.model_validate_json(
+                response.text
+            )
+
+        except Exception as parse_error:
+
+            print(
+                "Quiz parsing error:",
+                parse_error
+            )
+
+            return {
+                "success": False,
+                "error": (
+                    "Gemini generated an invalid quiz format. "
+                    "Please try again."
+                ),
+                "quiz": None
+            }
 
 
         # ==================================================
         # VALIDATE QUESTIONS
         # ==================================================
 
-        if len(quiz.questions) == 0:
-
-            return {
-                "success": False,
-                "error": (
-                    "No quiz questions were generated."
-                ),
-                "quiz": None
-            }
+        valid_questions = validate_questions(
+            quiz.questions,
+            number_of_questions
+        )
 
 
-        valid_questions = []
-
-
-        for question in quiz.questions:
-
-            # Must have exactly 4 options
-            if len(question.options) != 4:
-                continue
-
-            # Correct answer must exist in options
-            if question.correct_answer not in question.options:
-                continue
-
-            valid_questions.append(
-                question
-            )
-
-
-        # --------------------------------------------------
-        # Final validation
-        # --------------------------------------------------
+        # ==================================================
+        # NO VALID QUESTIONS
+        # ==================================================
 
         if not valid_questions:
 
             return {
                 "success": False,
                 "error": (
-                    "Gemini generated an invalid quiz format."
+                    "No valid quiz questions were generated. "
+                    "Please try again."
                 ),
                 "quiz": None
             }
 
 
-        quiz.questions = valid_questions[
-            :number_of_questions
-        ]
+        # ==================================================
+        # UPDATE QUIZ
+        # ==================================================
 
+        quiz.questions = valid_questions
+
+
+        # ==================================================
+        # RETURN
+        # ==================================================
 
         return {
             "success": True,
@@ -312,19 +489,68 @@ IMPORTANT RULES:
         }
 
 
+    # ======================================================
+    # GEMINI / SYSTEM ERROR
+    # ======================================================
+
     except Exception as e:
 
+        error_type = type(e).__name__
+        error_message = str(e)
+
+
         print(
-            "Quiz Generator Error:",
-            type(e).__name__,
-            str(e)
+            "\n========== QUIZ GENERATOR ERROR =========="
         )
+
+        print(
+            "Error Type:",
+            error_type
+        )
+
+        print(
+            "Error:",
+            error_message
+        )
+
+        print(
+            "==========================================\n"
+        )
+
+
+        # --------------------------------------------------
+        # Quota error
+        # --------------------------------------------------
+
+        if (
+            "429" in error_message
+            or
+            "RESOURCE_EXHAUSTED" in error_message
+            or
+            "quota" in error_message.lower()
+        ):
+
+            return {
+                "success": False,
+                "error": (
+                    "⚠️ Gemini quota is currently "
+                    "exhausted for this model/API key.\n\n"
+                    "Please wait for the quota to reset "
+                    "or use another available Gemini model."
+                ),
+                "quiz": None
+            }
+
+
+        # --------------------------------------------------
+        # Other errors
+        # --------------------------------------------------
 
         return {
             "success": False,
             "error": (
-                "Unable to generate the quiz.\n\n"
-                f"{type(e).__name__}: {str(e)}"
+                f"Unable to generate the quiz.\n\n"
+                f"{error_type}: {error_message}"
             ),
             "quiz": None
         }
