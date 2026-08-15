@@ -1,19 +1,69 @@
+import os
 import streamlit as st
-from quiz_generator import generate_quiz
-from firebase_manager import require_login
 
-require_login()
+from quiz_generator import generate_quiz
 
 from firebase_manager import (
+    require_login,
     is_authenticated,
     get_current_user,
     logout_user
 )
 
-# =====================================================
+from progress_manager import (
+    record_quiz_result
+)
+
+
+# ==========================================================
+# PAGE CONFIG
+# ==========================================================
+
+st.set_page_config(
+    page_title="Automatic Quiz Generator",
+    page_icon="🧠",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+
+# ==========================================================
+# LOGIN REQUIRED
+# ==========================================================
+
+require_login()
+
+
+# ==========================================================
+# LOAD SHARED CSS
+# ==========================================================
+
+css_path = os.path.join(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    ),
+    "css",
+    "style.css"
+)
+
+if os.path.exists(css_path):
+
+    with open(
+        css_path,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
+
+# ==========================================================
 # LOGGED-IN USER PROFILE
 # TOP-RIGHT PROFESSIONAL PROFILE BAR
-# =====================================================
+# ==========================================================
 
 if is_authenticated():
 
@@ -70,45 +120,6 @@ if is_authenticated():
 
                 st.rerun()
 
-# ==========================================================
-# PAGE CONFIG
-# ==========================================================
-
-st.set_page_config(
-    page_title="Automatic Quiz Generator",
-    page_icon="🧠",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-
-# ==========================================================
-# LOAD SHARED CSS
-# ==========================================================
-
-import os
-
-css_path = os.path.join(
-    os.path.dirname(
-        os.path.dirname(__file__)
-    ),
-    "css",
-    "style.css"
-)
-
-if os.path.exists(css_path):
-
-    with open(
-        css_path,
-        "r",
-        encoding="utf-8"
-    ) as f:
-
-        st.markdown(
-            f"<style>{f.read()}</style>",
-            unsafe_allow_html=True
-        )
-
 
 # ==========================================================
 # SESSION STATE
@@ -140,56 +151,85 @@ if "quiz_difficulty" not in st.session_state:
 
 with st.sidebar:
 
-    st.markdown("""
-    # 📚 Academic Notes AI
+    st.markdown(
+        """
+        # 📚 Academic Notes AI
 
-    ### Learn Smarter with AI
-    """)
-
-    st.divider()
-
-    st.info("""
-    ### 🤖 About
-
-    An AI-powered academic assistant that helps students:
-
-    - 📚 Search academic notes
-    - 📄 Chat with uploaded PDFs
-    - 🧠 Learn difficult concepts
-    - ⚡ Get instant answers
-    """)
+        ### Learn Smarter with AI
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 🚀 Technologies")
+    st.info(
+        """
+        ### 🤖 About
 
-    st.success("🤖 Google Gemini")
-    st.success("🦜 LangChain")
-    st.success("📚 FAISS")
-    st.success("🧠 RAG")
-    st.success("🧠 Quiz Generator")
-    st.success("⚡ Streamlit")
+        An AI-powered academic assistant that helps students:
+
+        - 📚 Search academic notes
+        - 📄 Chat with uploaded PDFs
+        - 🧠 Learn difficult concepts
+        - ⚡ Get instant answers
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 👩‍💻 Developer")
+    st.markdown(
+        "### 🚀 Technologies"
+    )
 
-    st.info("""
-    **Payal Pawar**
+    st.success(
+        "🤖 Google Gemini"
+    )
 
-    🎓 MCA Student
+    st.success(
+        "🦜 LangChain"
+    )
 
-    Academic Notes AI
+    st.success(
+        "📚 FAISS"
+    )
 
-    Version 1.0
-    """)
+    st.success(
+        "🧠 RAG"
+    )
+
+    st.success(
+        "🧠 Quiz Generator"
+    )
+
+    st.success(
+        "⚡ Streamlit"
+    )
+
+    st.divider()
+
+    st.markdown(
+        "### 👩‍💻 Developer"
+    )
+
+    st.info(
+        """
+        **Payal Pawar**
+
+        🎓 MCA Student
+
+        Academic Notes AI
+
+        Version 1.0
+        """
+    )
 
 
 # ==========================================================
 # PAGE HEADER
 # ==========================================================
 
-st.title("🧠 Automatic Quiz Generator")
+st.title(
+    "🧠 Automatic Quiz Generator"
+)
 
 st.write(
     "Enter any academic topic and generate an "
@@ -203,7 +243,9 @@ st.divider()
 # QUIZ SETTINGS
 # ==========================================================
 
-st.markdown("### ⚙️ Quiz Settings")
+st.markdown(
+    "### ⚙️ Quiz Settings"
+)
 
 
 settings_col1, settings_col2, settings_col3 = (
@@ -255,7 +297,9 @@ with settings_col3:
 
 
 # Keep selected settings
+
 st.session_state.quiz_topic = topic
+
 st.session_state.quiz_difficulty = difficulty
 
 
@@ -286,7 +330,9 @@ with quick1:
         )
 
         st.session_state.quiz_data = None
+
         st.session_state.quiz_submitted = False
+
         st.session_state.quiz_score = None
 
         st.rerun()
@@ -302,7 +348,9 @@ with quick2:
         st.session_state.quiz_topic = "DBMS"
 
         st.session_state.quiz_data = None
+
         st.session_state.quiz_submitted = False
+
         st.session_state.quiz_score = None
 
         st.rerun()
@@ -320,7 +368,9 @@ with quick3:
         )
 
         st.session_state.quiz_data = None
+
         st.session_state.quiz_submitted = False
+
         st.session_state.quiz_score = None
 
         st.rerun()
@@ -336,7 +386,9 @@ with quick4:
         st.session_state.quiz_topic = "Python"
 
         st.session_state.quiz_data = None
+
         st.session_state.quiz_submitted = False
+
         st.session_state.quiz_score = None
 
         st.rerun()
@@ -396,7 +448,9 @@ if st.button(
 
             st.session_state.quiz_score = None
 
+
             # Clear old answers
+
             for index in range(15):
 
                 key = f"quiz_answer_{index}"
@@ -404,6 +458,7 @@ if st.button(
                 if key in st.session_state:
 
                     del st.session_state[key]
+
 
             st.rerun()
 
@@ -445,13 +500,20 @@ if st.session_state.quiz_data:
 
     if st.session_state.quiz_submitted:
 
-        score = st.session_state.quiz_score or 0
+        score = (
+            st.session_state.quiz_score
+            or 0
+        )
 
         total = len(questions)
 
-        percentage = round(
-            (score / total) * 100
-        ) if total else 0
+        percentage = (
+            round(
+                (score / total) * 100
+            )
+            if total
+            else 0
+        )
 
 
         # ==================================================
@@ -483,6 +545,7 @@ if st.session_state.quiz_data:
         with score3:
 
             correct_count = score
+
             wrong_count = total - score
 
             st.metric(
@@ -491,9 +554,9 @@ if st.session_state.quiz_data:
             )
 
 
-        # --------------------------------------------------
-        # Large result message
-        # --------------------------------------------------
+        # ==================================================
+        # RESULT MESSAGE
+        # ==================================================
 
         if percentage >= 80:
 
@@ -601,6 +664,7 @@ if st.session_state.quiz_data:
 
             st.session_state.quiz_score = None
 
+
             for index in range(15):
 
                 key = f"quiz_answer_{index}"
@@ -608,6 +672,7 @@ if st.session_state.quiz_data:
                 if key in st.session_state:
 
                     del st.session_state[key]
+
 
             st.rerun()
 
@@ -652,7 +717,7 @@ if st.session_state.quiz_data:
 
 
         # ==================================================
-        # SUBMIT
+        # SUBMIT QUIZ
         # ==================================================
 
         if st.button(
@@ -664,6 +729,10 @@ if st.session_state.quiz_data:
 
             score = 0
 
+
+            # ------------------------------------------------
+            # Calculate score
+            # ------------------------------------------------
 
             for index, question in enumerate(
                 questions
@@ -682,9 +751,30 @@ if st.session_state.quiz_data:
                     score += 1
 
 
+            # ==================================================
+            # SAVE SCORE IN SESSION STATE
+            # ==================================================
+
             st.session_state.quiz_score = score
 
             st.session_state.quiz_submitted = True
+
+
+            # ==================================================
+            # RECORD QUIZ FOR DASHBOARD
+            # ==================================================
+
+            record_quiz_result(
+                topic=quiz["topic"],
+                difficulty=st.session_state.quiz_difficulty,
+                score=score,
+                total_questions=len(questions)
+            )
+
+
+            # ==================================================
+            # SHOW RESULT
+            # ==================================================
 
             st.rerun()
 
@@ -717,7 +807,11 @@ else:
 
 st.divider()
 
-footer1, footer2, footer3 = st.columns(3)
+
+footer1, footer2, footer3 = st.columns(
+    3
+)
+
 
 with footer1:
 
@@ -725,11 +819,13 @@ with footer1:
         "🧠 Automatic Quiz Generator"
     )
 
+
 with footer2:
 
     st.caption(
         "⚡ Powered by Gemini"
     )
+
 
 with footer3:
 

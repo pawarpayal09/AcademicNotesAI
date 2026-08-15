@@ -97,8 +97,6 @@ def get_google_api_keys():
     for key_name in [
         "MAIN_CHAT_API_KEY_5",
         "IMAGE_STUDY_API_KEY_4",
-        "Text_to_Speech_API_KEY_3",
-        "Speech_to_Text_API_KEY_2",
         "MAIN_CHAT_API_KEY_1"
     ]:
 
@@ -114,8 +112,6 @@ def get_google_api_keys():
     for key_name in [
         "MAIN_CHAT_API_KEY_5",
         "IMAGE_STUDY_API_KEY_4",
-        "Text_to_Speech_API_KEY_3",
-        "Speech_to_Text_API_KEY_2",
         "MAIN_CHAT_API_KEY_1"
     ]:
 

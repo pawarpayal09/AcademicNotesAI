@@ -1,22 +1,77 @@
+import os
 import streamlit as st
-from firebase_manager import require_login
-
-require_login()
-
-from youtube_service import (
-    search_youtube_videos
-)
 
 from firebase_manager import (
+    require_login,
     is_authenticated,
     get_current_user,
     logout_user
 )
 
-# =====================================================
+from youtube_service import (
+    search_youtube_videos
+)
+
+from progress_manager import (
+    record_youtube_search
+)
+
+
+# ==========================================================
+# PAGE CONFIG
+# ==========================================================
+
+st.set_page_config(
+    page_title="YouTube Learning Resources",
+    page_icon="🎥",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+
+# ==========================================================
+# LOGIN REQUIRED
+# ==========================================================
+
+require_login()
+
+
+# ==========================================================
+# LOAD SHARED CSS
+# ==========================================================
+
+css_path = os.path.join(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    ),
+    "css",
+    "style.css"
+)
+
+if os.path.exists(css_path):
+
+    with open(
+        css_path,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
+else:
+
+    st.warning(
+        f"⚠️ CSS file not found: {css_path}"
+    )
+
+
+# ==========================================================
 # LOGGED-IN USER PROFILE
 # TOP-RIGHT PROFESSIONAL PROFILE BAR
-# =====================================================
+# ==========================================================
 
 if is_authenticated():
 
@@ -73,43 +128,6 @@ if is_authenticated():
 
                 st.rerun()
 
-# ==========================================================
-# PAGE CONFIG
-# ==========================================================
-
-st.set_page_config(
-    page_title="YouTube Learning Resources",
-    page_icon="🎥",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# ==========================================================
-# LOAD SHARED CSS
-# ==========================================================
-
-import os
-
-css_path = os.path.join(
-    os.path.dirname(
-        os.path.dirname(__file__)
-    ),
-    "css",
-    "style.css"
-)
-
-if os.path.exists(css_path):
-
-    with open(
-        css_path,
-        "r",
-        encoding="utf-8"
-    ) as f:
-
-        st.markdown(
-            f"<style>{f.read()}</style>",
-            unsafe_allow_html=True
-        )
 
 # ==========================================================
 # SIDEBAR
@@ -117,56 +135,85 @@ if os.path.exists(css_path):
 
 with st.sidebar:
 
-    st.markdown("""
-    # 📚 Academic Notes AI
+    st.markdown(
+        """
+        # 📚 Academic Notes AI
 
-    ### Learn Smarter with AI
-    """)
-
-    st.divider()
-
-    st.info("""
-    ### 🤖 About
-
-    An AI-powered academic assistant that helps students:
-
-    - 📚 Search academic notes
-    - 📄 Chat with uploaded PDFs
-    - 🧠 Learn difficult concepts
-    - ⚡ Get instant answers
-    """)
+        ### Learn Smarter with AI
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 🚀 Technologies")
+    st.info(
+        """
+        ### 🤖 About
 
-    st.success("🤖 Google Gemini")
-    st.success("🦜 LangChain")
-    st.success("📚 FAISS")
-    st.success("🧠 RAG")
-    st.success("🎥 YouTube API")
-    st.success("⚡ Streamlit")
+        An AI-powered academic assistant that helps students:
+
+        - 📚 Search academic notes
+        - 📄 Chat with uploaded PDFs
+        - 🧠 Learn difficult concepts
+        - ⚡ Get instant answers
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 👩‍💻 Developer")
+    st.markdown(
+        "### 🚀 Technologies"
+    )
 
-    st.info("""
-    **Payal Pawar**
+    st.success(
+        "🤖 Google Gemini"
+    )
 
-    🎓 MCA Student
+    st.success(
+        "🦜 LangChain"
+    )
 
-    Academic Notes AI
+    st.success(
+        "📚 FAISS"
+    )
 
-    Version 1.0
-    """)
+    st.success(
+        "🧠 RAG"
+    )
+
+    st.success(
+        "🎥 YouTube API"
+    )
+
+    st.success(
+        "⚡ Streamlit"
+    )
+
+    st.divider()
+
+    st.markdown(
+        "### 👩‍💻 Developer"
+    )
+
+    st.info(
+        """
+        **Payal Pawar**
+
+        🎓 MCA Student
+
+        Academic Notes AI
+
+        Version 1.0
+        """
+    )
 
 
 # ==========================================================
 # PAGE HEADER
 # ==========================================================
 
-st.title("🎥 YouTube Learning Resources")
+st.title(
+    "🎥 YouTube Learning Resources"
+)
 
 st.write(
     "Find educational YouTube videos related to your "
@@ -180,7 +227,9 @@ st.divider()
 # INTRODUCTION
 # ==========================================================
 
-info_col1, info_col2, info_col3 = st.columns(3)
+info_col1, info_col2, info_col3 = st.columns(
+    3
+)
 
 
 with info_col1:
@@ -219,7 +268,10 @@ with info_col3:
     )
 
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown(
+    "<br>",
+    unsafe_allow_html=True
+)
 
 
 # ==========================================================
@@ -232,7 +284,8 @@ st.markdown(
 
 
 search_col1, search_col2 = st.columns(
-    [4, 1]
+    [4, 1],
+    gap="small"
 )
 
 
@@ -266,7 +319,10 @@ st.markdown(
 )
 
 
-quick1, quick2, quick3, quick4 = st.columns(4)
+quick1, quick2, quick3, quick4 = st.columns(
+    4,
+    gap="small"
+)
 
 
 def run_topic_search(topic):
@@ -413,6 +469,17 @@ if query:
 
     else:
 
+        # --------------------------------------------------
+        # DASHBOARD TRACKING
+        # --------------------------------------------------
+        # Record the search only when the YouTube API
+        # successfully returns learning resources.
+
+        record_youtube_search(
+            topic=query
+        )
+
+
         st.success(
             f"✅ Found {len(result['videos'])} "
             f"learning resources."
@@ -425,7 +492,7 @@ if query:
         ):
 
             # ------------------------------------------------
-            # Video card
+            # VIDEO CARD
             # ------------------------------------------------
 
             card_col1, card_col2 = st.columns(
@@ -435,7 +502,7 @@ if query:
 
 
             # ------------------------------------------------
-            # Thumbnail
+            # THUMBNAIL
             # ------------------------------------------------
 
             with card_col1:
@@ -449,7 +516,7 @@ if query:
 
 
             # ------------------------------------------------
-            # Details
+            # DETAILS
             # ------------------------------------------------
 
             with card_col2:
@@ -471,6 +538,7 @@ if query:
                         video["published_at"]
                         .split("T")[0]
                     )
+
 
                     st.caption(
                         f"📅 Published: "
@@ -523,7 +591,10 @@ else:
 
 st.divider()
 
-footer1, footer2, footer3 = st.columns(3)
+
+footer1, footer2, footer3 = st.columns(
+    3
+)
 
 
 with footer1:

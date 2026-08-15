@@ -1,19 +1,66 @@
+import os
 import streamlit as st
 from pathlib import Path
-from firebase_manager import require_login
 
-require_login()
+from firebase_manager import (
+    require_login,
+    is_authenticated,
+    get_current_user,
+    logout_user
+)
 
 from favourites_manager import (
     load_favourites,
     remove_favourite
 )
 
-from firebase_manager import (
-    is_authenticated,
-    get_current_user,
-    logout_user
+
+# =====================================================
+# PAGE CONFIG
+# =====================================================
+
+st.set_page_config(
+    page_title="Saved Notes",
+    page_icon="📌",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
+
+
+# =====================================================
+# LOGIN REQUIRED
+# =====================================================
+
+require_login()
+
+
+# =====================================================
+# LOAD SHARED CSS
+# =====================================================
+
+css_file = Path(
+    os.path.join(
+        os.path.dirname(
+            os.path.dirname(__file__)
+        ),
+        "css",
+        "style.css"
+    )
+)
+
+if css_file.exists():
+
+    with open(
+        css_file,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
 
 # =====================================================
 # LOGGED-IN USER PROFILE
@@ -75,39 +122,6 @@ if is_authenticated():
 
                 st.rerun()
 
-# =====================================================
-# PAGE CONFIG
-# =====================================================
-
-st.set_page_config(
-    page_title="Saved Notes",
-    page_icon="📌",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-
-# =====================================================
-# LOAD SHARED CSS
-# =====================================================
-
-css_file = Path(
-    "css/style.css"
-)
-
-if css_file.exists():
-
-    with open(
-        css_file,
-        "r",
-        encoding="utf-8"
-    ) as f:
-
-        st.markdown(
-            f"<style>{f.read()}</style>",
-            unsafe_allow_html=True
-        )
-
 
 # =====================================================
 # SIDEBAR
@@ -115,48 +129,72 @@ if css_file.exists():
 
 with st.sidebar:
 
-    st.markdown("""
-    # 📚 Academic Notes AI
+    st.markdown(
+        """
+        # 📚 Academic Notes AI
 
-    ### Learn Smarter with AI
-    """)
-
-    st.divider()
-
-    st.info("""
-    ### 🤖 About
-
-    An AI-powered academic assistant that helps students:
-
-    - 📚 Search academic notes
-    - 📄 Chat with uploaded PDFs
-    - 🧠 Learn difficult concepts
-    - ⚡ Get instant answers
-    """)
+        ### Learn Smarter with AI
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 🚀 Technologies")
+    st.info(
+        """
+        ### 🤖 About
 
-    st.success("🤖 Google Gemini")
-    st.success("🦜 LangChain")
-    st.success("📚 FAISS")
-    st.success("🧠 RAG")
-    st.success("⚡ Streamlit")
+        An AI-powered academic assistant that helps students:
+
+        - 📚 Search academic notes
+        - 📄 Chat with uploaded PDFs
+        - 🧠 Learn difficult concepts
+        - ⚡ Get instant answers
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 👩‍💻 Developer")
+    st.markdown(
+        "### 🚀 Technologies"
+    )
 
-    st.info("""
-    **Payal Pawar**
+    st.success(
+        "🤖 Google Gemini"
+    )
 
-    🎓 MCA Student
+    st.success(
+        "🦜 LangChain"
+    )
 
-    Academic Notes AI
+    st.success(
+        "📚 FAISS"
+    )
 
-    Version 1.0
-    """)
+    st.success(
+        "🧠 RAG"
+    )
+
+    st.success(
+        "⚡ Streamlit"
+    )
+
+    st.divider()
+
+    st.markdown(
+        "### 👩‍💻 Developer"
+    )
+
+    st.info(
+        """
+        **Payal Pawar**
+
+        🎓 MCA Student
+
+        Academic Notes AI
+
+        Version 1.0
+        """
+    )
 
 
 # =====================================================
@@ -184,7 +222,9 @@ with st.container(
 
     if not favorites:
 
-        st.title("📌 Saved Notes")
+        st.title(
+            "📌 Saved Notes"
+        )
 
         st.info(
             "⭐ No favorite notes saved yet."
@@ -213,7 +253,9 @@ with st.container(
 
     with header_left:
 
-        st.title("📌 Saved Notes")
+        st.title(
+            "📌 Saved Notes"
+        )
 
         st.caption(
             "Your personal library of important AI answers."
@@ -263,9 +305,7 @@ with st.container(
 
     search = st.text_input(
         "Search",
-        placeholder=(
-            "Search by question..."
-        ),
+        placeholder="Search by question...",
         label_visibility="collapsed"
     )
 
@@ -285,14 +325,15 @@ with st.container(
 
         if not search.strip():
 
-            filtered.append(fav)
+            filtered.append(
+                fav
+            )
 
-        elif (
-            search.lower()
-            in question.lower()
-        ):
+        elif search.lower() in question.lower():
 
-            filtered.append(fav)
+            filtered.append(
+                fav
+            )
 
 
     # =================================================
@@ -340,7 +381,7 @@ with st.container(
 
 
                 # -----------------------------------------
-                # NOTES TITLE
+                # NOTE TITLE
                 # -----------------------------------------
 
                 with note_col1:
@@ -360,9 +401,7 @@ with st.container(
 
                     else:
 
-                        display_question = (
-                            question
-                        )
+                        display_question = question
 
 
                     st.markdown(
@@ -385,18 +424,23 @@ with st.container(
                     )
 
 
-                # ---------------------------------------------
+                # -----------------------------------------
                 # ACTIONS
-                # ---------------------------------------------
+                # -----------------------------------------
 
                 with note_col3:
 
-                    with st.container(key=f"saved_note_actions_{fav['id']}"):
+                    with st.container(
+                        key=f"saved_note_actions_{fav['id']}"
+                    ):
 
-                        action_open, action_remove = st.columns(
-                            [1, 1],
-                            gap="small"
+                        action_open, action_remove = (
+                            st.columns(
+                                [1, 1],
+                                gap="small"
+                            )
                         )
+
 
                         with action_open:
 
@@ -406,6 +450,7 @@ with st.container(
                                 help="Open saved note",
                                 use_container_width=True
                             )
+
 
                         with action_remove:
 
@@ -417,12 +462,22 @@ with st.container(
                             )
 
 
+                    # -----------------------------------------
+                    # OPEN
+                    # -----------------------------------------
+
                     if open_clicked:
 
-                        st.session_state.selected_favorite = fav
+                        st.session_state.selected_favorite = (
+                            fav
+                        )
 
                         st.rerun()
 
+
+                    # -----------------------------------------
+                    # REMOVE
+                    # -----------------------------------------
 
                     if remove_clicked:
 
@@ -433,10 +488,12 @@ with st.container(
                         if (
                             st.session_state.selected_favorite
                             and
-                            st.session_state.selected_favorite["id"] == fav["id"]
+                            st.session_state.selected_favorite["id"]
+                            == fav["id"]
                         ):
 
                             st.session_state.selected_favorite = None
+
 
                         st.toast(
                             "Note removed",
@@ -444,6 +501,7 @@ with st.container(
                         )
 
                         st.rerun()
+
 
                 st.divider()
 
@@ -570,16 +628,15 @@ with st.container(
             if st.button(
                 "🗑 Remove From Saved Notes",
                 type="primary",
-                use_container_width=True
+                use_container_width=True,
+                key="remove_selected_saved_note"
             ):
 
                 remove_favourite(
                     fav["id"]
                 )
 
-                st.session_state.selected_favorite = (
-                    None
-                )
+                st.session_state.selected_favorite = None
 
                 st.toast(
                     "Note removed successfully",
@@ -616,7 +673,9 @@ with st.container(
 
     st.divider()
 
-    footer1, footer2, footer3 = st.columns(3)
+    footer1, footer2, footer3 = st.columns(
+        3
+    )
 
     with footer1:
 

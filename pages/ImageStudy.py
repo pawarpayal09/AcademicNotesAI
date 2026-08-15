@@ -1,21 +1,95 @@
 import os
 import streamlit as st
 import streamlit.components.v1 as components
-from image_processor import analyze_study_image
-from firebase_manager import require_login
 
-require_login()
+from image_processor import analyze_study_image
 
 from firebase_manager import (
+    require_login,
     is_authenticated,
     get_current_user,
     logout_user
 )
 
-# =====================================================
+from progress_manager import (
+    record_image_study
+)
+
+
+# ==========================================================
+# PAGE CONFIG
+# ==========================================================
+
+st.set_page_config(
+    page_title="Image Study Assistant",
+    page_icon="🖼️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+
+# ==========================================================
+# LOGIN REQUIRED
+# ==========================================================
+
+require_login()
+
+
+# ==========================================================
+# LOAD SHARED CSS
+# ==========================================================
+
+def load_css():
+
+    css_path = os.path.join(
+        os.path.dirname(
+            os.path.dirname(__file__)
+        ),
+        "css",
+        "style.css"
+    )
+
+    if os.path.exists(css_path):
+
+        with open(
+            css_path,
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            st.markdown(
+                f"<style>{f.read()}</style>",
+                unsafe_allow_html=True
+            )
+
+    else:
+
+        st.warning(
+            f"⚠️ CSS file not found: {css_path}"
+        )
+
+
+load_css()
+
+
+# ==========================================================
+# IMAGE STUDY SESSION STATE
+# ==========================================================
+
+if "image_answer" not in st.session_state:
+
+    st.session_state.image_answer = None
+
+
+if "image_instruction" not in st.session_state:
+
+    st.session_state.image_instruction = None
+
+
+# ==========================================================
 # LOGGED-IN USER PROFILE
 # TOP-RIGHT PROFESSIONAL PROFILE BAR
-# =====================================================
+# ==========================================================
 
 if is_authenticated():
 
@@ -72,54 +146,6 @@ if is_authenticated():
 
                 st.rerun()
 
-# ==========================================================
-# PAGE CONFIG
-# ==========================================================
-
-st.set_page_config(
-    page_title="Image Study Assistant",
-    page_icon="🖼️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# ==========================================================
-# IMAGE STUDY SESSION STATE
-# ==========================================================
-
-if "image_answer" not in st.session_state:
-    st.session_state.image_answer = None
-
-if "image_instruction" not in st.session_state:
-    st.session_state.image_instruction = None
-
-# =====================================================
-# LOAD SHARED CSS
-# =====================================================
-
-def load_css():
-
-    css_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "css",
-        "style.css"
-    )
-
-    if os.path.exists(css_path):
-
-        with open(css_path, "r", encoding="utf-8") as f:
-
-            st.markdown(
-                f"<style>{f.read()}</style>",
-                unsafe_allow_html=True
-            )
-
-    else:
-
-        st.warning(f"⚠️ CSS file not found: {css_path}")
-
-
-load_css()
 
 # ==========================================================
 # SIDEBAR
@@ -127,54 +153,81 @@ load_css()
 
 with st.sidebar:
 
-    st.markdown("""
-    # 📚 Academic Notes AI
+    st.markdown(
+        """
+        # 📚 Academic Notes AI
 
-    ### Learn Smarter with AI
-    """)
-
-    st.divider()
-
-    st.info("""
-    ### 🤖 About
-
-    An AI-powered academic assistant that helps students:
-
-    - 📚 Search academic notes
-    - 📄 Chat with uploaded PDFs
-    - 🧠 Learn difficult concepts
-    - ⚡ Get instant answers
-    """)
+        ### Learn Smarter with AI
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 🚀 Technologies")
+    st.info(
+        """
+        ### 🤖 About
 
-    st.success("🤖 Google Gemini")
-    st.success("🦜 LangChain")
-    st.success("📚 FAISS")
-    st.success("🧠 RAG")
-    st.success("⚡ Streamlit")
+        An AI-powered academic assistant that helps students:
+
+        - 📚 Search academic notes
+        - 📄 Chat with uploaded PDFs
+        - 🧠 Learn difficult concepts
+        - ⚡ Get instant answers
+        """
+    )
 
     st.divider()
 
-    st.markdown("### 👩‍💻 Developer")
+    st.markdown(
+        "### 🚀 Technologies"
+    )
 
-    st.info("""
-    **Payal Pawar**
+    st.success(
+        "🤖 Google Gemini"
+    )
 
-    🎓 MCA Student
+    st.success(
+        "🦜 LangChain"
+    )
 
-    Academic Notes AI
+    st.success(
+        "📚 FAISS"
+    )
 
-    Version 1.0
-    """)
+    st.success(
+        "🧠 RAG"
+    )
+
+    st.success(
+        "⚡ Streamlit"
+    )
+
+    st.divider()
+
+    st.markdown(
+        "### 👩‍💻 Developer"
+    )
+
+    st.info(
+        """
+        **Payal Pawar**
+
+        🎓 MCA Student
+
+        Academic Notes AI
+
+        Version 1.0
+        """
+    )
+
 
 # ==========================================================
 # PAGE HEADER
 # ==========================================================
 
-st.title("🖼️ Image Study Assistant")
+st.title(
+    "🖼️ Image Study Assistant"
+)
 
 st.write(
     "Upload your study material and let AI explain it "
@@ -183,11 +236,15 @@ st.write(
 
 st.divider()
 
+
 # ==========================================================
 # FEATURE INTRO
 # ==========================================================
 
-info_col1, info_col2, info_col3 = st.columns(3)
+info_col1, info_col2, info_col3 = st.columns(
+    3
+)
+
 
 with info_col1:
 
@@ -200,6 +257,7 @@ with info_col1:
         """
     )
 
+
 with info_col2:
 
     st.info(
@@ -210,6 +268,7 @@ with info_col2:
         academic content in your image.
         """
     )
+
 
 with info_col3:
 
@@ -223,13 +282,20 @@ with info_col3:
     )
 
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown(
+    "<br>",
+    unsafe_allow_html=True
+)
+
 
 # ==========================================================
 # IMAGE UPLOAD
 # ==========================================================
 
-st.markdown("### 📤 Upload Study Material")
+st.markdown(
+    "### 📤 Upload Study Material"
+)
+
 
 uploaded_image = st.file_uploader(
     "Choose an image from your device",
@@ -246,15 +312,16 @@ uploaded_image = st.file_uploader(
     )
 )
 
+
 # ==========================================================
 # IMAGE SELECTED
 # ==========================================================
 
 if uploaded_image:
 
-    # ------------------------------------------------------
+    # ======================================================
     # IMAGE DATA
-    # ------------------------------------------------------
+    # ======================================================
 
     image_bytes = uploaded_image.getvalue()
 
@@ -262,15 +329,20 @@ if uploaded_image:
 
     mime_type = uploaded_image.type
 
+
     # ======================================================
     # IMAGE PREVIEW
     # ======================================================
 
-    st.markdown("### 🖼️ Image Preview")
+    st.markdown(
+        "### 🖼️ Image Preview"
+    )
+
 
     preview_col1, preview_col2, preview_col3 = st.columns(
         [1, 2, 1]
     )
+
 
     with preview_col2:
 
@@ -280,11 +352,15 @@ if uploaded_image:
             width=500
         )
 
+
     # ======================================================
     # FILE INFORMATION
     # ======================================================
 
-    detail_col1, detail_col2, detail_col3 = st.columns(3)
+    detail_col1, detail_col2, detail_col3 = st.columns(
+        3
+    )
+
 
     with detail_col1:
 
@@ -293,12 +369,14 @@ if uploaded_image:
             uploaded_image.name
         )
 
+
     with detail_col2:
 
         st.metric(
             "📦 Size",
             f"{file_size_kb:.1f} KB"
         )
+
 
     with detail_col3:
 
@@ -307,7 +385,9 @@ if uploaded_image:
             mime_type
         )
 
+
     st.divider()
+
 
     # ======================================================
     # USER INSTRUCTION
@@ -316,6 +396,7 @@ if uploaded_image:
     st.markdown(
         "### 📝 What do you want to know from this image?"
     )
+
 
     instruction = st.text_area(
         "Enter your request",
@@ -331,13 +412,19 @@ if uploaded_image:
         key="image_instruction_box"
     )
 
+
     # ======================================================
     # QUICK PROMPTS
     # ======================================================
 
-    with st.expander("💡 Quick Prompts"):
+    with st.expander(
+        "💡 Quick Prompts"
+    ):
 
-        quick_col1, quick_col2 = st.columns(2)
+        quick_col1, quick_col2 = st.columns(
+            2
+        )
+
 
         with quick_col1:
 
@@ -354,6 +441,7 @@ if uploaded_image:
 
                 st.rerun()
 
+
         with quick_col2:
 
             if st.button(
@@ -369,7 +457,11 @@ if uploaded_image:
 
                 st.rerun()
 
-        quick_col3, quick_col4 = st.columns(2)
+
+        quick_col3, quick_col4 = st.columns(
+            2
+        )
+
 
         with quick_col3:
 
@@ -386,6 +478,7 @@ if uploaded_image:
 
                 st.rerun()
 
+
         with quick_col4:
 
             if st.button(
@@ -401,8 +494,9 @@ if uploaded_image:
 
                 st.rerun()
 
+
     # ======================================================
-    # USE SESSION INSTRUCTION WHEN AVAILABLE
+    # CURRENT INSTRUCTION
     # ======================================================
 
     current_instruction = (
@@ -410,6 +504,7 @@ if uploaded_image:
         if st.session_state.image_instruction
         else instruction
     )
+
 
     # ======================================================
     # ANALYZE IMAGE
@@ -429,8 +524,9 @@ if uploaded_image:
                 "visible in this image in simple language."
             )
 
+
         # --------------------------------------------------
-        # Validate image
+        # VALIDATE IMAGE
         # --------------------------------------------------
 
         if not image_bytes:
@@ -439,27 +535,51 @@ if uploaded_image:
                 "❌ The uploaded image could not be read."
             )
 
+
         else:
 
             # ------------------------------------------------
-            # Gemini analysis
+            # GEMINI ANALYSIS
             # ------------------------------------------------
 
             with st.spinner(
                 "🧠 Reading the image and generating an answer..."
             ):
 
-                st.session_state.image_answer = (
-                    analyze_study_image(
-                        image_bytes=image_bytes,
-                        mime_type=mime_type,
-                        instruction=current_instruction
-                    )
+                answer = analyze_study_image(
+                    image_bytes=image_bytes,
+                    mime_type=mime_type,
+                    instruction=current_instruction
                 )
+
+
+                # --------------------------------------------
+                # SAVE ANSWER
+                # --------------------------------------------
+
+                st.session_state.image_answer = answer
 
                 st.session_state.image_instruction = (
                     current_instruction
                 )
+
+
+                # --------------------------------------------
+                # DASHBOARD TRACKING
+                # --------------------------------------------
+                # Record ONE image-study activity only when
+                # the Analyze Image button is used.
+                #
+                # Regenerate does not create another image
+                # activity because it is the same uploaded image.
+
+                if answer and not str(answer).startswith("⚠️"):
+
+                    record_image_study(
+                        instruction=current_instruction,
+                        image_name=uploaded_image.name
+                    )
+
 
     # ======================================================
     # DISPLAY AI ANSWER
@@ -469,28 +589,36 @@ if uploaded_image:
 
         st.divider()
 
-        st.markdown("### 📚 AI Explanation")
+
+        st.markdown(
+            "### 📚 AI Explanation"
+        )
+
 
         st.success(
             "✅ Image analyzed successfully."
         )
 
+
         st.markdown(
             st.session_state.image_answer
         )
-        
+
+
         # ==================================================
-        # COPY + REGENERATE + FEEDBACK BUTTONS
+        # COPY + REGENERATE + FEEDBACK
         # ==================================================
 
-        copy_col, regenerate_col, feedback_col, empty_col = st.columns(
+        copy_col, regenerate_col, feedback_col, empty_col = (
+            st.columns(
                 [0.05, 0.07, 0.14, 0.74],
                 gap="small"
             )
+        )
+
 
         # ==================================================
         # COPY
-        # Same Streamlit button style as Chatbot.py
         # ==================================================
 
         with copy_col:
@@ -502,13 +630,12 @@ if uploaded_image:
             ):
 
                 st.toast(
-                    "✅ Answer copied!",
-                    icon="📋"
+                    "✅ Answer copied!"
                 )
+
 
         # ==================================================
         # REGENERATE
-        # Same logic as Chatbot.py
         # ==================================================
 
         with regenerate_col:
@@ -527,6 +654,7 @@ if uploaded_image:
                         )
                     )
 
+
                     if not regenerate_instruction:
 
                         regenerate_instruction = (
@@ -534,6 +662,7 @@ if uploaded_image:
                             "content visible in this image "
                             "in simple language."
                         )
+
 
                     with st.spinner(
                         "🔄 Regenerating answer..."
@@ -547,11 +676,12 @@ if uploaded_image:
                             )
                         )
 
+
                     st.rerun()
+
 
         # ==================================================
         # FEEDBACK
-        # Same st.feedback("thumbs") as Chatbot.py
         # ==================================================
 
         with feedback_col:
@@ -560,6 +690,7 @@ if uploaded_image:
                 "thumbs",
                 key="feedback_rating_image"
             )
+
 
             if feedback is not None:
 
@@ -574,6 +705,7 @@ if uploaded_image:
                     st.toast(
                         "👎 Thanks for feedback. We'll improve it."
                     )
+
 
 # ==========================================================
 # EMPTY STATE
@@ -595,9 +727,16 @@ else:
         """
     )
 
-    st.markdown("### 🚀 Example Uses")
 
-    example_col1, example_col2 = st.columns(2)
+    st.markdown(
+        "### 🚀 Example Uses"
+    )
+
+
+    example_col1, example_col2 = st.columns(
+        2
+    )
+
 
     with example_col1:
 
@@ -611,6 +750,7 @@ else:
             """
         )
 
+
     with example_col2:
 
         st.markdown(
@@ -620,8 +760,9 @@ else:
             Upload a question and ask:
 
             *"Solve this question step-by-step."*
-            """ 
+            """
         )
+
 
 # ==========================================================
 # FOOTER
@@ -629,7 +770,11 @@ else:
 
 st.divider()
 
-footer_col1, footer_col2, footer_col3 = st.columns(3)
+
+footer_col1, footer_col2, footer_col3 = st.columns(
+    3
+)
+
 
 with footer_col1:
 
@@ -637,11 +782,13 @@ with footer_col1:
         "🖼️ Image Study Assistant"
     )
 
+
 with footer_col2:
 
     st.caption(
         "⚡ Powered by Gemini"
     )
+
 
 with footer_col3:
 

@@ -388,5 +388,23 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "d4a9a765-d121-456e-ae64-e331d63d6e05",
+        "title": "what is normalisation",
+        "date": "2026-08-15",
+        "messages": [
+            {
+                "role": "user",
+                "content": "what is normalisation"
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\nNormalizing data refers to scaling data values to a much smaller range, such as **[-1, 1]** or **[0.0, 1.0]**. It is also a process that organizes data for more efficient access.\n\n---\n\n### Explanation\nWhen dealing with a numeric attribute $A$ containing $n$ observed values ($V_1, V_2, V_3, \\dots, V_n$), normalization methods are used to transform and rescale these values into a standard, smaller range.\n\n---\n\n### Key Points\nThe notes mention different methods for normalizing data:\n* **Min-Max Normalization:** This method performs a linear transformation on the original data using the minimum value ($\\text{min}_A$) and maximum value ($\\text{max}_A$) observed for attribute $A$ to normalize a given value $V_i$.\n* **Z-Score Normalization:** This method normalizes values using the mean ($\\bar{A}$) and standard deviation ($\\sigma_A$) of attribute $A$.\n\n---\n\n### Example\n* **Z-Score Normalization Example:** Normalizing a value of **$73,600** for an attribute $A$ that has a mean of **$54,000$** and a standard deviation of **$16,000$**.\n\n---\n\n### Conclusion\nNormalization is a data preprocessing step that organizes data for efficient access and scales numeric attributes to a smaller specified range using techniques such as Min-Max and Z-score normalization.",
+                "sources": [
+                    "Data Science.pdf"
+                ]
+            }
+        ]
     }
 ]
