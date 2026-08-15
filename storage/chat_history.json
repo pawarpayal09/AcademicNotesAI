@@ -406,5 +406,36 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "a27879e9-9813-40c6-87aa-8f4eb595f718",
+        "title": "what are the",
+        "date": "2026-08-15",
+        "messages": [
+            {
+                "role": "user",
+                "content": "what are the"
+            },
+            {
+                "role": "assistant",
+                "content": "I couldn't find this information in the uploaded notes.",
+                "sources": [
+                    "COMPUTER NETWORKS.pdf",
+                    "Introduction to cyber security.pdf",
+                    "Database Management Systems-Raghu ramakrishnan (2).pdf"
+                ]
+            },
+            {
+                "role": "user",
+                "content": "Explain the structure of Operating System."
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\n\nThe structure of an Operating System is organized into 4 distinct layers that facilitate communication between computer programs and the physical hardware.\n\n---\n\n### Explanation\n\nThe Operating System structure comprises the following 4 layers:\n* **Hardware:** The underlying physical components of the computer.\n* **Kernel:** The vital core part of the operating system that interacts directly with the computer hardware.\n* **System call interface (shell):** The layer that provides an interface to the operating system services, allowing programs to communicate with the kernel.\n* **Application programs:** The user programs that run on the system and request tasks via system calls.\n\n---\n\n### Key Points\n\n* **Role of the Kernel:** It is a vital part of the operating system and communicates directly with the hardware.\n* **Interaction via System Calls:** Programs interact with the kernel through 10 system calls.\n* **Purpose of System Calls:** A system call directs the kernel to carry out various tasks for a program. \n* **Tasks Performed by System Calls:**\n  * Opening a file\n  * Writing to a file\n  * Obtaining information about a file\n  * Executing a program\n  * Terminating a process\n\n---\n\n### Conclusion\n\nThe 4-layered structure of an Operating System ensures that application programs can perform necessary tasks and interact with the hardware through system calls and the kernel.",
+                "sources": [
+                    "Operating System.pdf"
+                ]
+            }
+        ]
     }
 ]

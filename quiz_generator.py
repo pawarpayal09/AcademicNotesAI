@@ -61,7 +61,7 @@ def get_quiz_api_key():
     try:
 
         api_key = st.secrets.get(
-            "MAIN_CHAT_API_KEY_5"
+            "MAIN_CHAT_API_KEY_1"
         )
 
     except Exception:
@@ -76,7 +76,7 @@ def get_quiz_api_key():
     if not api_key:
 
         api_key = os.getenv(
-            "MAIN_CHAT_API_KEY_5"
+            "MAIN_CHAT_API_KEY_1"
         )
 
 
@@ -268,7 +268,7 @@ def generate_quiz(
         return {
             "success": False,
             "error": (
-                "MAIN_CHAT_API_KEY_5 is not configured."
+                "MAIN_CHAT_API_KEY_1 is not configured."
             ),
             "quiz": None
         }

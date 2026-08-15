@@ -18,14 +18,14 @@ def get_image_study_api_key():
 
     try:
         api_key = st.secrets.get(
-            "IMAGE_STUDY_API_KEY_4"
+            "IMAGE_STUDY_API_KEY"
         )
     except Exception:
         api_key = None
 
     if not api_key:
         api_key = os.getenv(
-            "IMAGE_STUDY_API_KEY_4"
+            "IMAGE_STUDY_API_KEY"
         )
 
     if api_key:
@@ -53,7 +53,7 @@ def analyze_study_image(
     if not api_key:
         return (
             "❌ Image Study API key not found.\n\n"
-            "Please check IMAGE_STUDY_API_KEY_4 "
+            "Please check IMAGE_STUDY_API_KEY "
             "in your .env file."
         )
 

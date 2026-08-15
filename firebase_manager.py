@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from datetime import datetime, timezone
 
 import requests
 import streamlit as st
@@ -20,31 +21,82 @@ load_dotenv()
 
 
 # ==========================================================
-# CONSTANTS
+# PATHS
 # ==========================================================
 
-FIREBASE_AUTH_BASE_URL = (
-    "https://identitytoolkit.googleapis.com/v1/accounts"
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+STORAGE_DIR = PROJECT_ROOT / "storage"
+
+USERS_JSON_FILE = (
+    STORAGE_DIR / "users.json"
 )
 
-# Your service-account JSON is OUTSIDE AcademicNotesAI
+
+# Your Firebase service-account JSON is outside
+# the AcademicNotesAI project folder.
 LOCAL_SERVICE_ACCOUNT_PATH = (
-    Path(__file__).resolve().parent.parent
+    PROJECT_ROOT.parent
+    / "firebase_credentials"
+    / "firebase_service_account.json"
+)
+
+
+# Optional fallback if the JSON is inside the project.
+PROJECT_SERVICE_ACCOUNT_PATH = (
+    PROJECT_ROOT
     / "firebase_credentials"
     / "firebase_service_account.json"
 )
 
 
 # ==========================================================
-# FIREBASE API KEY
+# FIREBASE AUTH REST URL
+# ==========================================================
+
+FIREBASE_AUTH_BASE_URL = (
+    "https://identitytoolkit.googleapis.com/v1/accounts"
+)
+
+
+# ==========================================================
+# DEFAULT USER STATS
+# ==========================================================
+
+DEFAULT_USER_STATS = {
+    "total_questions": 0,
+    "total_quizzes": 0,
+    "quiz_score_sum": 0,
+    "average_quiz_score": 0,
+    "total_images": 0,
+    "total_saved_notes": 0,
+    "total_youtube_searches": 0,
+}
+
+
+# ==========================================================
+# CREATE STORAGE DIRECTORY
+# ==========================================================
+
+def ensure_storage_directory():
+
+    STORAGE_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+
+ensure_storage_directory()
+
+
+# ==========================================================
+# FIREBASE WEB API KEY
 # ==========================================================
 
 def get_firebase_api_key():
     """
-    Get the Firebase Web API key.
-
     Priority:
-    1. Streamlit secrets
+    1. Streamlit Secrets
     2. Local .env
     """
 
@@ -64,7 +116,6 @@ def get_firebase_api_key():
 
         api_key = None
 
-
     # ------------------------------------------------------
     # Local .env
     # ------------------------------------------------------
@@ -75,11 +126,11 @@ def get_firebase_api_key():
             "FIREBASE_API_KEY"
         )
 
-
     if api_key:
 
-        api_key = str(api_key).strip()
-
+        api_key = str(
+            api_key
+        ).strip()
 
     return api_key
 
@@ -90,19 +141,28 @@ def get_firebase_api_key():
 
 def get_service_account_info():
     """
-    Get the Firebase service-account JSON data.
+    Get Firebase service-account information.
 
-    Local:
-        D:\\MCA Sem 3\\LLM\\firebase_credentials\\
-        firebase_service_account.json
+    Streamlit Cloud supports:
 
-    Streamlit Cloud:
-        FIREBASE_SERVICE_ACCOUNT_JSON secret
+    FIREBASE_SERVICE_ACCOUNT_JSON = "..."
+
+    OR:
+
+    [FIREBASE_SERVICE_ACCOUNT]
+    type = "service_account"
+    ...
+
+    Local development supports:
+
+    FIREBASE_SERVICE_ACCOUNT_PATH
+    external firebase_credentials folder
+    project firebase_credentials folder
     """
 
-    # ------------------------------------------------------
-    # Option 1: Streamlit secret as JSON string
-    # ------------------------------------------------------
+    # ======================================================
+    # OPTION 1 — JSON STRING IN STREAMLIT SECRETS
+    # ======================================================
 
     try:
 
@@ -128,12 +188,13 @@ def get_service_account_info():
                     secret_json
                 )
 
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
 
                 raise RuntimeError(
                     "FIREBASE_SERVICE_ACCOUNT_JSON "
                     "contains invalid JSON."
-                )
+                ) from e
+
 
         if isinstance(
             secret_json,
@@ -145,9 +206,40 @@ def get_service_account_info():
             )
 
 
-    # ------------------------------------------------------
-    # Option 2: Explicit local environment path
-    # ------------------------------------------------------
+    # ======================================================
+    # OPTION 2 — TOML SECTION IN STREAMLIT SECRETS
+    # ======================================================
+
+    try:
+
+        secret_section = st.secrets.get(
+            "FIREBASE_SERVICE_ACCOUNT"
+        )
+
+    except Exception:
+
+        secret_section = None
+
+
+    if secret_section:
+
+        try:
+
+            return dict(
+                secret_section
+            )
+
+        except Exception as e:
+
+            raise RuntimeError(
+                "FIREBASE_SERVICE_ACCOUNT secret "
+                "could not be read."
+            ) from e
+
+
+    # ======================================================
+    # OPTION 3 — ENVIRONMENT PATH
+    # ======================================================
 
     env_path = os.getenv(
         "FIREBASE_SERVICE_ACCOUNT_PATH"
@@ -160,29 +252,46 @@ def get_service_account_info():
             env_path
         )
 
-    else:
+    # ======================================================
+    # OPTION 4 — EXTERNAL LOCAL FILE
+    # ======================================================
+
+    elif LOCAL_SERVICE_ACCOUNT_PATH.exists():
 
         service_account_path = (
             LOCAL_SERVICE_ACCOUNT_PATH
         )
 
+    # ======================================================
+    # OPTION 5 — PROJECT LOCAL FILE
+    # ======================================================
 
-    # ------------------------------------------------------
-    # Check local file
-    # ------------------------------------------------------
+    else:
+
+        service_account_path = (
+            PROJECT_SERVICE_ACCOUNT_PATH
+        )
+
+
+    # ======================================================
+    # CHECK FILE
+    # ======================================================
 
     if not service_account_path.exists():
 
         raise FileNotFoundError(
-            "Firebase service-account JSON was not found.\n\n"
-            f"Expected path:\n"
-            f"{service_account_path}"
+            "Firebase service-account credentials "
+            "were not found.\n\n"
+            "Checked:\n"
+            f"{LOCAL_SERVICE_ACCOUNT_PATH}\n"
+            f"{PROJECT_SERVICE_ACCOUNT_PATH}\n"
+            "and Streamlit Secrets."
         )
 
 
-    # ------------------------------------------------------
-    # Read JSON
-    # ------------------------------------------------------
+    # ======================================================
+    # READ JSON FILE
+    # ======================================================
 
     with open(
         service_account_path,
@@ -199,14 +308,10 @@ def get_service_account_info():
 # INITIALIZE FIREBASE ADMIN SDK
 # ==========================================================
 
-@st.cache_resource(show_spinner=False)
+@st.cache_resource(
+    show_spinner=False
+)
 def initialize_firebase_admin():
-    """
-    Initialize Firebase Admin SDK once.
-
-    Returns:
-        Firebase Admin app
-    """
 
     # Already initialized?
     if firebase_admin._apps:
@@ -224,23 +329,19 @@ def initialize_firebase_admin():
     )
 
 
-    app = firebase_admin.initialize_app(
+    return firebase_admin.initialize_app(
         cred
     )
-
-
-    return app
 
 
 # ==========================================================
 # FIRESTORE CLIENT
 # ==========================================================
 
-@st.cache_resource(show_spinner=False)
+@st.cache_resource(
+    show_spinner=False
+)
 def get_firestore_client():
-    """
-    Return the Firestore client.
-    """
 
     initialize_firebase_admin()
 
@@ -248,14 +349,12 @@ def get_firestore_client():
 
 
 # ==========================================================
-# FIREBASE ERROR MESSAGE
+# FIREBASE ERROR FORMATTER
 # ==========================================================
 
-def format_firebase_error(error_message):
-    """
-    Convert Firebase API error codes into
-    user-friendly messages.
-    """
+def format_firebase_error(
+    error_message
+):
 
     error_message = str(
         error_message
@@ -275,6 +374,9 @@ def format_firebase_error(error_message):
             "Incorrect password.",
 
         "INVALID_LOGIN_CREDENTIALS":
+            "Incorrect email or password.",
+
+        "INVALID_CREDENTIAL":
             "Incorrect email or password.",
 
         "USER_DISABLED":
@@ -300,11 +402,17 @@ def format_firebase_error(error_message):
             "Firebase project could not be found.",
 
         "USER_NOT_FOUND":
-            "User account was not found."
+            "User account was not found.",
+
+        "INVALID_ID_TOKEN":
+            "Firebase login session is invalid. "
+            "Please login again.",
+
+        "TOKEN_EXPIRED":
+            "Your login session has expired. "
+            "Please login again.",
     }
 
-
-    # Exact match first
 
     if error_message in error_map:
 
@@ -312,8 +420,6 @@ def format_firebase_error(error_message):
             error_message
         ]
 
-
-    # Search inside longer Firebase errors
 
     for code, message in error_map.items():
 
@@ -336,9 +442,6 @@ def firebase_auth_request(
     endpoint,
     payload
 ):
-    """
-    Send a request to Firebase Authentication REST API.
-    """
 
     api_key = get_firebase_api_key()
 
@@ -365,7 +468,7 @@ def firebase_auth_request(
         response = requests.post(
             url,
             json=payload,
-            timeout=15
+            timeout=20
         )
 
 
@@ -380,19 +483,19 @@ def firebase_auth_request(
         }
 
 
-    except requests.RequestException:
+    except requests.RequestException as e:
 
         return {
             "success": False,
             "error": (
                 "Unable to connect to Firebase. "
-                "Please check your internet connection."
+                f"{e}"
             )
         }
 
 
     # ------------------------------------------------------
-    # Parse JSON response
+    # Parse JSON
     # ------------------------------------------------------
 
     try:
@@ -441,6 +544,416 @@ def firebase_auth_request(
 
 
 # ==========================================================
+# USERS JSON HELPERS
+# ==========================================================
+
+def load_users_json():
+    """
+    Load storage/users.json.
+
+    If the file doesn't exist, it is created automatically.
+    """
+
+    ensure_storage_directory()
+
+
+    # ------------------------------------------------------
+    # Create file if missing
+    # ------------------------------------------------------
+
+    if not USERS_JSON_FILE.exists():
+
+        with open(
+            USERS_JSON_FILE,
+            "w",
+            encoding="utf-8"
+        ) as file:
+
+            json.dump(
+                [],
+                file,
+                indent=4,
+                ensure_ascii=False
+            )
+
+
+        return []
+
+
+    # ------------------------------------------------------
+    # Repair empty file
+    # ------------------------------------------------------
+
+    if USERS_JSON_FILE.stat().st_size == 0:
+
+        with open(
+            USERS_JSON_FILE,
+            "w",
+            encoding="utf-8"
+        ) as file:
+
+            json.dump(
+                [],
+                file,
+                indent=4,
+                ensure_ascii=False
+            )
+
+
+        return []
+
+
+    # ------------------------------------------------------
+    # Read file
+    # ------------------------------------------------------
+
+    try:
+
+        with open(
+            USERS_JSON_FILE,
+            "r",
+            encoding="utf-8"
+        ) as file:
+
+            data = json.load(
+                file
+            )
+
+
+        if isinstance(
+            data,
+            list
+        ):
+
+            return data
+
+
+        return []
+
+
+    except (
+        json.JSONDecodeError,
+        OSError
+    ):
+
+        # Repair invalid file
+
+        with open(
+            USERS_JSON_FILE,
+            "w",
+            encoding="utf-8"
+        ) as file:
+
+            json.dump(
+                [],
+                file,
+                indent=4,
+                ensure_ascii=False
+            )
+
+
+        return []
+
+
+# ==========================================================
+# CREATE USERS.JSON AUTOMATICALLY
+# ==========================================================
+
+# IMPORTANT:
+# This call is intentionally AFTER load_users_json()
+# has been defined.
+
+load_users_json()
+
+
+# ==========================================================
+# SAVE USERS JSON
+# ==========================================================
+
+def save_users_json(
+    users
+):
+
+    ensure_storage_directory()
+
+
+    temporary_file = (
+        STORAGE_DIR / "users.tmp"
+    )
+
+
+    with open(
+        temporary_file,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            users,
+            file,
+            indent=4,
+            ensure_ascii=False
+        )
+
+
+    os.replace(
+        temporary_file,
+        USERS_JSON_FILE
+    )
+
+
+# ==========================================================
+# SAVE / UPDATE SINGLE USER
+# ==========================================================
+
+def save_user_to_json(
+    uid,
+    name,
+    email,
+    email_verified=False,
+    disabled=False,
+    created_at=None,
+    last_login_at=None
+):
+    """
+    Save user information to storage/users.json.
+
+    Passwords are NEVER stored.
+    """
+
+    users = load_users_json()
+
+
+    existing_user = None
+
+
+    for user in users:
+
+        if user.get(
+            "uid"
+        ) == uid:
+
+            existing_user = user
+
+            break
+
+
+    user_data = {
+        "uid": uid,
+        "name": name,
+        "email": email,
+        "email_verified": bool(
+            email_verified
+        ),
+        "disabled": bool(
+            disabled
+        ),
+        "created_at": created_at,
+        "last_login_at": last_login_at,
+    }
+
+
+    # Remove None values
+
+    user_data = {
+        key: value
+        for key, value in user_data.items()
+        if value is not None
+    }
+
+
+    # Update existing user
+
+    if existing_user:
+
+        existing_user.update(
+            user_data
+        )
+
+
+    # Add new user
+
+    else:
+
+        users.append(
+            user_data
+        )
+
+
+    save_users_json(
+        users
+    )
+
+
+# ==========================================================
+# TIMESTAMP HELPER
+# ==========================================================
+
+def datetime_from_timestamp(
+    timestamp
+):
+
+    try:
+
+        milliseconds = int(
+            timestamp
+        )
+
+
+        seconds = (
+            milliseconds / 1000
+        )
+
+
+        return datetime.fromtimestamp(
+            seconds,
+            timezone.utc
+        ).strftime(
+            "%Y-%m-%d %H:%M:%S UTC"
+        )
+
+
+    except Exception:
+
+        return str(
+            timestamp
+        )
+
+
+# ==========================================================
+# SYNC ALL FIREBASE USERS TO JSON
+# ==========================================================
+
+def sync_all_users_to_json():
+    """
+    Mirror Firebase Authentication users
+    into storage/users.json.
+
+    Passwords are never stored.
+    """
+
+    initialize_firebase_admin()
+
+
+    users = []
+
+
+    try:
+
+        page = auth.list_users()
+
+
+        while page:
+
+            for user_record in page.users:
+
+                user_metadata = (
+                    user_record.user_metadata
+                )
+
+
+                created_at = None
+
+                last_login_at = None
+
+
+                if user_metadata:
+
+                    creation_timestamp = getattr(
+                        user_metadata,
+                        "creation_timestamp",
+                        None
+                    )
+
+
+                    last_sign_in_timestamp = getattr(
+                        user_metadata,
+                        "last_sign_in_timestamp",
+                        None
+                    )
+
+
+                    if creation_timestamp:
+
+                        created_at = (
+                            datetime_from_timestamp(
+                                creation_timestamp
+                            )
+                        )
+
+
+                    if last_sign_in_timestamp:
+
+                        last_login_at = (
+                            datetime_from_timestamp(
+                                last_sign_in_timestamp
+                            )
+                        )
+
+
+                # Safe display name
+
+                if user_record.display_name:
+
+                    display_name = (
+                        user_record.display_name
+                    )
+
+                elif user_record.email:
+
+                    display_name = (
+                        user_record.email.split("@")[0]
+                    )
+
+                else:
+
+                    display_name = "Student"
+
+
+                users.append(
+                    {
+                        "uid": user_record.uid,
+                        "name": display_name,
+                        "email": (
+                            user_record.email
+                            or ""
+                        ),
+                        "email_verified": bool(
+                            user_record.email_verified
+                        ),
+                        "disabled": bool(
+                            user_record.disabled
+                        ),
+                        "created_at": created_at,
+                        "last_login_at": last_login_at,
+                    }
+                )
+
+
+            page = page.get_next_page()
+
+
+        save_users_json(
+            users
+        )
+
+
+        return users
+
+
+    except Exception as e:
+
+        print(
+            "Firebase users sync error:",
+            type(e).__name__,
+            str(e)
+        )
+
+
+        return []
+
+
+# ==========================================================
 # SIGN UP
 # ==========================================================
 
@@ -450,19 +963,30 @@ def sign_up_user(
     password
 ):
     """
-    Create a Firebase email/password account.
+    Create Firebase email/password account.
 
-    Returns:
-        success, uid, email, id_token
+    Also:
+    - creates Firestore profile
+    - creates/updates storage/users.json
     """
 
-    name = str(name).strip()
-    email = str(email).strip().lower()
-    password = str(password)
+    name = str(
+        name
+    ).strip()
+
+
+    email = str(
+        email
+    ).strip().lower()
+
+
+    password = str(
+        password
+    )
 
 
     # ------------------------------------------------------
-    # Local validation
+    # VALIDATION
     # ------------------------------------------------------
 
     if not name:
@@ -481,7 +1005,9 @@ def sign_up_user(
         }
 
 
-    if len(password) < 6:
+    if len(
+        password
+    ) < 6:
 
         return {
             "success": False,
@@ -493,7 +1019,7 @@ def sign_up_user(
 
 
     # ------------------------------------------------------
-    # Firebase signup
+    # FIREBASE SIGNUP
     # ------------------------------------------------------
 
     result = firebase_auth_request(
@@ -515,11 +1041,16 @@ def sign_up_user(
 
 
     uid = data["localId"]
+
     id_token = data["idToken"]
+
+    refresh_token = data.get(
+        "refreshToken"
+    )
 
 
     # ------------------------------------------------------
-    # Save display name in Firebase Auth
+    # SAVE DISPLAY NAME IN FIREBASE AUTH
     # ------------------------------------------------------
 
     update_result = firebase_auth_request(
@@ -534,16 +1065,25 @@ def sign_up_user(
 
     if update_result["success"]:
 
-        data = update_result["data"]
+        update_data = (
+            update_result["data"]
+        )
 
-        id_token = data.get(
+
+        id_token = update_data.get(
             "idToken",
             id_token
         )
 
 
+        refresh_token = update_data.get(
+            "refreshToken",
+            refresh_token
+        )
+
+
     # ------------------------------------------------------
-    # Create Firestore profile
+    # CREATE FIRESTORE PROFILE
     # ------------------------------------------------------
 
     try:
@@ -563,14 +1103,7 @@ def sign_up_user(
                     "email": email
                 },
 
-                "stats": {
-                    "total_questions": 0,
-                    "total_quizzes": 0,
-                    "average_quiz_score": 0,
-                    "total_images": 0,
-                    "total_saved_notes": 0,
-                    "total_youtube_searches": 0
-                }
+                "stats": DEFAULT_USER_STATS
             },
             merge=True
         )
@@ -584,12 +1117,39 @@ def sign_up_user(
             str(e)
         )
 
-        # Do not destroy a successful Firebase account
-        # just because profile creation failed.
 
         st.warning(
-            "Account created, but your profile "
-            "could not be saved yet."
+            "Account created, but the Firestore "
+            "profile could not be saved."
+        )
+
+
+    # ------------------------------------------------------
+    # SAVE USER TO JSON
+    # ------------------------------------------------------
+
+    try:
+
+        save_user_to_json(
+            uid=uid,
+            name=name,
+            email=email,
+            email_verified=False,
+            disabled=False
+        )
+
+
+        # Sync all Firebase users
+
+        sync_all_users_to_json()
+
+
+    except Exception as e:
+
+        print(
+            "Local users.json error:",
+            type(e).__name__,
+            str(e)
         )
 
 
@@ -598,7 +1158,8 @@ def sign_up_user(
         "uid": uid,
         "name": name,
         "email": email,
-        "id_token": id_token
+        "id_token": id_token,
+        "refresh_token": refresh_token
     }
 
 
@@ -614,9 +1175,19 @@ def login_user(
     Login with Firebase email/password.
     """
 
-    email = str(email).strip().lower()
-    password = str(password)
+    email = str(
+        email
+    ).strip().lower()
 
+
+    password = str(
+        password
+    )
+
+
+    # ------------------------------------------------------
+    # VALIDATION
+    # ------------------------------------------------------
 
     if not email:
 
@@ -635,7 +1206,7 @@ def login_user(
 
 
     # ------------------------------------------------------
-    # Firebase login
+    # FIREBASE LOGIN
     # ------------------------------------------------------
 
     result = firebase_auth_request(
@@ -657,21 +1228,25 @@ def login_user(
 
 
     uid = data["localId"]
+
     id_token = data["idToken"]
+
+    refresh_token = data.get(
+        "refreshToken"
+    )
 
 
     # ------------------------------------------------------
-    # Verify Firebase ID token server-side
+    # VERIFY FIREBASE ID TOKEN
     # ------------------------------------------------------
 
     try:
 
         initialize_firebase_admin()
 
-        decoded_token = (
-            auth.verify_id_token(
-                id_token
-            )
+
+        decoded_token = auth.verify_id_token(
+            id_token
         )
 
 
@@ -698,6 +1273,7 @@ def login_user(
             str(e)
         )
 
+
         return {
             "success": False,
             "error": (
@@ -708,7 +1284,7 @@ def login_user(
 
 
     # ------------------------------------------------------
-    # Get user information
+    # GET FIREBASE USER
     # ------------------------------------------------------
 
     try:
@@ -717,6 +1293,7 @@ def login_user(
             uid
         )
 
+
         display_name = (
             firebase_user.display_name
             or
@@ -724,15 +1301,85 @@ def login_user(
         )
 
 
-    except Exception:
+        email_verified = bool(
+            firebase_user.email_verified
+        )
+
+
+        disabled = bool(
+            firebase_user.disabled
+        )
+
+
+        user_metadata = (
+            firebase_user.user_metadata
+        )
+
+
+        created_at = None
+
+        last_login_at = None
+
+
+        if user_metadata:
+
+            created_timestamp = getattr(
+                user_metadata,
+                "creation_timestamp",
+                None
+            )
+
+
+            last_sign_in_timestamp = getattr(
+                user_metadata,
+                "last_sign_in_timestamp",
+                None
+            )
+
+
+            if created_timestamp:
+
+                created_at = (
+                    datetime_from_timestamp(
+                        created_timestamp
+                    )
+                )
+
+
+            if last_sign_in_timestamp:
+
+                last_login_at = (
+                    datetime_from_timestamp(
+                        last_sign_in_timestamp
+                    )
+                )
+
+
+    except Exception as e:
+
+        print(
+            "Firebase user lookup error:",
+            type(e).__name__,
+            str(e)
+        )
+
 
         display_name = (
             email.split("@")[0]
         )
 
 
+        email_verified = False
+
+        disabled = False
+
+        created_at = None
+
+        last_login_at = None
+
+
     # ------------------------------------------------------
-    # Ensure user profile exists
+    # ENSURE FIRESTORE PROFILE
     # ------------------------------------------------------
 
     try:
@@ -764,13 +1411,20 @@ def login_user(
                         "email": email
                     },
 
-                    "stats": {
-                        "total_questions": 0,
-                        "total_quizzes": 0,
-                        "average_quiz_score": 0,
-                        "total_images": 0,
-                        "total_saved_notes": 0,
-                        "total_youtube_searches": 0
+                    "stats": DEFAULT_USER_STATS
+                },
+                merge=True
+            )
+
+
+        else:
+
+            user_ref.set(
+                {
+                    "profile": {
+                        "uid": uid,
+                        "name": display_name,
+                        "email": email
                     }
                 },
                 merge=True
@@ -786,12 +1440,42 @@ def login_user(
         )
 
 
+    # ------------------------------------------------------
+    # UPDATE USERS.JSON
+    # ------------------------------------------------------
+
+    try:
+
+        save_user_to_json(
+            uid=uid,
+            name=display_name,
+            email=email,
+            email_verified=email_verified,
+            disabled=disabled,
+            created_at=created_at,
+            last_login_at=last_login_at
+        )
+
+
+        sync_all_users_to_json()
+
+
+    except Exception as e:
+
+        print(
+            "Local users.json update error:",
+            type(e).__name__,
+            str(e)
+        )
+
+
     return {
         "success": True,
         "uid": uid,
         "name": display_name,
         "email": email,
-        "id_token": id_token
+        "id_token": id_token,
+        "refresh_token": refresh_token
     }
 
 
@@ -802,27 +1486,37 @@ def login_user(
 def set_current_user(
     user
 ):
-    """
-    Store the authenticated user in Streamlit session state.
-    """
 
     st.session_state.authenticated = True
+
 
     st.session_state.user_uid = (
         user["uid"]
     )
 
+
     st.session_state.user_name = (
         user["name"]
     )
+
 
     st.session_state.user_email = (
         user["email"]
     )
 
+
     st.session_state.firebase_id_token = (
         user["id_token"]
     )
+
+
+    if user.get(
+        "refresh_token"
+    ):
+
+        st.session_state.firebase_refresh_token = (
+            user["refresh_token"]
+        )
 
 
 # ==========================================================
@@ -830,10 +1524,6 @@ def set_current_user(
 # ==========================================================
 
 def is_authenticated():
-    """
-    Check whether this Streamlit session has
-    an authenticated user.
-    """
 
     return bool(
         st.session_state.get(
@@ -848,9 +1538,6 @@ def is_authenticated():
 # ==========================================================
 
 def get_current_user():
-    """
-    Return current authenticated user's session data.
-    """
 
     if not is_authenticated():
 
@@ -877,17 +1564,14 @@ def get_current_user():
 # ==========================================================
 
 def logout_user():
-    """
-    Clear authentication information from
-    the current Streamlit session.
-    """
 
     keys_to_remove = [
         "authenticated",
         "user_uid",
         "user_name",
         "user_email",
-        "firebase_id_token"
+        "firebase_id_token",
+        "firebase_refresh_token"
     ]
 
 
@@ -906,11 +1590,6 @@ def logout_user():
 def require_login(
     login_page="pages/Login.py"
 ):
-    """
-    Use this only inside protected pages.
-
-    If the user is not logged in, redirect to Login.
-    """
 
     if not is_authenticated():
 
@@ -918,22 +1597,20 @@ def require_login(
             "🔐 Please login to access this feature."
         )
 
+
         st.switch_page(
             login_page
         )
+
 
         st.stop()
 
 
 # ==========================================================
-# FIRESTORE USER DOCUMENT
+# GET USER DOCUMENT
 # ==========================================================
 
 def get_user_document():
-    """
-    Return the Firestore document reference
-    belonging to the currently logged-in user.
-    """
 
     if not is_authenticated():
 
@@ -967,9 +1644,6 @@ def get_user_document():
 # ==========================================================
 
 def get_user_profile():
-    """
-    Get the current user's Firestore profile.
-    """
 
     user_ref = get_user_document()
 
@@ -979,9 +1653,7 @@ def get_user_profile():
         return None
 
 
-    document = (
-        user_ref.get()
-    )
+    document = user_ref.get()
 
 
     if not document.exists:
@@ -990,6 +1662,7 @@ def get_user_profile():
 
 
     data = document.to_dict()
+
 
     return data.get(
         "profile",
@@ -1002,192 +1675,72 @@ def get_user_profile():
 # ==========================================================
 
 def get_user_stats():
-    """
-    Get current user's dashboard statistics.
-    """
 
     user_ref = get_user_document()
 
 
     if user_ref is None:
 
-        return {
-            "total_questions": 0,
-            "total_quizzes": 0,
-            "average_quiz_score": 0,
-            "total_images": 0,
-            "total_saved_notes": 0,
-            "total_youtube_searches": 0
-        }
+        return DEFAULT_USER_STATS.copy()
 
 
-    document = (
-        user_ref.get()
-    )
+    document = user_ref.get()
 
 
     if not document.exists:
 
-        return {
-            "total_questions": 0,
-            "total_quizzes": 0,
-            "average_quiz_score": 0,
-            "total_images": 0,
-            "total_saved_notes": 0,
-            "total_youtube_searches": 0
-        }
+        return DEFAULT_USER_STATS.copy()
 
 
     data = document.to_dict()
 
 
-    return data.get(
+    stats = data.get(
         "stats",
-        {
-            "total_questions": 0,
-            "total_quizzes": 0,
-            "average_quiz_score": 0,
-            "total_images": 0,
-            "total_saved_notes": 0,
-            "total_youtube_searches": 0
-        }
+        {}
     )
 
+
+    result = (
+        DEFAULT_USER_STATS.copy()
+    )
+
+
+    result.update(
+        stats
+    )
+
+
+    return result
+
+
 # ==========================================================
-# SEND EMAIL VERIFICATION
+# PASSWORD RESET
 # ==========================================================
 
-def send_email_verification(id_token):
-    """
-    Send Firebase verification email.
-    """
+def send_password_reset(
+    email
+):
 
     api_key = get_firebase_api_key()
 
+
     if not api_key:
+
         return {
             "success": False,
-            "error": "FIREBASE_API_KEY is not configured."
-        }
-
-    url = (
-        f"https://identitytoolkit.googleapis.com/v1/"
-        f"accounts:sendOobCode?key={api_key}"
-    )
-
-    try:
-
-        response = requests.post(
-            url,
-            json={
-                "requestType": "VERIFY_EMAIL",
-                "idToken": id_token
-            },
-            timeout=15
-        )
-
-        data = response.json()
-
-        if response.status_code != 200:
-
-            error_message = (
-                data
-                .get("error", {})
-                .get(
-                    "message",
-                    "Unable to send verification email."
-                )
+            "error": (
+                "FIREBASE_API_KEY is not configured."
             )
-
-            return {
-                "success": False,
-                "error": format_firebase_error(
-                    error_message
-                )
-            }
-
-        return {
-            "success": True,
-            "error": None
         }
 
-    except Exception as e:
-
-        return {
-            "success": False,
-            "error": f"Verification email error: {e}"
-        }
-
-
-# ==========================================================
-# CHECK EMAIL VERIFICATION
-# ==========================================================
-
-def get_email_verification_status(id_token):
-    """
-    Check whether the current Firebase user
-    has verified their email.
-    """
-
-    api_key = get_firebase_api_key()
-
-    if not api_key:
-        return False
 
     url = (
-        f"https://identitytoolkit.googleapis.com/v1/"
-        f"accounts:lookup?key={api_key}"
+        f"{FIREBASE_AUTH_BASE_URL}"
+        f":sendOobCode"
+        f"?key={api_key}"
     )
 
-    try:
-
-        response = requests.post(
-            url,
-            json={
-                "idToken": id_token
-            },
-            timeout=15
-        )
-
-        data = response.json()
-
-        users = data.get("users", [])
-
-        if not users:
-            return False
-
-        return bool(
-            users[0].get(
-                "emailVerified",
-                False
-            )
-        )
-
-    except Exception:
-        return False
-
-
-# ==========================================================
-# SEND PASSWORD RESET EMAIL
-# ==========================================================
-
-def send_password_reset(email):
-    """
-    Send Firebase password reset email.
-    """
-
-    api_key = get_firebase_api_key()
-
-    if not api_key:
-        return {
-            "success": False,
-            "error": "FIREBASE_API_KEY is not configured."
-        }
-
-    url = (
-        f"https://identitytoolkit.googleapis.com/v1/"
-        f"accounts:sendOobCode?key={api_key}"
-    )
 
     try:
 
@@ -1195,12 +1748,18 @@ def send_password_reset(email):
             url,
             json={
                 "requestType": "PASSWORD_RESET",
-                "email": email.strip().lower()
+                "email": (
+                    str(email)
+                    .strip()
+                    .lower()
+                )
             },
-            timeout=15
+            timeout=20
         )
 
+
         data = response.json()
+
 
         if response.status_code != 200:
 
@@ -1213,68 +1772,6 @@ def send_password_reset(email):
                 )
             )
 
-            return {
-                "success": False,
-                "error": format_firebase_error(
-                    error_message
-                )
-            }
-
-        return {
-            "success": True,
-            "error": None
-        }
-
-    except Exception as e:
-
-        return {
-            "success": False,
-            "error": f"Password reset error: {e}"
-        }
-
-# ==========================================================
-# SEND EMAIL VERIFICATION
-# ==========================================================
-
-def send_email_verification(id_token):
-
-    api_key = get_firebase_api_key()
-
-    if not api_key:
-
-        return {
-            "success": False,
-            "error": "FIREBASE_API_KEY is not configured."
-        }
-
-    url = (
-        "https://identitytoolkit.googleapis.com/v1/"
-        f"accounts:sendOobCode?key={api_key}"
-    )
-
-    try:
-
-        response = requests.post(
-            url,
-            json={
-                "requestType": "VERIFY_EMAIL",
-                "idToken": id_token
-            },
-            timeout=15
-        )
-
-        data = response.json()
-
-        if response.status_code != 200:
-
-            error_message = (
-                data
-                .get("error", {})
-                .get(
-                    "message",
-                    "Unable to send verification email."
-                )
-            )
 
             return {
                 "success": False,
@@ -1283,133 +1780,18 @@ def send_email_verification(id_token):
                 )
             }
 
+
         return {
             "success": True,
             "error": None
         }
+
 
     except requests.RequestException as e:
 
         return {
             "success": False,
             "error": (
-                f"Unable to send verification email: {e}"
-            )
-        }
-
-
-# ==========================================================
-# CHECK EMAIL VERIFICATION STATUS
-# ==========================================================
-
-def get_email_verification_status(id_token):
-
-    api_key = get_firebase_api_key()
-
-    if not api_key:
-        return False
-
-    url = (
-        "https://identitytoolkit.googleapis.com/v1/"
-        f"accounts:lookup?key={api_key}"
-    )
-
-    try:
-
-        response = requests.post(
-            url,
-            json={
-                "idToken": id_token
-            },
-            timeout=15
-        )
-
-        if response.status_code != 200:
-            return False
-
-        data = response.json()
-
-        users = data.get(
-            "users",
-            []
-        )
-
-        if not users:
-            return False
-
-        return bool(
-            users[0].get(
-                "emailVerified",
-                False
-            )
-        )
-
-    except Exception:
-
-        return False
-
-
-# ==========================================================
-# SEND PASSWORD RESET EMAIL
-# ==========================================================
-
-def send_password_reset(email):
-
-    api_key = get_firebase_api_key()
-
-    if not api_key:
-
-        return {
-            "success": False,
-            "error": "FIREBASE_API_KEY is not configured."
-        }
-
-    url = (
-        "https://identitytoolkit.googleapis.com/v1/"
-        f"accounts:sendOobCode?key={api_key}"
-    )
-
-    try:
-
-        response = requests.post(
-            url,
-            json={
-                "requestType": "PASSWORD_RESET",
-                "email": email.strip().lower()
-            },
-            timeout=15
-        )
-
-        data = response.json()
-
-        if response.status_code != 200:
-
-            error_message = (
-                data
-                .get("error", {})
-                .get(
-                    "message",
-                    "Unable to send password reset email."
-                )
-            )
-
-            return {
-                "success": False,
-                "error": format_firebase_error(
-                    error_message
-                )
-            }
-
-        return {
-            "success": True,
-            "error": None
-        }
-
-    except requests.RequestException as e:
-
-        return {
-            "success": False,
-            "error": (
-                f"Unable to send password reset email: {e}"
+                f"Password reset error: {e}"
             )
         }

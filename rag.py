@@ -14,9 +14,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 load_dotenv()
 
 try:
-    MAIN_CHAT_API_KEY_5 = st.secrets["MAIN_CHAT_API_KEY_5"]
+    MAIN_CHAT_API_KEY_1 = st.secrets["MAIN_CHAT_API_KEY_1"]
 except Exception:
-    MAIN_CHAT_API_KEY_5 = os.getenv("MAIN_CHAT_API_KEY_5")
+    MAIN_CHAT_API_KEY_1 = os.getenv("MAIN_CHAT_API_KEY_1")
 
 # ==========================================================
 # Cached Embedding Model
@@ -95,9 +95,8 @@ def get_google_api_keys():
 
     # Streamlit Cloud / deployed project
     for key_name in [
-        "MAIN_CHAT_API_KEY_5",
-        "IMAGE_STUDY_API_KEY_4",
-        "MAIN_CHAT_API_KEY_1"
+        "MAIN_CHAT_API_KEY_1",
+        "MAIN_CHAT_API_KEY_2"
     ]:
 
         try:
@@ -110,9 +109,8 @@ def get_google_api_keys():
 
     # Local .env
     for key_name in [
-        "MAIN_CHAT_API_KEY_5",
-        "IMAGE_STUDY_API_KEY_4",
-        "MAIN_CHAT_API_KEY_1"
+        "MAIN_CHAT_API_KEY_1",
+        "MAIN_CHAT_API_KEY_2"
     ]:
 
         key = os.getenv(key_name)

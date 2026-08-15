@@ -1,13 +1,16 @@
 import os
-from datetime import datetime, timezone
-
 import streamlit as st
+
+from datetime import datetime, timezone
 
 from firebase_manager import (
     require_login,
+    is_authenticated,
     get_current_user,
     get_user_profile,
+    logout_user
 )
+
 
 from progress_manager import (
     get_dashboard_stats,
@@ -18,6 +21,65 @@ from progress_manager import (
     get_study_streak,
 )
 
+# =====================================================
+# LOGGED-IN USER PROFILE
+# TOP-RIGHT PROFESSIONAL PROFILE BAR
+# =====================================================
+
+if is_authenticated():
+
+    current_user = get_current_user()
+
+    profile_spacer, profile_area = st.columns(
+        [5.8, 1.8],
+        gap="small"
+    )
+
+    with profile_area:
+
+        with st.container(
+            key="home_user_profile"
+        ):
+
+            # -----------------------------------------
+            # USER NAME
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-name">
+                    👤 {current_user['name']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # USER EMAIL
+            # -----------------------------------------
+
+            st.markdown(
+                f"""
+                <div class="home-profile-email">
+                    {current_user['email']}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # -----------------------------------------
+            # LOGOUT
+            # -----------------------------------------
+
+            if st.button(
+                "🚪 Logout",
+                key="home_logout_button",
+                use_container_width=True
+            ):
+
+                logout_user()
+
+                st.rerun()
 
 # ==========================================================
 # PAGE CONFIG
@@ -200,14 +262,6 @@ with header1:
         f"Welcome back, {user_name}. "
         "Track your learning activity and progress."
     )
-
-with header2:
-
-    st.metric(
-        "👤 Student",
-        user_name
-    )
-
 
 # ==========================================================
 # LOAD DATA
