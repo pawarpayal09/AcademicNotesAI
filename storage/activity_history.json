@@ -1,0 +1,125 @@
+[
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786787173977",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "quiz",
+        "topic": "Computer Networks",
+        "description": "Hard quiz: 0/5 (0%)",
+        "date": "2026-08-15 09:46:13 UTC",
+        "metadata": {
+            "difficulty": "Hard",
+            "score": 0,
+            "total_questions": 5,
+            "percentage": 0
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786787804402",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "Explain this diagram.",
+        "date": "2026-08-15 09:56:44 UTC",
+        "metadata": {
+            "image_name": "Flowchart-of-Machine-Learning-Model.webp"
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786787804750",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "Explain this diagram.",
+        "date": "2026-08-15 09:56:44 UTC",
+        "metadata": {
+            "image_name": "Flowchart-of-Machine-Learning-Model.webp"
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786787861278",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "Explain this diagram.",
+        "date": "2026-08-15 09:57:41 UTC",
+        "metadata": {
+            "image_name": "flowchart.png"
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786787861486",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "Explain this diagram.",
+        "date": "2026-08-15 09:57:41 UTC",
+        "metadata": {
+            "image_name": "flowchart.png"
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786788492197",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "quiz",
+        "topic": "DBMS",
+        "description": "Medium quiz: 2/5 (40%)",
+        "date": "2026-08-15 10:08:12 UTC",
+        "metadata": {
+            "difficulty": "Medium",
+            "score": 2,
+            "total_questions": 5,
+            "percentage": 40
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786789241869",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "DBMS tutorial",
+        "description": "YouTube learning search: DBMS tutorial",
+        "date": "2026-08-15 10:20:41 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786789544275",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "Machine Learning tutorial",
+        "description": "YouTube learning search: Machine Learning tutorial",
+        "date": "2026-08-15 10:25:44 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1786789546729",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "Machine Learning tutorial",
+        "description": "YouTube learning search: Machine Learning tutorial",
+        "date": "2026-08-15 10:25:46 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    }
+]

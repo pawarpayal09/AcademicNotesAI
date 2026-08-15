@@ -3,6 +3,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from image_processor import analyze_study_image
+from progress_manager import record_image_study
 
 from firebase_manager import (
     require_login,
@@ -551,7 +552,16 @@ if uploaded_image:
                     mime_type=mime_type,
                     instruction=current_instruction
                 )
+                st.session_state.image_answer = answer
 
+                st.session_state.image_instruction = (
+                    current_instruction
+                )
+
+                record_image_study(
+                    instruction=current_instruction,
+                    image_name=uploaded_image.name
+                )
 
                 # --------------------------------------------
                 # SAVE ANSWER

@@ -48,6 +48,7 @@ css_path = os.path.join(
     "style.css"
 )
 
+
 if os.path.exists(css_path):
 
     with open(
@@ -66,6 +67,20 @@ else:
     st.warning(
         f"⚠️ CSS file not found: {css_path}"
     )
+
+
+# ==========================================================
+# SESSION STATE
+# ==========================================================
+
+if "youtube_search_query" not in st.session_state:
+
+    st.session_state.youtube_search_query = ""
+
+
+if "youtube_search_pending" not in st.session_state:
+
+    st.session_state.youtube_search_pending = False
 
 
 # ==========================================================
@@ -306,7 +321,8 @@ with search_col2:
     search_button = st.button(
         "🔎 Search",
         type="primary",
-        use_container_width=True
+        use_container_width=True,
+        key="youtube_search_button"
     )
 
 
@@ -327,14 +343,21 @@ quick1, quick2, quick3, quick4 = st.columns(
 
 def run_topic_search(topic):
 
-    st.session_state.youtube_search_query = topic
+    st.session_state.youtube_search_query = (
+        topic
+    )
+
+    st.session_state.youtube_search_pending = (
+        True
+    )
 
 
 with quick1:
 
     if st.button(
         "🤖 Machine Learning",
-        use_container_width=True
+        use_container_width=True,
+        key="quick_youtube_ml"
     ):
 
         run_topic_search(
@@ -348,7 +371,8 @@ with quick2:
 
     if st.button(
         "🗄️ DBMS",
-        use_container_width=True
+        use_container_width=True,
+        key="quick_youtube_dbms"
     ):
 
         run_topic_search(
@@ -362,7 +386,8 @@ with quick3:
 
     if st.button(
         "☁️ Cloud Computing",
-        use_container_width=True
+        use_container_width=True,
+        key="quick_youtube_cloud"
     ):
 
         run_topic_search(
@@ -376,7 +401,8 @@ with quick4:
 
     if st.button(
         "🐍 Python",
-        use_container_width=True
+        use_container_width=True,
+        key="quick_youtube_python"
     ):
 
         run_topic_search(
@@ -387,34 +413,35 @@ with quick4:
 
 
 # ==========================================================
-# SEARCH QUERY SESSION STATE
+# DETERMINE QUERY FROM SEARCH BUTTON
 # ==========================================================
-
-if "youtube_search_query" not in st.session_state:
-
-    st.session_state.youtube_search_query = ""
-
-
-# ==========================================================
-# DETERMINE QUERY
-# ==========================================================
-
-query = st.session_state.youtube_search_query
-
 
 if search_button:
 
     if search_query.strip():
 
-        query = search_query.strip()
+        st.session_state.youtube_search_query = (
+            search_query.strip()
+        )
 
-        st.session_state.youtube_search_query = query
+        st.session_state.youtube_search_pending = (
+            True
+        )
 
     else:
 
         st.warning(
             "⚠️ Please enter a topic first."
         )
+
+
+# ==========================================================
+# CURRENT QUERY
+# ==========================================================
+
+query = (
+    st.session_state.youtube_search_query
+)
 
 
 # ==========================================================
@@ -452,6 +479,12 @@ if query:
         )
 
 
+        # Do not keep failed search pending
+        st.session_state.youtube_search_pending = (
+            False
+        )
+
+
     # ======================================================
     # NO RESULTS
     # ======================================================
@@ -463,8 +496,14 @@ if query:
         )
 
 
+        # Do not count empty searches
+        st.session_state.youtube_search_pending = (
+            False
+        )
+
+
     # ======================================================
-    # DISPLAY RESULTS
+    # SUCCESSFUL SEARCH
     # ======================================================
 
     else:
@@ -472,12 +511,24 @@ if query:
         # --------------------------------------------------
         # DASHBOARD TRACKING
         # --------------------------------------------------
-        # Record the search only when the YouTube API
-        # successfully returns learning resources.
+        # Record the search only when it was actually
+        # triggered by the user.
+        #
+        # This prevents duplicate entries when Streamlit
+        # reruns the page.
 
-        record_youtube_search(
-            topic=query
-        )
+        if st.session_state.youtube_search_pending:
+
+            record_youtube_search(
+                topic=query,
+                results_count=len(
+                    result["videos"]
+                )
+            )
+
+            st.session_state.youtube_search_pending = (
+                False
+            )
 
 
         st.success(
@@ -485,6 +536,10 @@ if query:
             f"learning resources."
         )
 
+
+        # ==================================================
+        # DISPLAY VIDEO RESULTS
+        # ==================================================
 
         for index, video in enumerate(
             result["videos"],
