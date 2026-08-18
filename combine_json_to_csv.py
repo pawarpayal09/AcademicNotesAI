@@ -3,6 +3,11 @@ import csv
 from pathlib import Path
 from datetime import datetime
 
+import pandas as pd
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.table import Table, TableStyleInfo
+
 
 # ==========================================================
 # PROJECT PATHS
@@ -12,7 +17,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 STORAGE_DIR = PROJECT_ROOT / "storage"
 
-OUTPUT_FILE = STORAGE_DIR / "combined_student_data.csv"
+CSV_OUTPUT_FILE = (
+    STORAGE_DIR / "combined_student_data.csv"
+)
+
+EXCEL_OUTPUT_FILE = (
+    STORAGE_DIR / "combined_student_data.xlsx"
+)
 
 
 # ==========================================================
@@ -31,7 +42,7 @@ JSON_FILES = [
 
 
 # ==========================================================
-# COMMON CSV COLUMNS
+# COMMON CSV / EXCEL COLUMNS
 # ==========================================================
 
 COMMON_COLUMNS = [
@@ -75,6 +86,53 @@ COMMON_COLUMNS = [
 
 
 # ==========================================================
+# EXCEL SHEET MAPPING
+# ==========================================================
+
+SHEET_MAPPING = {
+    "users": "Users",
+    "chat_history": "Chats",
+    "favourites": "Saved Notes",
+    "quiz_history": "Quizzes",
+    "image_study_history": "Image Study",
+    "youtube_history": "YouTube",
+    "activity_history": "Activity",
+}
+
+
+# ==========================================================
+# EXCEL COLORS
+# ==========================================================
+
+HEADER_FILL = PatternFill(
+    fill_type="solid",
+    fgColor="2563EB"
+)
+
+HEADER_FONT = Font(
+    color="FFFFFF",
+    bold=True
+)
+
+SUBHEADER_FILL = PatternFill(
+    fill_type="solid",
+    fgColor="DBEAFE"
+)
+
+SUBHEADER_FONT = Font(
+    color="075985",
+    bold=True
+)
+
+THIN_BORDER = Border(
+    bottom=Side(
+        style="thin",
+        color="D1D5DB"
+    )
+)
+
+
+# ==========================================================
 # SAFE JSON READ
 # ==========================================================
 
@@ -110,9 +168,6 @@ def load_json_file(file_path):
 
             return data
 
-
-        # If the JSON contains one dictionary,
-        # convert it into a one-record list.
 
         if isinstance(data, dict):
 
@@ -154,7 +209,7 @@ def load_json_file(file_path):
 def clean_value(value):
     """
     Convert dictionaries/lists into JSON strings
-    so they can safely be stored inside one CSV cell.
+    so they can safely be stored inside CSV/Excel cells.
     """
 
     if value is None:
@@ -180,7 +235,11 @@ def clean_value(value):
 # GENERATE RECORD ID
 # ==========================================================
 
-def get_record_id(record, source_file, index):
+def get_record_id(
+    record,
+    source_file,
+    index
+):
 
     possible_ids = [
         "id",
@@ -195,14 +254,18 @@ def get_record_id(record, source_file, index):
 
     for key in possible_ids:
 
-        value = record.get(key)
+        value = record.get(
+            key
+        )
 
         if value not in (
             None,
             ""
         ):
 
-            return str(value)
+            return str(
+                value
+            )
 
 
     return (
@@ -221,10 +284,12 @@ def convert_record(
     index
 ):
     """
-    Convert one JSON record into one CSV row.
+    Convert one JSON record into one
+    standardized tabular row.
     """
 
     row = {}
+
 
     # ------------------------------------------------------
     # BASIC INFORMATION
@@ -276,9 +341,11 @@ def convert_record(
     # TIME
     # ------------------------------------------------------
 
-    row["date"] = record.get(
-        "date",
-        ""
+    row["date"] = clean_value(
+        record.get(
+            "date",
+            ""
+        )
     )
 
     row["created_at"] = clean_value(
@@ -293,19 +360,25 @@ def convert_record(
     # ACADEMIC CONTENT
     # ------------------------------------------------------
 
-    row["topic"] = record.get(
-        "topic",
-        ""
+    row["topic"] = clean_value(
+        record.get(
+            "topic",
+            ""
+        )
     )
 
-    row["question"] = record.get(
-        "question",
-        ""
+    row["question"] = clean_value(
+        record.get(
+            "question",
+            ""
+        )
     )
 
-    row["answer"] = record.get(
-        "answer",
-        ""
+    row["answer"] = clean_value(
+        record.get(
+            "answer",
+            ""
+        )
     )
 
 
@@ -313,24 +386,32 @@ def convert_record(
     # QUIZ
     # ------------------------------------------------------
 
-    row["difficulty"] = record.get(
-        "difficulty",
-        ""
+    row["difficulty"] = clean_value(
+        record.get(
+            "difficulty",
+            ""
+        )
     )
 
-    row["score"] = record.get(
-        "score",
-        ""
+    row["score"] = clean_value(
+        record.get(
+            "score",
+            ""
+        )
     )
 
-    row["total_questions"] = record.get(
-        "total_questions",
-        ""
+    row["total_questions"] = clean_value(
+        record.get(
+            "total_questions",
+            ""
+        )
     )
 
-    row["percentage"] = record.get(
-        "percentage",
-        ""
+    row["percentage"] = clean_value(
+        record.get(
+            "percentage",
+            ""
+        )
     )
 
 
@@ -338,14 +419,18 @@ def convert_record(
     # IMAGE STUDY
     # ------------------------------------------------------
 
-    row["image_name"] = record.get(
-        "image_name",
-        ""
+    row["image_name"] = clean_value(
+        record.get(
+            "image_name",
+            ""
+        )
     )
 
-    row["instruction"] = record.get(
-        "instruction",
-        ""
+    row["instruction"] = clean_value(
+        record.get(
+            "instruction",
+            ""
+        )
     )
 
 
@@ -353,9 +438,11 @@ def convert_record(
     # YOUTUBE
     # ------------------------------------------------------
 
-    row["results_count"] = record.get(
-        "results_count",
-        ""
+    row["results_count"] = clean_value(
+        record.get(
+            "results_count",
+            ""
+        )
     )
 
 
@@ -363,11 +450,13 @@ def convert_record(
     # CHAT HISTORY
     # ------------------------------------------------------
 
-    row["chat_title"] = record.get(
-        "title",
+    row["chat_title"] = clean_value(
         record.get(
-            "chat_title",
-            ""
+            "title",
+            record.get(
+                "chat_title",
+                ""
+            )
         )
     )
 
@@ -396,9 +485,11 @@ def convert_record(
     # ACTIVITY
     # ------------------------------------------------------
 
-    row["description"] = record.get(
-        "description",
-        ""
+    row["description"] = clean_value(
+        record.get(
+            "description",
+            ""
+        )
     )
 
 
@@ -418,19 +509,23 @@ def convert_record(
     # USER ACCOUNT FIELDS
     # ------------------------------------------------------
 
-    row["email_verified"] = record.get(
-        "email_verified",
-        ""
+    row["email_verified"] = clean_value(
+        record.get(
+            "email_verified",
+            ""
+        )
     )
 
-    row["disabled"] = record.get(
-        "disabled",
-        ""
+    row["disabled"] = clean_value(
+        record.get(
+            "disabled",
+            ""
+        )
     )
 
 
     # ------------------------------------------------------
-    # NESTED / EXTRA DATA
+    # UNKNOWN / ADDITIONAL DATA
     # ------------------------------------------------------
 
     known_keys = {
@@ -441,28 +536,38 @@ def convert_record(
         "search_id",
         "chat_id",
         "record_id",
+
         "user_uid",
         "user_name",
         "user_email",
+
         "name",
         "email",
+
         "date",
         "created_at",
+
         "topic",
         "question",
         "answer",
+
         "difficulty",
         "score",
         "total_questions",
         "percentage",
+
         "image_name",
         "instruction",
+
         "results_count",
+
         "title",
         "chat_title",
         "messages",
+
         "description",
         "sources",
+
         "email_verified",
         "disabled",
     }
@@ -475,44 +580,46 @@ def convert_record(
     }
 
 
-    row["metadata_json"] = (
-        json.dumps(
-            extra_data,
-            ensure_ascii=False
+    # ------------------------------------------------------
+    # CHAT MESSAGES + EXTRA DATA
+    # ------------------------------------------------------
+
+    metadata = {}
+
+
+    if extra_data:
+
+        metadata.update(
+            extra_data
         )
-        if extra_data
-        else ""
-    )
 
-
-    # ------------------------------------------------------
-    # STORE CHAT MESSAGES WITHOUT LOSING THEM
-    # ------------------------------------------------------
 
     if messages:
 
-        row["metadata_json"] = json.dumps(
-            {
-                "messages": messages,
-                **extra_data,
-            },
+        metadata["messages"] = messages
+
+
+    row["metadata_json"] = (
+        json.dumps(
+            metadata,
             ensure_ascii=False
         )
+        if metadata
+        else ""
+    )
 
 
     return row
 
 
 # ==========================================================
-# COMBINE ALL JSON FILES
+# CREATE DATAFRAME
 # ==========================================================
 
-def combine_json_to_csv():
+def create_combined_dataframe():
     """
-    Read all project JSON files and create one CSV file.
-
-    The CSV is completely regenerated every time the
-    function runs, so newly added JSON records are included.
+    Read all JSON files and create one
+    standardized Pandas DataFrame.
     """
 
     STORAGE_DIR.mkdir(
@@ -529,7 +636,7 @@ def combine_json_to_csv():
     )
 
     print(
-        " Academic Notes AI - JSON → CSV"
+        " Academic Notes AI - JSON → DATASET"
     )
 
     print(
@@ -539,7 +646,9 @@ def combine_json_to_csv():
 
     for json_name in JSON_FILES:
 
-        json_path = STORAGE_DIR / json_name
+        json_path = (
+            STORAGE_DIR / json_name
+        )
 
 
         print(
@@ -588,37 +697,455 @@ def combine_json_to_csv():
 
 
     # ======================================================
-    # WRITE CSV
+    # CREATE DATAFRAME
     # ======================================================
 
-    with open(
-        OUTPUT_FILE,
-        "w",
-        encoding="utf-8-sig",
-        newline=""
-    ) as file:
+    if all_rows:
 
-        writer = csv.DictWriter(
-            file,
-            fieldnames=COMMON_COLUMNS,
-            extrasaction="ignore"
+        dataframe = pd.DataFrame(
+            all_rows,
+            columns=COMMON_COLUMNS
+        )
+
+    else:
+
+        dataframe = pd.DataFrame(
+            columns=COMMON_COLUMNS
         )
 
 
-        writer.writeheader()
+    # ======================================================
+    # SORT DATA
+    # ======================================================
 
+    if not dataframe.empty:
 
-        writer.writerows(
-            all_rows
+        dataframe = (
+            dataframe
+            .sort_values(
+                by=[
+                    "user_uid",
+                    "date",
+                    "record_type"
+                ],
+                ascending=[
+                    True,
+                    False,
+                    True
+                ],
+                na_position="last"
+            )
+            .reset_index(
+                drop=True
+            )
         )
 
+
+    return dataframe
+
+
+# ==========================================================
+# WRITE CSV
+# ==========================================================
+
+def write_csv(
+    dataframe
+):
+    """
+    Write combined dataframe to CSV.
+    """
+
+    dataframe.to_csv(
+        CSV_OUTPUT_FILE,
+        index=False,
+        encoding="utf-8-sig"
+    )
+
+
+# ==========================================================
+# FORMAT EXCEL SHEET
+# ==========================================================
+
+def format_worksheet(
+    worksheet,
+    freeze_row=2
+):
+    """
+    Apply professional formatting to an Excel sheet.
+    """
+
+    worksheet.freeze_panes = (
+        f"A{freeze_row}"
+    )
+
+
+    # ------------------------------------------------------
+    # Header formatting
+    # ------------------------------------------------------
+
+    for cell in worksheet[1]:
+
+        cell.fill = HEADER_FILL
+
+        cell.font = HEADER_FONT
+
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center"
+        )
+
+        cell.border = THIN_BORDER
+
+
+    worksheet.row_dimensions[1].height = 24
+
+
+    # ------------------------------------------------------
+    # Cell alignment
+    # ------------------------------------------------------
+
+    for row in worksheet.iter_rows(
+        min_row=2
+    ):
+
+        for cell in row:
+
+            cell.alignment = Alignment(
+                vertical="top",
+                wrap_text=True
+            )
+
+
+    # ------------------------------------------------------
+    # Automatic column widths
+    # ------------------------------------------------------
+
+    for column_cells in worksheet.columns:
+
+        column_letter = (
+            get_column_letter(
+                column_cells[0].column
+            )
+        )
+
+
+        max_length = 0
+
+
+        for cell in column_cells:
+
+            try:
+
+                value_length = len(
+                    str(
+                        cell.value
+                        or ""
+                    )
+                )
+
+
+                max_length = max(
+                    max_length,
+                    value_length
+                )
+
+            except Exception:
+
+                pass
+
+
+        # Keep widths reasonable.
+
+        width = min(
+            max(
+                max_length + 2,
+                12
+            ),
+            45
+        )
+
+
+        worksheet.column_dimensions[
+            column_letter
+        ].width = width
+
+
+    # ------------------------------------------------------
+    # Table formatting
+    # ------------------------------------------------------
+
+    if worksheet.max_row >= 2:
+
+        table_ref = (
+            f"A1:"
+            f"{get_column_letter(worksheet.max_column)}"
+            f"{worksheet.max_row}"
+        )
+
+
+        table = Table(
+            displayName=(
+                "Table_"
+                + worksheet.title.replace(
+                    " ",
+                    "_"
+                )
+            ),
+            ref=table_ref
+        )
+
+
+        table_style = TableStyleInfo(
+            name="TableStyleMedium2",
+            showFirstColumn=False,
+            showLastColumn=False,
+            showRowStripes=True,
+            showColumnStripes=False
+        )
+
+
+        table.tableStyleInfo = (
+            table_style
+        )
+
+
+        worksheet.add_table(
+            table
+        )
+
+
+# ==========================================================
+# WRITE EXCEL WORKBOOK
+# ==========================================================
+
+def write_excel(
+    combined_dataframe
+):
+    """
+    Create a convenient multi-sheet Excel workbook.
+
+    Sheets:
+        Overview
+        Users
+        Chats
+        Saved Notes
+        Quizzes
+        Image Study
+        YouTube
+        Activity
+        Combined Dataset
+    """
+
+    with pd.ExcelWriter(
+        EXCEL_OUTPUT_FILE,
+        engine="openpyxl"
+    ) as writer:
+
+        # ==================================================
+        # OVERVIEW
+        # ==================================================
+
+        overview_data = [
+
+            [
+                "Academic Notes AI",
+                "Combined Project Dataset"
+            ],
+
+            [
+                "Generated On",
+                datetime.now().strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+            ],
+
+            [
+                "Total Records",
+                len(
+                    combined_dataframe
+                )
+            ],
+
+            [
+                "Total Columns",
+                len(
+                    COMMON_COLUMNS
+                )
+            ],
+
+            [
+                "Source JSON Files",
+                len(
+                    JSON_FILES
+                )
+            ],
+
+        ]
+
+
+        overview_df = pd.DataFrame(
+            overview_data,
+            columns=[
+                "Metric",
+                "Value"
+            ]
+        )
+
+
+        overview_df.to_excel(
+            writer,
+            sheet_name="Overview",
+            index=False
+        )
+
+
+        # ==================================================
+        # INDIVIDUAL SHEETS
+        # ==================================================
+
+        for record_type, sheet_name in (
+            SHEET_MAPPING.items()
+        ):
+
+            filtered = (
+                combined_dataframe[
+                    combined_dataframe[
+                        "record_type"
+                    ] == record_type
+                ]
+                .copy()
+            )
+
+
+            filtered.to_excel(
+                writer,
+                sheet_name=sheet_name,
+                index=False
+            )
+
+
+        # ==================================================
+        # COMBINED DATASET
+        # ==================================================
+
+        combined_dataframe.to_excel(
+            writer,
+            sheet_name="Combined Dataset",
+            index=False
+        )
+
+
+    # ======================================================
+    # POST-FORMATTING
+    # ======================================================
+
+    from openpyxl import load_workbook
+
+    workbook = load_workbook(
+        EXCEL_OUTPUT_FILE
+    )
+
+
+    # ------------------------------------------------------
+    # Overview formatting
+    # ------------------------------------------------------
+
+    overview_sheet = workbook[
+        "Overview"
+    ]
+
+
+    for cell in overview_sheet[1]:
+
+        cell.fill = HEADER_FILL
+
+        cell.font = HEADER_FONT
+
+        cell.alignment = Alignment(
+            horizontal="center"
+        )
+
+
+    overview_sheet.column_dimensions[
+        "A"
+    ].width = 24
+
+
+    overview_sheet.column_dimensions[
+        "B"
+    ].width = 35
+
+
+    # ------------------------------------------------------
+    # Format all other sheets
+    # ------------------------------------------------------
+
+    for worksheet in workbook.worksheets:
+
+        if worksheet.title == "Overview":
+
+            continue
+
+
+        format_worksheet(
+            worksheet
+        )
+
+
+    workbook.save(
+        EXCEL_OUTPUT_FILE
+    )
+
+
+# ==========================================================
+# MAIN FUNCTION
+# ==========================================================
+
+def combine_json_to_csv():
+    """
+    Main function.
+
+    Every run:
+        1. Reads latest JSON files.
+        2. Rebuilds combined CSV.
+        3. Rebuilds Excel workbook.
+
+    Therefore newly added records are always included.
+    """
+
+    dataframe = (
+        create_combined_dataframe()
+    )
+
+
+    # ======================================================
+    # CSV
+    # ======================================================
+
+    write_csv(
+        dataframe
+    )
+
+
+    # ======================================================
+    # EXCEL
+    # ======================================================
+
+    write_excel(
+        dataframe
+    )
+
+
+    # ======================================================
+    # FINAL SUMMARY
+    # ======================================================
 
     print(
         "\n========================================"
     )
 
     print(
-        "✅ CSV CREATED SUCCESSFULLY"
+        "✅ DATASET CREATED SUCCESSFULLY"
     )
 
     print(
@@ -627,15 +1154,36 @@ def combine_json_to_csv():
 
 
     print(
-        f"📄 File: {OUTPUT_FILE}"
+        f"📄 CSV:"
+        f"\n   {CSV_OUTPUT_FILE}"
     )
 
-    print(
-        f"📊 Total records: {len(all_rows)}"
-    )
 
     print(
-        f"📋 Total columns: {len(COMMON_COLUMNS)}"
+        f"\n📊 Excel:"
+        f"\n   {EXCEL_OUTPUT_FILE}"
+    )
+
+
+    print(
+        f"\n📈 Total records: "
+        f"{len(dataframe)}"
+    )
+
+
+    print(
+        f"📋 Total columns: "
+        f"{len(COMMON_COLUMNS)}"
+    )
+
+
+    print(
+        "\n========================================"
+    )
+
+
+    print(
+        "✅ JSON → CSV + Excel completed"
     )
 
 
@@ -644,7 +1192,10 @@ def combine_json_to_csv():
     )
 
 
-    return OUTPUT_FILE
+    return (
+        CSV_OUTPUT_FILE,
+        EXCEL_OUTPUT_FILE
+    )
 
 
 # ==========================================================

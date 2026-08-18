@@ -111,5 +111,86 @@
             "total_questions": 5,
             "percentage": 80
         }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787030260808",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "Python programming tutorial",
+        "description": "YouTube learning search: Python programming tutorial",
+        "date": "2026-08-18 05:17:40 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787030265625",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "Python programming tutorial",
+        "description": "YouTube learning search: Python programming tutorial",
+        "date": "2026-08-18 05:17:45 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787030267474",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "Python programming tutorial",
+        "description": "YouTube learning search: Python programming tutorial",
+        "date": "2026-08-18 05:17:47 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787030469160",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "summarize notes",
+        "date": "2026-08-18 05:21:09 UTC",
+        "metadata": {
+            "image_name": "datascience.png"
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787030470048",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "summarize notes",
+        "date": "2026-08-18 05:21:10 UTC",
+        "metadata": {
+            "image_name": "datascience.png"
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787030677873",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "quiz",
+        "topic": "Artificial Intelligence",
+        "description": "Easy quiz: 5/5 (100%)",
+        "date": "2026-08-18 05:24:37 UTC",
+        "metadata": {
+            "difficulty": "Easy",
+            "score": 5,
+            "total_questions": 5,
+            "percentage": 100
+        }
     }
 ]
