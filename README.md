@@ -1,4 +1,4 @@
-# 📚 Academic Notes AI – Intelligent RAG Chatbot for Academic Learning
+# 🧑‍🎓 StudyNova – Intelligent RAG Chatbot for Academic Learning
 
 ## 📖 Project Overview
 Academic Notes AI is an AI-powered educational chatbot that helps students ask questions from academic PDF notes and receive accurate, context-based answers using Retrieval-Augmented Generation (RAG). It combines Google's Gemini LLM, LangChain, FAISS, and Sentence Transformer embeddings to provide intelligent responses.

@@ -15,7 +15,7 @@ DATA_FOLDER = "data"
 VECTOR_DB = "vectorstore"
 
 print("=" * 60)
-print("📚 Academic Notes Chatbot")
+print("🧑‍🎓 StudyNova")
 print("=" * 60)
 
 # --------------------------------------------------

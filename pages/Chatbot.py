@@ -197,7 +197,7 @@ st.markdown(
         font-weight:800;
         margin-bottom:0px;
     ">
-    📚 Academic Notes AI
+    🧑‍🎓 StudyNova
     </h1>
 
     <p style="
@@ -263,7 +263,7 @@ with st.sidebar:
 
     st.markdown(
         """
-        # 📚 Academic Notes AI
+        # 🧑‍🎓 StudyNova
 
         Learn Smarter with AI
         """,
@@ -1356,7 +1356,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
 
     st.caption(
-        "📚 Academic Notes AI"
+        "🧑‍🎓 StudyNova"
     )
 
 

@@ -153,7 +153,7 @@ with st.sidebar:
 
     st.markdown(
         """
-        # 📚 Academic Notes AI
+        # 🧑‍🎓 StudyNova
 
         ### Learn Smarter with AI
         """

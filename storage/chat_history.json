@@ -424,5 +424,42 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "433f8775-86a5-430d-a6b0-048952dd48cd",
+        "title": "Explain Unsupervised Learning.",
+        "date": "2026-08-18",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Explain Unsupervised Learning."
+            },
+            {
+                "role": "assistant",
+                "content": "I couldn't find this information in the uploaded notes.",
+                "sources": [
+                    "Data Science.pdf",
+                    "Introduction to machine learning.pdf"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "70abfd9c-905d-46a5-91aa-7a219513d115",
+        "title": "What is AI?",
+        "date": "2026-08-20",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is AI?"
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\n\nAccording to the notes, Artificial Intelligence (AI) can be defined in multiple ways:\n* It is the study of systems that act in a way that appears intelligent to any observer.\n* It involves using methods based on the intelligent behavior of humans and other animals to solve complex problems.\n* It is the study of human intelligence and actions replicated artificially, designed so that the system can think and act with human rationality (doing the right thing).\n* It is a new electronic machine that stores a large amount of information and processes it at very high speed.\n\n---\n\n### Explanation\n\n* **Interdisciplinary Background:** To understand AI, one must understand the background of other subjects, primarily philosophy, linguistics, psychology, and biology.\n* **Core Concepts:** AI requires understanding terms such as intelligence, knowledge, reasoning, thought, cognition (*gyan* or *bodh*), and learning. \n  * *Intelligence* is defined as the ability to acquire, understand, and apply knowledge, or the ability to exercise thought and reasons.\n\n---\n\n### Key Points\n\n* **Programming Languages:** PROLOG (Program Logic), developed in the 1970s, is an early programming language strongly associated with AI.\n* **Significance:** AI may be one of the most important developments of this century.\n\n---\n\n### Applications / Examples\n\nResearch funded by DARPA (Defense Advanced Research Projects Agency) includes three significant AI development programs:\n* **Autonomous Land Vehicle (ALV):** A driverless military vehicle.\n* **Pilot\u2019s Associate:** An expert system that provides assistance to fighter pilots.\n* **The Strategic Computing Program:** An AI-based military supercomputer project.",
+                "sources": [
+                    "Artificial Intelligence.pdf"
+                ]
+            }
+        ]
     }
 ]

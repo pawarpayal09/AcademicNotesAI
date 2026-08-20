@@ -100,7 +100,7 @@ if css_file.exists():
 with st.sidebar:
 
     st.markdown("""
-    # 📚 Academic Notes AI
+    # 🧑‍🎓 StudyNova
 
     ### Learn Smarter with AI
     """)
@@ -153,7 +153,7 @@ font-size:56px;
 font-weight:800;
 margin-bottom:0px;
 ">
-📚 Academic Notes AI
+🧑‍🎓 StudyNova
 </h1>
 
 <h4 style="

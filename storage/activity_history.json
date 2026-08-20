@@ -192,5 +192,40 @@
             "total_questions": 5,
             "percentage": 100
         }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787042742583",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "chat",
+        "topic": "Academic Notes",
+        "description": "Explain Unsupervised Learning.",
+        "date": "2026-08-18 08:45:42 UTC",
+        "metadata": {}
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787206318971",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "Cloud Computing tutorial",
+        "description": "YouTube learning search: Cloud Computing tutorial",
+        "date": "2026-08-20 06:11:58 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787206630371",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "chat",
+        "topic": "Academic Notes",
+        "description": "What is AI?",
+        "date": "2026-08-20 06:17:10 UTC",
+        "metadata": {}
     }
 ]

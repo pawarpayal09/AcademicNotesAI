@@ -54,7 +54,7 @@ load_css()
 # PAGE HEADER
 # ==========================================================
 
-st.markdown("## 📚 Academic Notes AI")
+st.markdown("## 🧑‍🎓 StudyNova")
 
 st.caption(
     "Create your personal study account"
