@@ -163,85 +163,92 @@ user_email = (
 )
 
 
-# ==========================================================
+# =====================================================
 # SIDEBAR
-# ==========================================================
+# =====================================================
 
 with st.sidebar:
 
-    st.markdown("""
-    # 🧑‍🎓 StudyNova
+    st.markdown(
+        """
+        # 🧑‍🎓 StudyNova
 
-    ### Learn Smarter with AI
-    """)
+        ### Learn Smarter with AI
+        """
+    )
 
     st.divider()
 
-    st.success(
-        f"👤 {user_name}"
-    )
+    st.info(
+        """
+### 🤖 About
 
-    st.caption(
-        user_email
+An AI-powered academic assistant that helps students:
+
+- 📚 Search academic notes
+- 📄 Chat with uploaded PDFs
+- 🖼️ Understand study images
+- 🧠 Generate practice quizzes
+- 🎥 Find educational YouTube resources
+- 📌 Save important AI answers
+- 📊 Track learning activity
+- 📈 View personal study progress
+"""
     )
 
     st.divider()
 
     st.markdown(
-        "### 📊 Dashboard"
+        "### 🚀 Technologies"
     )
 
-    if st.button(
-        "💬 Chatbot",
-        use_container_width=True
-    ):
+    st.success(
+        "🤖 Google Gemini"
+    )
 
-        st.switch_page(
-            "pages/Chatbot.py"
-        )
+    st.success(
+        "🦜 LangChain"
+    )
 
-    if st.button(
-        "🖼️ Image Study",
-        use_container_width=True
-    ):
+    st.success(
+        "📚 FAISS"
+    )
 
-        st.switch_page(
-            "pages/ImageStudy.py"
-        )
+    st.success(
+        "🧠 RAG"
+    )
 
-    if st.button(
-        "🧠 Quiz",
-        use_container_width=True
-    ):
+    st.success(
+        "🔥 Firebase"
+    )
 
-        st.switch_page(
-            "pages/Quiz.py"
-        )
+    st.success(
+        "🎥 YouTube API"
+    )
 
-    if st.button(
-        "🎥 YouTube",
-        use_container_width=True
-    ):
-
-        st.switch_page(
-            "pages/YouTubeResources.py"
-        )
-
-    if st.button(
-        "📌 Saved Notes",
-        use_container_width=True
-    ):
-
-        st.switch_page(
-            "pages/FavouriteNotes.py"
-        )
+    st.success(
+        "⚡ Streamlit"
+    )
 
     st.divider()
 
-    st.caption(
-        "Academic Notes AI"
+    st.markdown(
+        "### 👩‍💻 Developer"
     )
 
+    st.info(
+        """
+**Payal Pawar**
+
+🎓 MCA Student
+
+StudyNova
+
+Academic Notes AI
+
+Version 1.0
+"""
+    )
 
 # ==========================================================
 # HEADER

@@ -227,5 +227,84 @@
         "description": "What is AI?",
         "date": "2026-08-20 06:17:10 UTC",
         "metadata": {}
+    },
+    {
+        "activity_id": "5R0u2E5mLkfrKpsXr5d471OF0H42_1787373453768",
+        "user_uid": "5R0u2E5mLkfrKpsXr5d471OF0H42",
+        "user_name": "Bhakti Santosh Gharat",
+        "user_email": "bhakti123@gmail.com",
+        "type": "chat",
+        "topic": "Academic Notes",
+        "description": "Explain the structure of Operating System.",
+        "date": "2026-08-22 04:37:33 UTC",
+        "metadata": {}
+    },
+    {
+        "activity_id": "5R0u2E5mLkfrKpsXr5d471OF0H42_1787373590125",
+        "user_uid": "5R0u2E5mLkfrKpsXr5d471OF0H42",
+        "user_name": "Bhakti Santosh Gharat",
+        "user_email": "bhakti123@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "Explain this flowchart in simple language.",
+        "date": "2026-08-22 04:39:50 UTC",
+        "metadata": {
+            "image_name": "flowchart.png"
+        }
+    },
+    {
+        "activity_id": "5R0u2E5mLkfrKpsXr5d471OF0H42_1787373590483",
+        "user_uid": "5R0u2E5mLkfrKpsXr5d471OF0H42",
+        "user_name": "Bhakti Santosh Gharat",
+        "user_email": "bhakti123@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "Explain this flowchart in simple language.",
+        "date": "2026-08-22 04:39:50 UTC",
+        "metadata": {
+            "image_name": "flowchart.png"
+        }
+    },
+    {
+        "activity_id": "5R0u2E5mLkfrKpsXr5d471OF0H42_1787373624073",
+        "user_uid": "5R0u2E5mLkfrKpsXr5d471OF0H42",
+        "user_name": "Bhakti Santosh Gharat",
+        "user_email": "bhakti123@gmail.com",
+        "type": "youtube",
+        "topic": "Artificial Intelligence",
+        "description": "YouTube learning search: Artificial Intelligence",
+        "date": "2026-08-22 04:40:24 UTC",
+        "metadata": {
+            "results_count": 6
+        }
+    },
+    {
+        "activity_id": "5R0u2E5mLkfrKpsXr5d471OF0H42_1787373782494",
+        "user_uid": "5R0u2E5mLkfrKpsXr5d471OF0H42",
+        "user_name": "Bhakti Santosh Gharat",
+        "user_email": "bhakti123@gmail.com",
+        "type": "quiz",
+        "topic": "Python",
+        "description": "Easy quiz: 5/5 (100%)",
+        "date": "2026-08-22 04:43:02 UTC",
+        "metadata": {
+            "difficulty": "Easy",
+            "score": 5,
+            "total_questions": 5,
+            "percentage": 100
+        }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787375759685",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "image",
+        "topic": "Image Study",
+        "description": "Explain the chart.",
+        "date": "2026-08-22 05:15:59 UTC",
+        "metadata": {
+            "image_name": "ChatGPT Image Aug 20, 2026, 10_51_25 AM.png"
+        }
     }
 ]

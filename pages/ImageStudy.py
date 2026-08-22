@@ -1,6 +1,5 @@
 import os
 import streamlit as st
-import streamlit.components.v1 as components
 
 from image_processor import analyze_study_image
 from progress_manager import record_image_study
@@ -10,10 +9,6 @@ from firebase_manager import (
     is_authenticated,
     get_current_user,
     logout_user
-)
-
-from progress_manager import (
-    record_image_study
 )
 
 
@@ -552,43 +547,39 @@ if uploaded_image:
                     mime_type=mime_type,
                     instruction=current_instruction
                 )
-                st.session_state.image_answer = answer
 
-                st.session_state.image_instruction = (
-                    current_instruction
-                )
+
+            # ------------------------------------------------
+            # SAVE ANSWER
+            # ------------------------------------------------
+
+            st.session_state.image_answer = answer
+
+            st.session_state.image_instruction = (
+                current_instruction
+            )
+
+
+            # ------------------------------------------------
+            # DASHBOARD TRACKING
+            #
+            # IMPORTANT:
+            # There is ONLY ONE record_image_study()
+            # call in this file.
+            # ------------------------------------------------
+
+            if (
+                answer
+                and
+                not str(answer).startswith("⚠️")
+                and
+                not str(answer).startswith("❌")
+            ):
 
                 record_image_study(
                     instruction=current_instruction,
                     image_name=uploaded_image.name
                 )
-
-                # --------------------------------------------
-                # SAVE ANSWER
-                # --------------------------------------------
-
-                st.session_state.image_answer = answer
-
-                st.session_state.image_instruction = (
-                    current_instruction
-                )
-
-
-                # --------------------------------------------
-                # DASHBOARD TRACKING
-                # --------------------------------------------
-                # Record ONE image-study activity only when
-                # the Analyze Image button is used.
-                #
-                # Regenerate does not create another image
-                # activity because it is the same uploaded image.
-
-                if answer and not str(answer).startswith("⚠️"):
-
-                    record_image_study(
-                        instruction=current_instruction,
-                        image_name=uploaded_image.name
-                    )
 
 
     # ======================================================
@@ -685,6 +676,13 @@ if uploaded_image:
                                 instruction=regenerate_instruction
                             )
                         )
+
+
+                    # IMPORTANT:
+                    # Regenerate does not call
+                    # record_image_study().
+                    #
+                    # It is the same image-study activity.
 
 
                     st.rerun()

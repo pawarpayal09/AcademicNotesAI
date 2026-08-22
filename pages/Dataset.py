@@ -1,8 +1,16 @@
 import os
 from io import BytesIO
+
 import streamlit as st
 
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import (
+    Font,
+    PatternFill,
+    Alignment,
+    Border,
+    Side
+)
+
 from openpyxl.utils import get_column_letter
 
 from firebase_manager import (
@@ -13,7 +21,7 @@ from firebase_manager import (
 )
 
 from data_science.dataset_manager import (
-    get_current_user_dataset
+    get_all_data
 )
 
 
@@ -80,69 +88,86 @@ def load_css():
 
 load_css()
 
-# =====================================================
-# LOGGED-IN USER PROFILE
-# TOP-RIGHT PROFESSIONAL PROFILE BAR
-# =====================================================
+
+# ==========================================================
+# CURRENT USER
+# ==========================================================
 
 if is_authenticated():
 
     current_user = get_current_user()
 
-    profile_spacer, profile_area = st.columns(
-        [5.8, 1.8],
-        gap="small"
-    )
+else:
 
-    with profile_area:
+    st.stop()
 
-        with st.container(
-            key="home_user_profile"
+
+if not current_user:
+
+    st.stop()
+
+
+# ==========================================================
+# TOP-RIGHT USER PROFILE
+# ==========================================================
+
+profile_spacer, profile_area = st.columns(
+    [5.8, 1.8],
+    gap="small"
+)
+
+
+with profile_area:
+
+    with st.container(
+        key="home_user_profile"
+    ):
+
+        # -----------------------------------------
+        # USER NAME
+        # -----------------------------------------
+
+        st.markdown(
+            f"""
+            <div class="home-profile-name">
+                👤 {current_user['name']}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # -----------------------------------------
+        # USER EMAIL
+        # -----------------------------------------
+
+        st.markdown(
+            f"""
+            <div class="home-profile-email">
+                {current_user['email']}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # -----------------------------------------
+        # LOGOUT
+        # -----------------------------------------
+
+        if st.button(
+            "🚪 Logout",
+            key="home_logout_button",
+            use_container_width=True
         ):
 
-            # -----------------------------------------
-            # USER NAME
-            # -----------------------------------------
+            logout_user()
 
-            st.markdown(
-                f"""
-                <div class="home-profile-name">
-                    👤 {current_user['name']}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+            st.rerun()
 
-            # -----------------------------------------
-            # USER EMAIL
-            # -----------------------------------------
 
-            st.markdown(
-                f"""
-                <div class="home-profile-email">
-                    {current_user['email']}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
 
-            # -----------------------------------------
-            # LOGOUT
-            # -----------------------------------------
-
-            if st.button(
-                "🚪 Logout",
-                key="home_logout_button",
-                use_container_width=True
-            ):
-
-                logout_user()
-
-                st.rerun()
-
-# ==========================================================
+# =====================================================
 # SIDEBAR
-# ==========================================================
+# =====================================================
 
 with st.sidebar:
 
@@ -158,116 +183,56 @@ with st.sidebar:
 
     st.info(
         """
-        ### 📊 Dataset & Analysis
+### 🤖 About
 
-        View the APIs used in the project
-        and your latest activity dataset.
-        """
+An AI-powered academic assistant that helps students:
+
+- 📚 Search academic notes
+- 📄 Chat with uploaded PDFs
+- 🖼️ Understand study images
+- 🧠 Generate practice quizzes
+- 🎥 Find educational YouTube resources
+- 📌 Save important AI answers
+- 📊 Track learning activity
+- 📈 View personal study progress
+"""
     )
 
     st.divider()
 
     st.markdown(
-        "### 🚀 Navigation"
+        "### 🚀 Technologies"
     )
 
+    st.success(
+        "🤖 Google Gemini"
+    )
 
-    # ------------------------------------------------------
-    # HOME
-    # ------------------------------------------------------
+    st.success(
+        "🦜 LangChain"
+    )
 
-    if st.button(
-        "🏠 Home",
-        use_container_width=True,
-        key="dataset_home_button"
-    ):
+    st.success(
+        "📚 FAISS"
+    )
 
-        st.switch_page(
-            "app.py"
-        )
+    st.success(
+        "🧠 RAG"
+    )
 
+    st.success(
+        "🔥 Firebase"
+    )
 
-    # ------------------------------------------------------
-    # CHATBOT
-    # ------------------------------------------------------
+    st.success(
+        "🎥 YouTube API"
+    )
 
-    if st.button(
-        "💬 Chatbot",
-        use_container_width=True,
-        key="dataset_chatbot_button"
-    ):
-
-        st.switch_page(
-            "pages/Chatbot.py"
-        )
-
-
-    # ------------------------------------------------------
-    # QUIZ
-    # ------------------------------------------------------
-
-    if st.button(
-        "🧠 Quiz",
-        use_container_width=True,
-        key="dataset_quiz_button"
-    ):
-
-        st.switch_page(
-            "pages/Quiz.py"
-        )
-
-
-    # ------------------------------------------------------
-    # IMAGE STUDY
-    # ------------------------------------------------------
-
-    if st.button(
-        "🖼️ Image Study",
-        use_container_width=True,
-        key="dataset_image_button"
-    ):
-
-        st.switch_page(
-            "pages/ImageStudy.py"
-        )
-
-
-    # ------------------------------------------------------
-    # YOUTUBE
-    # ------------------------------------------------------
-
-    if st.button(
-        "🎥 YouTube",
-        use_container_width=True,
-        key="dataset_youtube_button"
-    ):
-
-        st.switch_page(
-            "pages/YouTubeResources.py"
-        )
-
-
-    # ------------------------------------------------------
-    # SAVED NOTES
-    # ------------------------------------------------------
-
-    if st.button(
-        "📌 Saved Notes",
-        use_container_width=True,
-        key="dataset_saved_button"
-    ):
-
-        st.switch_page(
-            "pages/FavouriteNotes.py"
-        )
-
+    st.success(
+        "⚡ Streamlit"
+    )
 
     st.divider()
-
-
-    # ------------------------------------------------------
-    # DEVELOPER
-    # ------------------------------------------------------
 
     st.markdown(
         "### 👩‍💻 Developer"
@@ -275,16 +240,17 @@ with st.sidebar:
 
     st.info(
         """
-        **Payal Pawar**
+**Payal Pawar**
 
-        🎓 MCA Student
+🎓 MCA Student
 
-        Academic Notes AI
+StudyNova
 
-        Version 1.0
-        """
+Academic Notes AI
+
+Version 1.0
+"""
     )
-
 
 # ==========================================================
 # PAGE HEADER
@@ -296,32 +262,28 @@ st.title(
 
 st.write(
     "View the APIs used in the project and "
-    "your latest user activity dataset."
+    "the complete user activity dataset."
 )
 
 st.caption(
-    f"Logged in as: {current_user.get('email', '')}"
+    f"Currently logged in as: "
+    f"{current_user.get('email', '')}"
 )
 
 st.divider()
 
 
 # ==========================================================
-# LOAD CURRENT USER DATA
+# LOAD COMPLETE DATASET
+# IMPORTANT:
+# THIS LOADS ALL USERS' RECORDS
 # ==========================================================
 
-user_uid = current_user.get(
-    "uid"
-)
-
-
 with st.spinner(
-    "📥 Loading your latest dataset..."
+    "📥 Loading complete activity dataset..."
 ):
 
-    dataframe = get_current_user_dataset(
-        user_uid
-    )
+    dataframe = get_all_data()
 
 
 # ==========================================================
@@ -341,8 +303,6 @@ st.write(
 # ==========================================================
 # API CARDS
 # ==========================================================
-
-# Row 1
 
 api1, api2, api3 = st.columns(
     3,
@@ -456,9 +416,10 @@ with api3:
 
         st.write(
             "Searches real educational videos "
-            "related to the selected academic topic." \
-            "And help students to learn."
+            "related to the selected academic topic "
+            "and helps students learn."
         )
+
 
 # ==========================================================
 # ROW 2
@@ -471,6 +432,7 @@ api4, api5, empty_column = st.columns(
     3,
     gap="small"
 )
+
 
 # ==========================================================
 # FIREBASE API
@@ -507,6 +469,7 @@ with api4:
             "and user identity through Firebase."
         )
 
+
 # ==========================================================
 # MAIN CHAT API 2
 # ==========================================================
@@ -518,7 +481,7 @@ with api5:
     ):
 
         st.markdown(
-            "### Main Chatbot API "
+            "### Main Chatbot API 2"
         )
 
         st.caption(
@@ -543,6 +506,7 @@ with api5:
             "chat generation flow."
         )
 
+
 # ==========================================================
 # DATASET SECTION
 # ==========================================================
@@ -554,27 +518,26 @@ st.markdown(
 )
 
 st.caption(
-    "All available records for the currently "
-    "logged-in user."
+    "Complete activity records of all users "
+    "from the beginning of the stored dataset "
+    "up to the latest available record."
 )
 
 
 # ==========================================================
-# HELPER:
-# REPLACE NULL / EMPTY VALUES WITH "NULL"
+# NULL / BLANK VALUE HELPER
 # ==========================================================
 
 def prepare_display_dataframe(
     source_dataframe
 ):
     """
-    Create a clean copy of the DataFrame.
+    Create a clean display copy.
 
-    Blank strings, whitespace-only values,
-    None, NaN and missing values are shown
-    consistently as the text 'NULL'.
+    Blank, empty and missing values are
+    displayed as 'NULL'.
 
-    The original backend DataFrame is not modified.
+    The original DataFrame is not modified.
     """
 
     clean_dataframe = (
@@ -601,7 +564,11 @@ def prepare_display_dataframe(
                     or (
                         not isinstance(
                             value,
-                            (list, dict, tuple)
+                            (
+                                list,
+                                dict,
+                                tuple
+                            )
                         )
                         and str(value).lower()
                         in {
@@ -620,7 +587,7 @@ def prepare_display_dataframe(
 
 
 # ==========================================================
-# PREPARE DATASET
+# DATASET DISPLAY
 # ==========================================================
 
 if dataframe.empty:
@@ -705,7 +672,7 @@ else:
 
 
     # ------------------------------------------------------
-    # Columns that exist in current backend
+    # Existing columns
     # ------------------------------------------------------
 
     available_columns = [
@@ -744,7 +711,7 @@ else:
 
 
     # ------------------------------------------------------
-    # Replace blanks/nulls with NULL
+    # Replace blank/null values
     # ------------------------------------------------------
 
     display_dataframe = (
@@ -767,12 +734,14 @@ else:
 
 
     # ======================================================
-    # DATASET INFORMATION
+    # DATASET COUNT
     # ======================================================
 
     st.caption(
-        f"Total records: {len(display_dataframe)} "
-        f"• Total columns: {len(display_dataframe.columns)}"
+        f"Total records: "
+        f"{len(display_dataframe)}"
+        f" • Total columns: "
+        f"{len(display_dataframe.columns)}"
     )
 
 
@@ -784,18 +753,13 @@ else:
         dataset
     ):
         """
-        Create a properly formatted Excel workbook
-        completely in memory.
+        Create a formatted Excel file in memory.
         """
+
+        import pandas as pd
 
         output = BytesIO()
 
-
-        # --------------------------------------------------
-        # Pandas Excel writer
-        # --------------------------------------------------
-
-        import pandas as pd
 
         with pd.ExcelWriter(
             output,
@@ -809,10 +773,6 @@ else:
             )
 
 
-            workbook = (
-                writer.book
-            )
-
             worksheet = (
                 writer.sheets[
                     "Fused Dataset"
@@ -821,7 +781,7 @@ else:
 
 
             # --------------------------------------------------
-            # Header style
+            # Header
             # --------------------------------------------------
 
             header_fill = PatternFill(
@@ -846,13 +806,9 @@ else:
 
             for cell in worksheet[1]:
 
-                cell.fill = (
-                    header_fill
-                )
+                cell.fill = header_fill
 
-                cell.font = (
-                    header_font
-                )
+                cell.font = header_font
 
                 cell.alignment = Alignment(
                     horizontal="center",
@@ -860,22 +816,18 @@ else:
                     wrap_text=True
                 )
 
-                cell.border = (
-                    thin_border
-                )
+                cell.border = thin_border
 
 
             # --------------------------------------------------
             # Freeze header
             # --------------------------------------------------
 
-            worksheet.freeze_panes = (
-                "A2"
-            )
+            worksheet.freeze_panes = "A2"
 
 
             # --------------------------------------------------
-            # Auto filter
+            # Filter
             # --------------------------------------------------
 
             worksheet.auto_filter.ref = (
@@ -884,7 +836,7 @@ else:
 
 
             # --------------------------------------------------
-            # Row height
+            # Header row height
             # --------------------------------------------------
 
             worksheet.row_dimensions[
@@ -893,7 +845,7 @@ else:
 
 
             # --------------------------------------------------
-            # Cell formatting
+            # Cell alignment
             # --------------------------------------------------
 
             for row in worksheet.iter_rows(
@@ -936,6 +888,7 @@ else:
                             )
                         )
 
+
                         max_length = max(
                             max_length,
                             value_length
@@ -945,9 +898,6 @@ else:
 
                         pass
 
-
-                # Keep columns readable without
-                # becoming extremely wide.
 
                 width = min(
                     max(
@@ -964,7 +914,7 @@ else:
 
 
             # --------------------------------------------------
-            # Add Excel table
+            # Excel Table
             # --------------------------------------------------
 
             if worksheet.max_row >= 2:
@@ -988,14 +938,12 @@ else:
                 )
 
 
-                table_style = (
-                    TableStyleInfo(
-                        name="TableStyleMedium2",
-                        showFirstColumn=False,
-                        showLastColumn=False,
-                        showRowStripes=True,
-                        showColumnStripes=False
-                    )
+                table_style = TableStyleInfo(
+                    name="TableStyleMedium2",
+                    showFirstColumn=False,
+                    showLastColumn=False,
+                    showRowStripes=True,
+                    showColumnStripes=False
                 )
 
 
@@ -1015,7 +963,7 @@ else:
 
 
     # ======================================================
-    # DOWNLOAD BUTTON
+    # DOWNLOAD FUSED DATASET
     # ======================================================
 
     excel_file = create_excel_file(

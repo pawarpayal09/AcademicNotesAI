@@ -52,5 +52,32 @@
         "image_name": "datascience.png",
         "instruction": "summarize notes",
         "date": "2026-08-18 05:21:10 UTC"
+    },
+    {
+        "activity_id": "5R0u2E5mLkfrKpsXr5d471OF0H42_1787373590117",
+        "user_uid": "5R0u2E5mLkfrKpsXr5d471OF0H42",
+        "user_name": "Bhakti Santosh Gharat",
+        "user_email": "bhakti123@gmail.com",
+        "image_name": "flowchart.png",
+        "instruction": "Explain this flowchart in simple language.",
+        "date": "2026-08-22 04:39:50 UTC"
+    },
+    {
+        "activity_id": "5R0u2E5mLkfrKpsXr5d471OF0H42_1787373590483",
+        "user_uid": "5R0u2E5mLkfrKpsXr5d471OF0H42",
+        "user_name": "Bhakti Santosh Gharat",
+        "user_email": "bhakti123@gmail.com",
+        "image_name": "flowchart.png",
+        "instruction": "Explain this flowchart in simple language.",
+        "date": "2026-08-22 04:39:50 UTC"
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787375759670",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "image_name": "ChatGPT Image Aug 20, 2026, 10_51_25 AM.png",
+        "instruction": "Explain the chart.",
+        "date": "2026-08-22 05:15:59 UTC"
     }
 ]

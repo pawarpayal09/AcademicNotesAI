@@ -53,5 +53,14 @@
             "Data Science.pdf"
         ],
         "date": "2026-08-20 11:47"
+    },
+    {
+        "id": "037082c0-3f2e-48bd-9d20-7fe51fde1521",
+        "question": "Explain the structure of Operating System.",
+        "answer": "### Definition\n\nThe structure of an Operating System is organized into four distinct layers that enable it to act as an intermediary between the user/applications and the computer hardware.\n\n---\n\n### Explanation\n\nThe Operating System structure comprises the following **4 layers**:\n\n1. **Hardware:** The physical computer equipment and components.\n2. **Kernel:** The vital part of the operating system that interacts directly with the computer hardware.\n3. **System Call Interface (Shell):** An interface that provides access to the operating system services, allowing programs to communicate with the kernel.\n4. **Application Programs:** Programs that run on the system and interact with the kernel through system calls.\n\n---\n\n### Key Points\n\n* **Kernel:** \n  * It is the vital part of the operating system.\n  * It interacts directly with the computer hardware.\n  * Programs interact with the kernel through system calls.\n* **System Call Interface:** \n  * Provides an interface to the operating system services.\n  * Tells the kernel to carry out various tasks on behalf of a program.\n* **Operating System Role:** \n  * Acts as the \"brain of the computer.\"\n  * Controls the internal activities of computer hardware and enables efficient utilization of hardware resources.\n\n---\n\n### Example\n\nExamples of tasks that system calls instruct the kernel to perform include:\n* Opening a file\n* Writing to a file\n* Obtaining information about a file\n* Executing a program\n* Terminating a process",
+        "sources": [
+            "Operating System.pdf"
+        ],
+        "date": "2026-08-22 10:08"
     }
 ]

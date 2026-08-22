@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from collections import Counter
 
 import pandas as pd
 
@@ -33,71 +34,118 @@ JSON_FILES = [
 
 
 # ==========================================================
+# CONSISTENT VALUES
+# ==========================================================
+
+NOT_APPLICABLE = "Not Applicable"
+
+
+# ==========================================================
 # COMMON DATASET COLUMNS
 # ==========================================================
 
 DATASET_COLUMNS = [
 
+    # ------------------------------------------------------
+    # Record identification
+    # ------------------------------------------------------
+
     "record_id",
-
     "source_file",
-
     "record_type",
+    "activity_type",
+
+    # ------------------------------------------------------
+    # User information
+    # ------------------------------------------------------
 
     "user_uid",
-
     "user_name",
-
     "user_email",
 
-    "date",
+    # ------------------------------------------------------
+    # Time
+    # ------------------------------------------------------
 
+    "date",
     "created_at",
+    "activity_hour",
+
+    # ------------------------------------------------------
+    # Academic information
+    # ------------------------------------------------------
 
     "topic",
 
-    "question",
+    # ------------------------------------------------------
+    # Text information
+    # ------------------------------------------------------
 
+    "question",
     "answer",
+    "instruction",
+    "description",
+    "sources",
+
+    # ------------------------------------------------------
+    # Quiz information
+    # ------------------------------------------------------
 
     "difficulty",
-
     "score",
-
     "total_questions",
-
     "percentage",
+
+    # ------------------------------------------------------
+    # Image information
+    # ------------------------------------------------------
 
     "image_name",
 
-    "instruction",
+    # ------------------------------------------------------
+    # YouTube information
+    # ------------------------------------------------------
 
     "results_count",
 
-    "chat_title",
+    # ------------------------------------------------------
+    # Chat information
+    # ------------------------------------------------------
 
+    "chat_title",
     "message_count",
 
-    "description",
-
-    "sources",
+    # ------------------------------------------------------
+    # User account information
+    # ------------------------------------------------------
 
     "email_verified",
-
     "disabled",
 
-    # Derived Data Science fields
-    "question_length",
+    # ------------------------------------------------------
+    # Data-science derived features
+    # ------------------------------------------------------
 
+    "question_length",
     "answer_length",
+    "instruction_length",
+    "description_length",
 
     "has_question",
-
     "has_answer",
-
+    "has_instruction",
     "has_source",
 
-    "activity_hour",
+    # ------------------------------------------------------
+    # Activity flags
+    # ------------------------------------------------------
+
+    "is_chat",
+    "is_quiz",
+    "is_image",
+    "is_youtube",
+    "is_saved_note",
+    "is_user_record",
 
 ]
 
@@ -110,14 +158,13 @@ def _load_json_file(
     file_path: Path
 ):
     """
-    Read one JSON file safely.
+    Safely read one JSON file.
 
     Returns:
         list of dictionaries
     """
 
     if not file_path.exists():
-
         return []
 
 
@@ -129,9 +176,7 @@ def _load_json_file(
             encoding="utf-8"
         ) as file:
 
-            data = json.load(
-                file
-            )
+            data = json.load(file)
 
 
     except (
@@ -143,7 +188,7 @@ def _load_json_file(
 
 
     # ------------------------------------------------------
-    # Normal format
+    # Normal list
     # ------------------------------------------------------
 
     if isinstance(
@@ -162,7 +207,7 @@ def _load_json_file(
 
 
     # ------------------------------------------------------
-    # Single dictionary
+    # Single object
     # ------------------------------------------------------
 
     if isinstance(
@@ -177,34 +222,273 @@ def _load_json_file(
 
 
 # ==========================================================
-# VALUE CLEANER
+# TEXT NORMALIZER
 # ==========================================================
 
-def _clean_value(
+def _normalize_text(
     value
 ):
     """
-    Convert nested Python values into a
-    simple value suitable for a DataFrame.
+    Convert missing or blank text values into
+    a consistent text value.
     """
 
     if value is None:
-
-        return ""
+        return NOT_APPLICABLE
 
 
     if isinstance(
         value,
-        (dict, list)
+        str
     ):
 
-        return json.dumps(
-            value,
-            ensure_ascii=False
+        value = value.strip()
+
+        if not value:
+            return NOT_APPLICABLE
+
+        return value
+
+
+    if isinstance(
+        value,
+        (list, dict, tuple)
+    ):
+
+        try:
+
+            return json.dumps(
+                value,
+                ensure_ascii=False
+            )
+
+        except Exception:
+
+            return str(value)
+
+
+    return str(value)
+
+
+# ==========================================================
+# NUMERIC NORMALIZER
+# ==========================================================
+
+def _normalize_number(
+    value,
+    default=0
+):
+    """
+    Convert a value into a numeric value.
+
+    Missing or invalid values become the supplied
+    default. For this dataset, 0 means the metric
+    is not applicable or has no recorded value.
+    """
+
+    if value is None:
+        return default
+
+
+    if isinstance(
+        value,
+        str
+    ):
+
+        value = value.strip()
+
+        if not value:
+            return default
+
+
+    try:
+
+        number = float(
+            value
+        )
+
+        if pd.isna(number):
+            return default
+
+
+        if number.is_integer():
+            return int(number)
+
+
+        return number
+
+
+    except (
+        ValueError,
+        TypeError
+    ):
+
+        return default
+
+
+# ==========================================================
+# BOOLEAN NORMALIZER
+# ==========================================================
+
+def _normalize_boolean(
+    value
+):
+    """
+    Store boolean values consistently as 0 or 1.
+    """
+
+    if isinstance(
+        value,
+        bool
+    ):
+
+        return 1 if value else 0
+
+
+    if isinstance(
+        value,
+        str
+    ):
+
+        value = value.strip().lower()
+
+        if value in {
+            "true",
+            "yes",
+            "1"
+        }:
+
+            return 1
+
+
+        if value in {
+            "false",
+            "no",
+            "0"
+        }:
+
+            return 0
+
+
+    if value in (
+        1,
+        0
+    ):
+
+        return int(
+            value
         )
 
 
+    return 0
+
+
+# ==========================================================
+# DATE NORMALIZER
+# ==========================================================
+
+def _normalize_date(
+    value
+):
+    """
+    Return a usable date/time string.
+    """
+
+    if value is None:
+        return NOT_APPLICABLE
+
+
+    value = str(
+        value
+    ).strip()
+
+
+    if not value:
+        return NOT_APPLICABLE
+
+
     return value
+
+
+# ==========================================================
+# EXTRACT HOUR
+# ==========================================================
+
+def _extract_hour(
+    value
+):
+    """
+    Extract hour from common date formats.
+
+    Returns 0 when time is not available.
+    """
+
+    if not value:
+        return 0
+
+
+    value = str(
+        value
+    ).strip()
+
+
+    # ------------------------------------------------------
+    # Format:
+    # 2026-08-15 09:46:13 UTC
+    # ------------------------------------------------------
+
+    try:
+
+        pieces = value.split()
+
+        if len(pieces) >= 2:
+
+            time_part = pieces[1]
+
+            hour = int(
+                time_part.split(":")[0]
+            )
+
+            return hour
+
+
+    except (
+        ValueError,
+        IndexError
+    ):
+
+        pass
+
+
+    # ------------------------------------------------------
+    # Format:
+    # 2026-08-15T09:46:13
+    # ------------------------------------------------------
+
+    try:
+
+        if "T" in value:
+
+            time_part = (
+                value.split("T")[1]
+            )
+
+            hour = int(
+                time_part.split(":")[0]
+            )
+
+            return hour
+
+
+    except (
+        ValueError,
+        IndexError
+    ):
+
+        pass
+
+
+    return 0
 
 
 # ==========================================================
@@ -217,24 +501,19 @@ def _get_record_id(
     index
 ):
     """
-    Find the best available ID for a record.
+    Find the best available unique ID.
     """
 
     possible_ids = [
 
         "record_id",
-
         "id",
-
         "uid",
-
         "quiz_id",
-
         "activity_id",
-
         "search_id",
-
         "chat_id",
+
     ]
 
 
@@ -262,87 +541,120 @@ def _get_record_id(
 
 
 # ==========================================================
-# PARSE HOUR FROM DATE
+# GET ACTIVITY TYPE
 # ==========================================================
 
-def _extract_hour(
-    value
+def _get_activity_type(
+    record,
+    source_file
 ):
     """
-    Try to extract the hour from a stored date/time string.
-
-    Returns:
-        integer hour 0-23
-        or empty string
+    Determine the real activity represented by a record.
     """
 
-    if not value:
-
-        return ""
-
-
-    value = str(
-        value
-    ).strip()
+    source = (
+        Path(
+            source_file
+        ).stem
+    )
 
 
     # ------------------------------------------------------
-    # Example:
-    # 2026-08-15 09:46:13 UTC
+    # Activity history
     # ------------------------------------------------------
 
-    try:
+    if source == "activity_history":
 
-        time_part = (
-            value.split(" ")[1]
+        activity_type = (
+            record.get(
+                "type"
+            )
         )
 
-        hour = (
-            time_part.split(":")[0]
-        )
 
-        return int(
-            hour
-        )
+        if activity_type:
 
-    except (
-        IndexError,
-        ValueError
+            return str(
+                activity_type
+            ).strip().lower()
+
+
+        return "activity"
+
+
+    # ------------------------------------------------------
+    # Other JSON sources
+    # ------------------------------------------------------
+
+    activity_map = {
+
+        "chat_history":
+            "chat",
+
+        "quiz_history":
+            "quiz",
+
+        "image_study_history":
+            "image",
+
+        "youtube_history":
+            "youtube",
+
+        "favourites":
+            "saved_note",
+
+        "users":
+            "user",
+
+    }
+
+
+    return activity_map.get(
+        source,
+        source
+    )
+
+
+# ==========================================================
+# EXTRACT ACTIVITY METADATA
+# ==========================================================
+
+def _get_activity_metadata(
+    record,
+    source_file
+):
+    """
+    Extract information stored inside activity_history.json
+    metadata.
+    """
+
+    source = (
+        Path(
+            source_file
+        ).stem
+    )
+
+
+    if source != "activity_history":
+
+        return {}
+
+
+    metadata = record.get(
+        "metadata",
+        {}
+    )
+
+
+    if isinstance(
+        metadata,
+        dict
     ):
 
-        pass
+        return metadata
 
 
-    # ------------------------------------------------------
-    # Another common format:
-    # 2026-08-15T09:46:13
-    # ------------------------------------------------------
-
-    try:
-
-        if "T" in value:
-
-            time_part = (
-                value.split("T")[1]
-            )
-
-            hour = (
-                time_part.split(":")[0]
-            )
-
-            return int(
-                hour
-            )
-
-    except (
-        IndexError,
-        ValueError
-    ):
-
-        pass
-
-
-    return ""
+    return {}
 
 
 # ==========================================================
@@ -355,227 +667,143 @@ def _convert_record(
     index
 ):
     """
-    Convert one JSON record into a standard
-    dataset row.
+    Convert one JSON record into one consistent
+    machine-learning-friendly row.
     """
 
-    row = {
-
-        "record_id": (
-            _get_record_id(
-                record,
-                source_file,
-                index
-            )
-        ),
-
-        "source_file": (
+    activity_type = (
+        _get_activity_type(
+            record,
             source_file
-        ),
+        )
+    )
 
-        "record_type": (
-            Path(
-                source_file
-            ).stem
-        ),
 
-        # --------------------------------------------------
-        # USER
-        # --------------------------------------------------
-
-        "user_uid": (
-            record.get(
-                "user_uid",
-                record.get(
-                    "uid",
-                    ""
-                )
-            )
-        ),
-
-        "user_name": (
-            record.get(
-                "user_name",
-                record.get(
-                    "name",
-                    ""
-                )
-            )
-        ),
-
-        "user_email": (
-            record.get(
-                "user_email",
-                record.get(
-                    "email",
-                    ""
-                )
-            )
-        ),
-
-        # --------------------------------------------------
-        # TIME
-        # --------------------------------------------------
-
-        "date": _clean_value(
-            record.get(
-                "date",
-                ""
-            )
-        ),
-
-        "created_at": _clean_value(
-            record.get(
-                "created_at",
-                ""
-            )
-        ),
-
-        # --------------------------------------------------
-        # ACADEMIC CONTENT
-        # --------------------------------------------------
-
-        "topic": _clean_value(
-            record.get(
-                "topic",
-                ""
-            )
-        ),
-
-        "question": _clean_value(
-            record.get(
-                "question",
-                ""
-            )
-        ),
-
-        "answer": _clean_value(
-            record.get(
-                "answer",
-                ""
-            )
-        ),
-
-        # --------------------------------------------------
-        # QUIZ
-        # --------------------------------------------------
-
-        "difficulty": _clean_value(
-            record.get(
-                "difficulty",
-                ""
-            )
-        ),
-
-        "score": _clean_value(
-            record.get(
-                "score",
-                ""
-            )
-        ),
-
-        "total_questions": _clean_value(
-            record.get(
-                "total_questions",
-                ""
-            )
-        ),
-
-        "percentage": _clean_value(
-            record.get(
-                "percentage",
-                ""
-            )
-        ),
-
-        # --------------------------------------------------
-        # IMAGE
-        # --------------------------------------------------
-
-        "image_name": _clean_value(
-            record.get(
-                "image_name",
-                ""
-            )
-        ),
-
-        "instruction": _clean_value(
-            record.get(
-                "instruction",
-                ""
-            )
-        ),
-
-        # --------------------------------------------------
-        # YOUTUBE
-        # --------------------------------------------------
-
-        "results_count": _clean_value(
-            record.get(
-                "results_count",
-                ""
-            )
-        ),
-
-        # --------------------------------------------------
-        # CHAT
-        # --------------------------------------------------
-
-        "chat_title": _clean_value(
-            record.get(
-                "title",
-                record.get(
-                    "chat_title",
-                    ""
-                )
-            )
-        ),
-
-        # --------------------------------------------------
-        # ACTIVITY
-        # --------------------------------------------------
-
-        "description": _clean_value(
-            record.get(
-                "description",
-                ""
-            )
-        ),
-
-        # --------------------------------------------------
-        # SOURCES
-        # --------------------------------------------------
-
-        "sources": _clean_value(
-            record.get(
-                "sources",
-                ""
-            )
-        ),
-
-        # --------------------------------------------------
-        # USER STATUS
-        # --------------------------------------------------
-
-        "email_verified": _clean_value(
-            record.get(
-                "email_verified",
-                ""
-            )
-        ),
-
-        "disabled": _clean_value(
-            record.get(
-                "disabled",
-                ""
-            )
-        ),
-    }
+    activity_metadata = (
+        _get_activity_metadata(
+            record,
+            source_file
+        )
+    )
 
 
     # ======================================================
-    # MESSAGE COUNT
+    # USER INFORMATION
     # ======================================================
+
+    user_uid = _normalize_text(
+        record.get(
+            "user_uid",
+            record.get(
+                "uid"
+            )
+        )
+    )
+
+
+    user_name = _normalize_text(
+        record.get(
+            "user_name",
+            record.get(
+                "name"
+            )
+        )
+    )
+
+
+    user_email = _normalize_text(
+        record.get(
+            "user_email",
+            record.get(
+                "email"
+            )
+        )
+    )
+
+
+    # ======================================================
+    # DATE
+    # ======================================================
+
+    date_value = _normalize_date(
+        record.get(
+            "date",
+            record.get(
+                "created_at"
+            )
+        )
+    )
+
+
+    created_at_value = _normalize_date(
+        record.get(
+            "created_at",
+            record.get(
+                "date"
+            )
+        )
+    )
+
+
+    # ======================================================
+    # ACADEMIC TEXT
+    # ======================================================
+
+    topic = _normalize_text(
+        record.get(
+            "topic"
+        )
+    )
+
+
+    question = _normalize_text(
+        record.get(
+            "question"
+        )
+    )
+
+
+    answer = _normalize_text(
+        record.get(
+            "answer"
+        )
+    )
+
+
+    instruction = _normalize_text(
+        record.get(
+            "instruction"
+        )
+    )
+
+
+    description = _normalize_text(
+        record.get(
+            "description"
+        )
+    )
+
+
+    sources = _normalize_text(
+        record.get(
+            "sources"
+        )
+    )
+
+
+    # ======================================================
+    # CHAT HISTORY
+    # ======================================================
+
+    chat_title = _normalize_text(
+        record.get(
+            "title",
+            record.get(
+                "chat_title"
+            )
+        )
+    )
+
 
     messages = record.get(
         "messages",
@@ -588,106 +816,583 @@ def _convert_record(
         list
     ):
 
-        row["message_count"] = len(
+        message_count = len(
             messages
         )
 
     else:
 
-        row["message_count"] = ""
+        message_count = 0
 
 
     # ======================================================
-    # DATA SCIENCE DERIVED FEATURES
+    # QUIZ DATA
     # ======================================================
 
-    question_text = str(
-        row["question"]
-        or
-        ""
+    difficulty = record.get(
+        "difficulty"
     )
 
 
-    answer_text = str(
-        row["answer"]
-        or
-        ""
+    score = record.get(
+        "score"
     )
 
 
-    sources_text = str(
-        row["sources"]
-        or
-        ""
+    total_questions = record.get(
+        "total_questions"
     )
 
 
-    row["question_length"] = len(
-        question_text.strip()
+    percentage = record.get(
+        "percentage"
     )
 
 
-    row["answer_length"] = len(
-        answer_text.strip()
+    # ------------------------------------------------------
+    # Extract quiz values from activity metadata
+    # ------------------------------------------------------
+
+    if activity_type == "quiz":
+
+        if difficulty in (
+            None,
+            ""
+        ):
+
+            difficulty = (
+                activity_metadata.get(
+                    "difficulty"
+                )
+            )
+
+
+        if score in (
+            None,
+            ""
+        ):
+
+            score = (
+                activity_metadata.get(
+                    "score"
+                )
+            )
+
+
+        if total_questions in (
+            None,
+            ""
+        ):
+
+            total_questions = (
+                activity_metadata.get(
+                    "total_questions"
+                )
+            )
+
+
+        if percentage in (
+            None,
+            ""
+        ):
+
+            percentage = (
+                activity_metadata.get(
+                    "percentage"
+                )
+            )
+
+
+    difficulty = _normalize_text(
+        difficulty
     )
 
 
-    row["has_question"] = (
-        1
-        if question_text.strip()
-        else 0
+    score = _normalize_number(
+        score
     )
 
 
-    row["has_answer"] = (
-        1
-        if answer_text.strip()
-        else 0
+    total_questions = _normalize_number(
+        total_questions
     )
 
 
-    row["has_source"] = (
-        1
-        if sources_text.strip()
-        else 0
+    percentage = _normalize_number(
+        percentage
     )
 
 
-    row["activity_hour"] = (
-        _extract_hour(
-            row["date"]
+    # ======================================================
+    # IMAGE DATA
+    # ======================================================
+
+    image_name = record.get(
+        "image_name"
+    )
+
+
+    if (
+        image_name in (
+            None,
+            ""
+        )
+        and activity_type == "image"
+    ):
+
+        image_name = (
+            activity_metadata.get(
+                "image_name"
+            )
+        )
+
+
+    image_name = _normalize_text(
+        image_name
+    )
+
+
+    # ======================================================
+    # YOUTUBE DATA
+    # ======================================================
+
+    results_count = record.get(
+        "results_count"
+    )
+
+
+    if (
+        results_count in (
+            None,
+            ""
+        )
+        and activity_type == "youtube"
+    ):
+
+        results_count = (
+            activity_metadata.get(
+                "results_count"
+            )
+        )
+
+
+    results_count = _normalize_number(
+        results_count
+    )
+
+
+    # ======================================================
+    # USER ACCOUNT DATA
+    # ======================================================
+
+    email_verified = _normalize_boolean(
+        record.get(
+            "email_verified"
         )
     )
+
+
+    disabled = _normalize_boolean(
+        record.get(
+            "disabled"
+        )
+    )
+
+
+    # ======================================================
+    # DERIVED TEXT FEATURES
+    # ======================================================
+
+    question_length = (
+        0
+        if question == NOT_APPLICABLE
+        else len(
+            question
+        )
+    )
+
+
+    answer_length = (
+        0
+        if answer == NOT_APPLICABLE
+        else len(
+            answer
+        )
+    )
+
+
+    instruction_length = (
+        0
+        if instruction == NOT_APPLICABLE
+        else len(
+            instruction
+        )
+    )
+
+
+    description_length = (
+        0
+        if description == NOT_APPLICABLE
+        else len(
+            description
+        )
+    )
+
+
+    # ======================================================
+    # SOURCE FLAGS
+    # ======================================================
+
+    has_question = (
+        1
+        if question != NOT_APPLICABLE
+        else 0
+    )
+
+
+    has_answer = (
+        1
+        if answer != NOT_APPLICABLE
+        else 0
+    )
+
+
+    has_instruction = (
+        1
+        if instruction != NOT_APPLICABLE
+        else 0
+    )
+
+
+    has_source = (
+        1
+        if sources != NOT_APPLICABLE
+        else 0
+    )
+
+
+    # ======================================================
+    # ACTIVITY FLAGS
+    # ======================================================
+
+    is_chat = (
+        1
+        if activity_type == "chat"
+        else 0
+    )
+
+
+    is_quiz = (
+        1
+        if activity_type == "quiz"
+        else 0
+    )
+
+
+    is_image = (
+        1
+        if activity_type == "image"
+        else 0
+    )
+
+
+    is_youtube = (
+        1
+        if activity_type == "youtube"
+        else 0
+    )
+
+
+    is_saved_note = (
+        1
+        if activity_type == "saved_note"
+        else 0
+    )
+
+
+    is_user_record = (
+        1
+        if activity_type == "user"
+        else 0
+    )
+
+
+    # ======================================================
+    # CREATE ROW
+    # ======================================================
+
+    row = {
+
+        "record_id": _get_record_id(
+            record,
+            source_file,
+            index
+        ),
+
+        "source_file":
+            source_file,
+
+        "record_type":
+            Path(
+                source_file
+            ).stem,
+
+        "activity_type":
+            activity_type,
+
+        "user_uid":
+            user_uid,
+
+        "user_name":
+            user_name,
+
+        "user_email":
+            user_email,
+
+        "date":
+            date_value,
+
+        "created_at":
+            created_at_value,
+
+        "topic":
+            topic,
+
+        "question":
+            question,
+
+        "answer":
+            answer,
+
+        "difficulty":
+            difficulty,
+
+        "score":
+            score,
+
+        "total_questions":
+            total_questions,
+
+        "percentage":
+            percentage,
+
+        "image_name":
+            image_name,
+
+        "instruction":
+            instruction,
+
+        "results_count":
+            results_count,
+
+        "chat_title":
+            chat_title,
+
+        "message_count":
+            message_count,
+
+        "description":
+            description,
+
+        "sources":
+            sources,
+
+        "email_verified":
+            email_verified,
+
+        "disabled":
+            disabled,
+
+        "question_length":
+            question_length,
+
+        "answer_length":
+            answer_length,
+
+        "instruction_length":
+            instruction_length,
+
+        "description_length":
+            description_length,
+
+        "has_question":
+            has_question,
+
+        "has_answer":
+            has_answer,
+
+        "has_instruction":
+            has_instruction,
+
+        "has_source":
+            has_source,
+
+        "is_chat":
+            is_chat,
+
+        "is_quiz":
+            is_quiz,
+
+        "is_image":
+            is_image,
+
+        "is_youtube":
+            is_youtube,
+
+        "is_saved_note":
+            is_saved_note,
+
+        "is_user_record":
+            is_user_record,
+
+        "activity_hour":
+            _extract_hour(
+                date_value
+            ),
+    }
 
 
     return row
 
 
 # ==========================================================
-# LOAD ALL DATA
+# REMOVE DUPLICATE ACTIVITY-HISTORY RECORDS
+# ==========================================================
+
+def _remove_duplicate_activity_records(
+    dataframe
+):
+    """
+    Remove duplicate summary records created because
+    detailed history and activity_history.json both
+    contain the same event.
+
+    Detailed sources are preferred:
+
+        quiz_history.json
+        image_study_history.json
+        youtube_history.json
+
+    activity_history.json is retained for:
+        chat
+        saved_note
+        user
+        other activities
+    """
+
+    if dataframe.empty:
+        return dataframe
+
+
+    detailed_types = {
+        "quiz",
+        "image",
+        "youtube",
+    }
+
+
+    detailed_source_files = {
+        "quiz_history.json",
+        "image_study_history.json",
+        "youtube_history.json",
+    }
+
+
+    # ------------------------------------------------------
+    # Separate detailed records
+    # ------------------------------------------------------
+
+    detailed = dataframe[
+        dataframe["source_file"].isin(
+            detailed_source_files
+        )
+    ].copy()
+
+
+    # ------------------------------------------------------
+    # Activity-history records
+    # ------------------------------------------------------
+
+    activity_history = dataframe[
+        dataframe["source_file"]
+        ==
+        "activity_history.json"
+    ].copy()
+
+
+    # ------------------------------------------------------
+    # Keep activity history only for activities without
+    # detailed duplicate sources.
+    # ------------------------------------------------------
+
+    if not activity_history.empty:
+
+        activity_history = activity_history[
+            ~activity_history[
+                "activity_type"
+            ].isin(
+                detailed_types
+            )
+        ].copy()
+
+
+    # ------------------------------------------------------
+    # Other sources
+    # ------------------------------------------------------
+
+    other_sources = dataframe[
+        ~dataframe["source_file"].isin(
+            detailed_source_files
+            |
+            {
+                "activity_history.json"
+            }
+        )
+    ].copy()
+
+
+    # ------------------------------------------------------
+    # Combine without duplicate summary records
+    # ------------------------------------------------------
+
+    cleaned = pd.concat(
+        [
+            other_sources,
+            detailed,
+            activity_history
+        ],
+        ignore_index=True
+    )
+
+
+    return cleaned
+
+
+# ==========================================================
+# LOAD COMPLETE DATASET
 # ==========================================================
 
 def load_combined_dataset(
     user_uid=None
 ):
     """
-    Read all seven JSON files and return one
-    combined Pandas DataFrame.
+    Read all seven JSON files and create one
+    clean, consistent dataset.
 
-    Parameters:
-        user_uid:
-            If supplied, only that user's records
-            are returned.
+    user_uid is optional.
 
-    Returns:
-        Pandas DataFrame
+    When user_uid is None:
+        all users are returned.
+
+    When user_uid is supplied:
+        only that user is returned.
     """
 
     all_rows = []
 
 
     # ======================================================
-    # READ EACH JSON
+    # READ ALL JSON FILES
     # ======================================================
 
     for json_name in JSON_FILES:
@@ -706,6 +1411,14 @@ def load_combined_dataset(
             records
         ):
 
+            if not isinstance(
+                record,
+                dict
+            ):
+
+                continue
+
+
             row = _convert_record(
                 record,
                 json_name,
@@ -723,13 +1436,72 @@ def load_combined_dataset(
     # ======================================================
 
     dataframe = pd.DataFrame(
-        all_rows,
-        columns=DATASET_COLUMNS
+        all_rows
     )
 
 
     # ======================================================
-    # USER FILTER
+    # ENSURE ALL COLUMNS EXIST
+    # ======================================================
+
+    for column in DATASET_COLUMNS:
+
+        if column not in dataframe.columns:
+
+            if column in {
+                "score",
+                "total_questions",
+                "percentage",
+                "results_count",
+                "message_count",
+                "question_length",
+                "answer_length",
+                "instruction_length",
+                "description_length",
+                "activity_hour",
+                "has_question",
+                "has_answer",
+                "has_instruction",
+                "has_source",
+                "is_chat",
+                "is_quiz",
+                "is_image",
+                "is_youtube",
+                "is_saved_note",
+                "is_user_record",
+            }:
+
+                dataframe[column] = 0
+
+            else:
+
+                dataframe[column] = (
+                    NOT_APPLICABLE
+                )
+
+
+    # ======================================================
+    # COLUMN ORDER
+    # ======================================================
+
+    dataframe = dataframe[
+        DATASET_COLUMNS
+    ]
+
+
+    # ======================================================
+    # REMOVE DUPLICATE SUMMARY EVENTS
+    # ======================================================
+
+    dataframe = (
+        _remove_duplicate_activity_records(
+            dataframe
+        )
+    )
+
+
+    # ======================================================
+    # FILTER USER WHEN REQUESTED
     # ======================================================
 
     if user_uid:
@@ -747,28 +1519,100 @@ def load_combined_dataset(
 
 
     # ======================================================
-    # RESET INDEX
+    # CLEAN TEXT COLUMNS AGAIN
     # ======================================================
 
-    dataframe = (
-        dataframe
-        .reset_index(
-            drop=True
+    text_columns = [
+
+        "record_id",
+        "source_file",
+        "record_type",
+        "activity_type",
+        "user_uid",
+        "user_name",
+        "user_email",
+        "date",
+        "created_at",
+        "topic",
+        "question",
+        "answer",
+        "difficulty",
+        "image_name",
+        "instruction",
+        "chat_title",
+        "description",
+        "sources",
+
+    ]
+
+
+    for column in text_columns:
+
+        dataframe[column] = (
+            dataframe[column]
+            .apply(
+                _normalize_text
+            )
         )
-    )
 
 
     # ======================================================
-    # SORT
+    # NUMERIC COLUMNS
+    # ======================================================
+
+    numeric_columns = [
+
+        "score",
+        "total_questions",
+        "percentage",
+        "results_count",
+        "message_count",
+        "question_length",
+        "answer_length",
+        "instruction_length",
+        "description_length",
+        "activity_hour",
+
+        "has_question",
+        "has_answer",
+        "has_instruction",
+        "has_source",
+
+        "is_chat",
+        "is_quiz",
+        "is_image",
+        "is_youtube",
+        "is_saved_note",
+        "is_user_record",
+
+        "email_verified",
+        "disabled",
+
+    ]
+
+
+    for column in numeric_columns:
+
+        dataframe[column] = (
+            pd.to_numeric(
+                dataframe[column],
+                errors="coerce"
+            )
+            .fillna(0)
+        )
+
+
+    # ======================================================
+    # SORT BY DATE
     # ======================================================
 
     if not dataframe.empty:
 
-        # Create temporary sorting field.
-
         dataframe["_sort_date"] = (
             pd.to_datetime(
-                dataframe["date"],
+                dataframe[
+                    "date"
+                ],
                 errors="coerce",
                 utc=True
             )
@@ -779,7 +1623,7 @@ def load_combined_dataset(
             dataframe
             .sort_values(
                 by="_sort_date",
-                ascending=False,
+                ascending=True,
                 na_position="last"
             )
             .drop(
@@ -789,6 +1633,33 @@ def load_combined_dataset(
                 drop=True
             )
         )
+
+
+    # ======================================================
+    # FINAL SAFETY CHECK
+    # ======================================================
+
+    for column in dataframe.columns:
+
+        if column in numeric_columns:
+
+            dataframe[column] = (
+                dataframe[column]
+                .fillna(0)
+            )
+
+        else:
+
+            dataframe[column] = (
+                dataframe[column]
+                .replace(
+                    "",
+                    NOT_APPLICABLE
+                )
+                .fillna(
+                    NOT_APPLICABLE
+                )
+            )
 
 
     return dataframe
@@ -830,9 +1701,6 @@ def get_current_user_dataset(
 def get_dataset_summary(
     dataframe
 ):
-    """
-    Calculate basic summary information.
-    """
 
     if dataframe is None:
 
@@ -843,107 +1711,89 @@ def get_dataset_summary(
 
     summary = {
 
-        "total_records": (
-            len(dataframe)
-        ),
+        "total_records":
+            len(dataframe),
 
-        "total_users": (
+        "total_users":
             dataframe[
                 "user_uid"
             ]
             .replace(
-                "",
+                NOT_APPLICABLE,
                 pd.NA
             )
-            .nunique()
-        ),
+            .nunique(),
 
-        "total_questions": (
+        "total_questions":
             (
                 dataframe[
-                    "record_type"
+                    "activity_type"
                 ]
-                == "chat_history"
-            )
-            .sum()
-        ),
+                == "chat"
+            ).sum(),
 
-        "total_quizzes": (
+        "total_quizzes":
             (
                 dataframe[
-                    "record_type"
+                    "activity_type"
                 ]
-                == "quiz_history"
-            )
-            .sum()
-        ),
+                == "quiz"
+            ).sum(),
 
-        "total_images": (
+        "total_images":
             (
                 dataframe[
-                    "record_type"
+                    "activity_type"
                 ]
-                == "image_study_history"
-            )
-            .sum()
-        ),
+                == "image"
+            ).sum(),
 
-        "total_youtube_searches": (
+        "total_youtube_searches":
             (
                 dataframe[
-                    "record_type"
+                    "activity_type"
                 ]
-                == "youtube_history"
-            )
-            .sum()
-        ),
+                == "youtube"
+            ).sum(),
 
-        "total_saved_notes": (
+        "total_saved_notes":
             (
                 dataframe[
-                    "record_type"
+                    "activity_type"
                 ]
-                == "favourites"
-            )
-            .sum()
-        ),
+                == "saved_note"
+            ).sum(),
     }
 
 
-    # ======================================================
-    # AVERAGE QUIZ SCORE
-    # ======================================================
-
-    if (
-        "percentage" in dataframe.columns
-        and not dataframe.empty
-    ):
-
-        quiz_percentages = pd.to_numeric(
-            dataframe.loc[
-                dataframe[
-                    "record_type"
-                ] == "quiz_history",
-                "percentage"
-            ],
-            errors="coerce"
-        ).dropna()
+    quiz_percentages = pd.to_numeric(
+        dataframe.loc[
+            dataframe[
+                "activity_type"
+            ]
+            ==
+            "quiz",
+            "percentage"
+        ],
+        errors="coerce"
+    )
 
 
-        if not quiz_percentages.empty:
+    quiz_percentages = (
+        quiz_percentages[
+            quiz_percentages > 0
+        ]
+    )
 
-            summary[
-                "average_quiz_percentage"
-            ] = round(
-                quiz_percentages.mean(),
-                2
-            )
 
-        else:
+    if not quiz_percentages.empty:
 
-            summary[
-                "average_quiz_percentage"
-            ] = 0
+        summary[
+            "average_quiz_percentage"
+        ] = round(
+            quiz_percentages.mean(),
+            2
+        )
 
     else:
 
@@ -963,9 +1813,6 @@ def get_top_topics(
     dataframe,
     limit=10
 ):
-    """
-    Return most frequently used topics.
-    """
 
     if dataframe is None:
 
@@ -990,6 +1837,7 @@ def get_top_topics(
         ~topics.isin(
             [
                 "",
+                NOT_APPLICABLE,
                 "General",
                 "Image Study",
                 "Saved Notes"
@@ -1032,15 +1880,12 @@ def get_top_topics(
 def get_activity_summary(
     dataframe
 ):
-    """
-    Count records by activity type.
-    """
 
     if dataframe is None:
 
         return pd.DataFrame(
             columns=[
-                "record_type",
+                "activity_type",
                 "count"
             ]
         )
@@ -1048,7 +1893,7 @@ def get_activity_summary(
 
     result = (
         dataframe[
-            "record_type"
+            "activity_type"
         ]
         .value_counts()
         .reset_index()
@@ -1056,7 +1901,7 @@ def get_activity_summary(
 
 
     result.columns = [
-        "record_type",
+        "activity_type",
         "count"
     ]
 
@@ -1071,9 +1916,6 @@ def get_activity_summary(
 def get_quiz_performance(
     dataframe
 ):
-    """
-    Return quiz records and useful numeric values.
-    """
 
     if dataframe is None:
 
@@ -1083,9 +1925,10 @@ def get_quiz_performance(
     quiz_data = (
         dataframe[
             dataframe[
-                "record_type"
+                "activity_type"
             ]
-            == "quiz_history"
+            ==
+            "quiz"
         ]
         .copy()
     )
@@ -1103,7 +1946,7 @@ def get_quiz_performance(
             "score"
         ],
         errors="coerce"
-    )
+    ).fillna(0)
 
 
     quiz_data[
@@ -1113,7 +1956,7 @@ def get_quiz_performance(
             "total_questions"
         ],
         errors="coerce"
-    )
+    ).fillna(0)
 
 
     quiz_data[
@@ -1123,22 +1966,19 @@ def get_quiz_performance(
             "percentage"
         ],
         errors="coerce"
-    )
+    ).fillna(0)
 
 
     return quiz_data
 
 
 # ==========================================================
-# DATE-WISE ACTIVITY
+# DAILY ACTIVITY
 # ==========================================================
 
 def get_daily_activity(
     dataframe
 ):
-    """
-    Return daily record counts.
-    """
 
     if dataframe is None:
 
@@ -1161,13 +2001,17 @@ def get_daily_activity(
 
 
     dates = pd.to_datetime(
-        dataframe["date"],
+        dataframe[
+            "date"
+        ],
         errors="coerce",
         utc=True
     )
 
 
-    valid_dates = dates.dropna()
+    valid_dates = (
+        dates.dropna()
+    )
 
 
     if valid_dates.empty:
@@ -1211,7 +2055,7 @@ def get_daily_activity(
 if __name__ == "__main__":
 
     dataframe = (
-        load_combined_dataset()
+        get_all_data()
     )
 
 
@@ -1220,7 +2064,7 @@ if __name__ == "__main__":
     )
 
     print(
-        "Academic Notes AI Dataset Manager"
+        "Academic Notes AI - ML Dataset"
     )
 
     print(
@@ -1239,15 +2083,56 @@ if __name__ == "__main__":
 
 
     print(
-        "\nColumns:"
+        "\nUsers:"
     )
 
 
-    for column in dataframe.columns:
+    users = (
+        dataframe[
+            [
+                "user_uid",
+                "user_name",
+                "user_email"
+            ]
+        ]
+        .drop_duplicates()
+    )
 
-        print(
-            f" - {column}"
+
+    print(
+        users.to_string(
+            index=False
         )
+    )
+
+
+    print(
+        "\nActivity distribution:"
+    )
+
+
+    print(
+        dataframe[
+            "activity_type"
+        ]
+        .value_counts()
+        .to_string()
+    )
+
+
+    print(
+        "\nMissing values:"
+    )
+
+
+    missing_values = (
+        dataframe.isna().sum()
+    )
+
+
+    print(
+        missing_values.to_string()
+    )
 
 
     print(
@@ -1256,6 +2141,10 @@ if __name__ == "__main__":
 
     print(
         "Dataset loaded successfully."
+    )
+
+    print(
+        "No blank/NaN values should remain."
     )
 
     print(
