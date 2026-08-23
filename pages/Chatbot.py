@@ -246,7 +246,8 @@ with st.sidebar:
 
     if st.button(
         "🏠 Back to Home",
-        use_container_width=True
+        use_container_width=True,
+        key="chatbot_back_home"
     ):
 
         st.switch_page(
@@ -508,100 +509,102 @@ with st.sidebar:
             )
 
 
-    # -----------------------------------------
-    # TODAY
-    # -----------------------------------------
+    with st.container(key="chatbot_history_list"):
 
-    if today_chats:
+        # -----------------------------------------
+        # TODAY
+        # -----------------------------------------
 
-        st.markdown(
-            "#### 📅 Today"
-        )
+        if today_chats:
+
+            st.markdown(
+                "#### 📅 Today"
+            )
 
 
-        for chat in reversed(
-            today_chats
-        ):
-
-            if st.button(
-                f"📝 {chat['title']}",
-                key=chat["id"],
-                use_container_width=True
+            for chat in reversed(
+                today_chats
             ):
 
-                st.session_state.messages = (
-                    chat["messages"]
-                )
+                if st.button(
+                    f"📝 {chat['title']}",
+                    key=chat["id"],
+                    use_container_width=True
+                ):
 
-                st.session_state.current_chat_id = (
-                    chat["id"]
-                )
+                    st.session_state.messages = (
+                        chat["messages"]
+                    )
 
-                st.rerun()
+                    st.session_state.current_chat_id = (
+                        chat["id"]
+                    )
 
-
-    # -----------------------------------------
-    # YESTERDAY
-    # -----------------------------------------
-
-    if yesterday_chats:
-
-        st.markdown(
-            "#### 📅 Yesterday"
-        )
+                    st.rerun()
 
 
-        for chat in reversed(
-            yesterday_chats
-        ):
+        # -----------------------------------------
+        # YESTERDAY
+        # -----------------------------------------
 
-            if st.button(
-                f"📝 {chat['title']}",
-                key="y" + chat["id"],
-                use_container_width=True
+        if yesterday_chats:
+
+            st.markdown(
+                "#### 📅 Yesterday"
+            )
+
+
+            for chat in reversed(
+                yesterday_chats
             ):
 
-                st.session_state.messages = (
-                    chat["messages"]
-                )
+                if st.button(
+                    f"📝 {chat['title']}",
+                    key="y" + chat["id"],
+                    use_container_width=True
+                ):
 
-                st.session_state.current_chat_id = (
-                    chat["id"]
-                )
+                    st.session_state.messages = (
+                        chat["messages"]
+                    )
 
-                st.rerun()
+                    st.session_state.current_chat_id = (
+                        chat["id"]
+                    )
 
-
-    # -----------------------------------------
-    # OLDER
-    # -----------------------------------------
-
-    if older_chats:
-
-        st.markdown(
-            "#### 📅 Older"
-        )
+                    st.rerun()
 
 
-        for chat in reversed(
-            older_chats
-        ):
+        # -----------------------------------------
+        # OLDER
+        # -----------------------------------------
 
-            if st.button(
-                f"📝 {chat['title']}",
-                key="o" + chat["id"],
-                use_container_width=True
+        if older_chats:
+
+            st.markdown(
+                "#### 📅 Older"
+            )
+
+
+            for chat in reversed(
+                older_chats
             ):
 
-                st.session_state.messages = (
-                    chat["messages"]
-                )
+                if st.button(
+                    f"📝 {chat['title']}",
+                    key="o" + chat["id"],
+                    use_container_width=True
+                ):
 
-                st.session_state.current_chat_id = (
-                    chat["id"]
-                )
+                    st.session_state.messages = (
+                        chat["messages"]
+                    )
 
-                st.rerun()
+                    st.session_state.current_chat_id = (
+                        chat["id"]
+                    )
+
+                    st.rerun()
 
 
     # -----------------------------------------
@@ -633,7 +636,8 @@ with st.sidebar:
 
     if st.button(
         "📌 Saved Notes",
-        use_container_width=True
+        use_container_width=True,
+        key="chatbot_saved_notes"
     ):
 
         st.switch_page(
@@ -647,7 +651,8 @@ with st.sidebar:
 
     if st.button(
         "🗑 Clear Chat",
-        use_container_width=True
+        use_container_width=True,
+        key="chatbot_clear_chat"
     ):
 
         st.session_state.messages = []

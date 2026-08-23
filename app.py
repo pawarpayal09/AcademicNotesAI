@@ -364,7 +364,7 @@ with col2:
             """
 ### 📄 Upload Your Own PDF
 
-Upload any PDF and instantly start chatting with your own document.
+Upload any PDF and start chatting with your own document.
 
 #### ✨ Features
 
@@ -443,40 +443,11 @@ Useful for self-practice and examination preparation.
 """
     )
 
-
-# -----------------------------------------------------
-# IMAGE STUDY
-# -----------------------------------------------------
-
-with feature_col2:
-
-    st.info(
-        """
-### 🖼️ Image Study Assistant
-
-Upload academic images and allow AI
-to explain the visible content.
-
-**Supports:**
-
-- ✅ Textbook pages
-- ✅ Handwritten notes
-- ✅ Diagrams
-- ✅ Questions
-- ✅ Charts
-- ✅ Screenshots
-
-The user can ask AI to explain, summarize,
-solve or extract important points.
-"""
-    )
-
-
 # -----------------------------------------------------
 # YOUTUBE
 # -----------------------------------------------------
 
-with feature_col3:
+with feature_col2:
 
     st.info(
         """
@@ -499,11 +470,37 @@ Useful for finding additional learning material And boosting performance.
     )
 
 
+# -----------------------------------------------------
+# IMAGE STUDY
+# -----------------------------------------------------
+
+with feature_col3:
+
+    st.info(
+        """
+### 🖼️ Image Study Assistant
+
+Upload academic images and allow AI
+to explain the visible content.
+
+**Supports:**
+
+- ✅ Textbook pages
+- ✅ Handwritten notes
+- ✅ Diagrams
+- ✅ Questions
+- ✅ Charts
+- ✅ Screenshots
+
+The user can ask AI to explain, summarize,
+solve or extract important points.
+"""
+    )
+    
 st.markdown(
     "<br>",
     unsafe_allow_html=True
 )
-
 
 # =====================================================
 # SECOND FEATURE ROW
