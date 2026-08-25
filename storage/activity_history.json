@@ -306,5 +306,43 @@
         "metadata": {
             "image_name": "ChatGPT Image Aug 20, 2026, 10_51_25 AM.png"
         }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787590100011",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "chat",
+        "topic": "Academic Notes",
+        "description": "What is Machine Learning?",
+        "date": "2026-08-24 16:48:20 UTC",
+        "metadata": {}
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787659175299",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "chat",
+        "topic": "Academic Notes",
+        "description": "Explain the concept of Data Stucture.",
+        "date": "2026-08-25 11:59:35 UTC",
+        "metadata": {}
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1787660133450",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "quiz",
+        "topic": "Python",
+        "description": "Medium quiz: 4/10 (40%)",
+        "date": "2026-08-25 12:15:33 UTC",
+        "metadata": {
+            "difficulty": "Medium",
+            "score": 4,
+            "total_questions": 10,
+            "percentage": 40
+        }
     }
 ]

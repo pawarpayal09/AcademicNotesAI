@@ -479,5 +479,42 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "db064919-f13f-4914-874b-c524191a6c07",
+        "title": "What is Machine Learning?",
+        "date": "2026-08-24",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is Machine Learning?"
+            },
+            {
+                "role": "assistant",
+                "content": "### Definition\nMachine learning is a method of building mathematical models based on statistical theory, where the core task is to make inferences from sample data. \n\n---\n\n### Explanation\nWe live in the era of \"big data,\" where everyday activities\u2014such as buying products, renting movies, visiting web pages, posting on social media, or moving around\u2014continuously generate data. Machine learning uses this data to build models that can:\n* **Predict:** Make predictions about the future.\n* **Describe:** Gain knowledge and insights from data (or do both).\n\n---\n\n### Key Points\n* **Role of Statistics:** Provides the foundation for constructing mathematical models to infer patterns from samples.\n* **Role of Computer Science:** \n  * Supplies efficient algorithms to solve optimization problems during training.\n  * Handles the storage and processing of massive amounts of data.\n  * Manages the representation and algorithmic execution once a model is learned.\n* **Solving Complex Tasks:** It helps find solutions for tasks where humans can perform the action effortlessly (unconsciously) but cannot clearly explain the exact rules to write standard computer code for every possible situation.\n\n---\n\n### Applications\n* Vision\n* Speech recognition\n* Robotics\n\n---\n\n### Example\n* **Face Recognition:** Humans recognize friends and family easily despite differences in lighting, pose, or hairstyle. However, because we do this unconsciously, we cannot explain the exact steps or write standard code for every scenario. Machine learning is used to solve this problem.\n\n---\n\n### Conclusion\nMachine learning bridges statistics and computer science to create models from big data, enabling computers to solve complex descriptive and predictive tasks in areas like vision and robotics.",
+                "sources": [
+                    "Introduction to machine learning.pdf"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "d13c0bd1-a402-4e86-a8a1-cbc468811286",
+        "title": "Explain the concept of Data Stucture.",
+        "date": "2026-08-25",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Explain the concept of Data Stucture."
+            },
+            {
+                "role": "assistant",
+                "content": "I couldn't find this information in the uploaded notes.",
+                "sources": [
+                    "Data Structures.pdf",
+                    "Database Management Systems-Raghu ramakrishnan (2).pdf"
+                ]
+            }
+        ]
     }
 ]
