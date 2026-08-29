@@ -13,7 +13,7 @@ from firebase_manager import (
 
 st.set_page_config(
     page_title="Signup | Academic Notes AI",
-    page_icon="📚",
+    page_icon="🔐",
     layout="centered",
     initial_sidebar_state="collapsed"
 )

@@ -344,5 +344,18 @@
             "total_questions": 10,
             "percentage": 40
         }
+    },
+    {
+        "activity_id": "k5LDBPo3iufWsFiAn8emSFS9zgo2_1788024041708",
+        "user_uid": "k5LDBPo3iufWsFiAn8emSFS9zgo2",
+        "user_name": "Payal Pramod Pawar",
+        "user_email": "payalpawar0907@gmail.com",
+        "type": "youtube",
+        "topic": "Cloud Computing tutorial",
+        "description": "YouTube learning search: Cloud Computing tutorial",
+        "date": "2026-08-29 17:20:41 UTC",
+        "metadata": {
+            "results_count": 6
+        }
     }
 ]

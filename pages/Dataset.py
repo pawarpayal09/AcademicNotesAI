@@ -30,8 +30,8 @@ from data_science.dataset_manager import (
 # ==========================================================
 
 st.set_page_config(
-    page_title="Dataset & Analysis",
-    page_icon="📊",
+    page_title="Dataset",
+    page_icon="📝",
     layout="wide",
     initial_sidebar_state="expanded"
 )

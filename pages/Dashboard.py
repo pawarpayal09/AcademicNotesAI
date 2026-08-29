@@ -86,7 +86,7 @@ if is_authenticated():
 
 st.set_page_config(
     page_title="Study Dashboard",
-    page_icon="📊",
+    page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -261,7 +261,7 @@ header1, header2 = st.columns(
 with header1:
 
     st.title(
-        "📊 My Study Dashboard"
+        "🎓 My Study Dashboard"
     )
 
     st.caption(

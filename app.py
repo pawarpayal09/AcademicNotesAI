@@ -7,6 +7,56 @@ from firebase_manager import (
     logout_user
 )
 
+# =====================================================
+# PAGE CONFIG
+# =====================================================
+
+st.set_page_config(
+    page_title="Academic Notes AI",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# =====================================================
+# LOAD CUSTOM CSS
+# =====================================================
+
+css_file = Path("css/style.css")
+
+if css_file.exists():
+
+    with open(
+        css_file,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
+        st.markdown(
+            f"<style>{f.read()}</style>",
+            unsafe_allow_html=True
+        )
+
+if (
+    is_authenticated()
+    and st.session_state.get(
+        "redirect_to_chatbot",
+        False
+    )
+):
+
+    # Remove the flag BEFORE redirecting.
+    #
+    # This is important because otherwise returning
+    # to app.py later from the sidebar would redirect
+    # to Chatbot again.
+
+    st.session_state["redirect_to_chatbot"] = False
+
+    st.switch_page(
+        "pages/Chatbot.py"
+    )
+
 
 # =====================================================
 # LOGGED-IN USER PROFILE
@@ -35,7 +85,7 @@ if is_authenticated():
             st.markdown(
                 f"""
                 <div class="home-profile-name">
-                    👤 {current_user['name']}
+                    👤 {current_user.get('name', 'Student')}
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -48,7 +98,7 @@ if is_authenticated():
             st.markdown(
                 f"""
                 <div class="home-profile-email">
-                    {current_user['email']}
+                    {current_user.get('email', '')}
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -66,40 +116,14 @@ if is_authenticated():
 
                 logout_user()
 
+                # Make sure the redirect flag is removed.
+
+                st.session_state.pop(
+                    "redirect_to_chatbot",
+                    None
+                )
+
                 st.rerun()
-
-
-# =====================================================
-# PAGE CONFIG
-# =====================================================
-
-st.set_page_config(
-    page_title="Academic Notes AI",
-    page_icon="📚",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-
-# =====================================================
-# LOAD CUSTOM CSS
-# =====================================================
-
-css_file = Path("css/style.css")
-
-if css_file.exists():
-
-    with open(
-        css_file,
-        "r",
-        encoding="utf-8"
-    ) as f:
-
-        st.markdown(
-            f"<style>{f.read()}</style>",
-            unsafe_allow_html=True
-        )
-
 
 # =====================================================
 # SIDEBAR
@@ -313,7 +337,6 @@ st.markdown(
 
 # =====================================================
 # TWO EXISTING FEATURE CARDS
-# KEEPING ORIGINAL DESIGN
 # =====================================================
 
 col1, col2 = st.columns(
@@ -374,15 +397,13 @@ Upload any PDF and start chatting with your own document.
 - ✅ Works with Notes, Books & Research Papers
 - ✅ Student-Friendly Explanations
 
-
 Perfect for studying your own notes, books, assignments, and research papers.
 """
         )
 
 
 # =====================================================
-# ADDITIONAL FEATURES - TEXT ONLY
-# KEEPING THE SAME SIMPLE DESIGN
+# ADDITIONAL FEATURES
 # =====================================================
 
 st.markdown(
@@ -443,6 +464,7 @@ Useful for self-practice and examination preparation.
 """
     )
 
+
 # -----------------------------------------------------
 # YOUTUBE
 # -----------------------------------------------------
@@ -465,7 +487,8 @@ for an academic topic.
 - ✅ Description
 - ✅ Direct YouTube link
 
-Useful for finding additional learning material And boosting performance.
+Useful for finding additional learning material
+and boosting performance.
 """
     )
 
@@ -496,11 +519,13 @@ The user can ask AI to explain, summarize,
 solve or extract important points.
 """
     )
-    
+
+
 st.markdown(
     "<br>",
     unsafe_allow_html=True
 )
+
 
 # =====================================================
 # SECOND FEATURE ROW
