@@ -1,26 +1,32 @@
-import pandas as pd
-import numpy as np
-import joblib
-
 from pathlib import Path
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+import joblib
+import pandas as pd
+
+from sklearn.model_selection import (
+    StratifiedKFold,
+    cross_validate
+)
+
 from sklearn.pipeline import Pipeline
 
+from sklearn.preprocessing import StandardScaler
+
 from sklearn.linear_model import LogisticRegression
+
 from sklearn.naive_bayes import GaussianNB
+
 from sklearn.tree import DecisionTreeClassifier
+
 from sklearn.ensemble import RandomForestClassifier
+
 from sklearn.svm import SVC
 
 from sklearn.metrics import (
-    accuracy_score,
+    make_scorer,
     precision_score,
     recall_score,
-    f1_score,
-    classification_report,
-    confusion_matrix
+    f1_score
 )
 
 from preprocessing import (
@@ -29,241 +35,362 @@ from preprocessing import (
 )
 
 
-# ==========================================================
-# LOAD DATA
-# ==========================================================
+# ============================================================
+# PATH CONFIGURATION
+# ============================================================
 
-df = load_dataset()
+BASE_DIR = Path(__file__).resolve().parent
 
-X, y = prepare_classification_data(df)
+MODEL_DIR = BASE_DIR / "models"
 
+RESULT_DIR = BASE_DIR / "results"
 
-print("\n==========================================")
-print("STUDYNOVA CLASSIFICATION")
-print("==========================================")
+MODEL_DIR.mkdir(
+    exist_ok=True
+)
 
-print("\nDataset shape:")
-print(X.shape)
-
-print("\nTarget distribution:")
-print(y.value_counts())
-
-
-# ==========================================================
-# TRAIN TEST SPLIT
-# ==========================================================
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.25,
-    random_state=42,
-    stratify=y
+RESULT_DIR.mkdir(
+    exist_ok=True
 )
 
 
-# ==========================================================
-# MODELS
-# ==========================================================
+# ============================================================
+# CLASSIFICATION MODELS
+# ============================================================
 
 models = {
 
-    "Logistic Regression":
-
-        Pipeline([
-            (
-                "scaler",
-                StandardScaler()
-            ),
-            (
-                "model",
-                LogisticRegression(
-                    max_iter=2000
-                )
-            )
-        ]),
-
-    "Naive Bayes":
-
-        GaussianNB(),
-
-    "Decision Tree":
-
-        DecisionTreeClassifier(
-            random_state=42,
-            max_depth=5
+    "Logistic Regression": Pipeline([
+        (
+            "scaler",
+            StandardScaler()
         ),
-
-    "Random Forest":
-
-        RandomForestClassifier(
-            n_estimators=100,
-            random_state=42,
-            max_depth=8
-        ),
-
-    "SVM":
-
-        Pipeline([
-            (
-                "scaler",
-                StandardScaler()
-            ),
-            (
-                "model",
-                SVC(
-                    kernel="rbf"
-                )
+        (
+            "model",
+            LogisticRegression(
+                max_iter=2000
             )
-        ])
+        )
+    ]),
+
+    "Naive Bayes": GaussianNB(),
+
+    "Decision Tree": DecisionTreeClassifier(
+        max_depth=5,
+        random_state=42
+    ),
+
+    "Random Forest": RandomForestClassifier(
+        n_estimators=100,
+        max_depth=8,
+        random_state=42,
+        class_weight="balanced"
+    ),
+
+    "SVM": Pipeline([
+        (
+            "scaler",
+            StandardScaler()
+        ),
+        (
+            "model",
+            SVC(
+                kernel="rbf"
+            )
+        )
+    ])
 }
 
 
-# ==========================================================
-# RESULTS
-# ==========================================================
+# ============================================================
+# CROSS-VALIDATION
+# ============================================================
 
-results = []
+cv = StratifiedKFold(
+    n_splits=4,
+    shuffle=True,
+    random_state=42
+)
 
 
-# ==========================================================
-# TRAIN EACH MODEL
-# ==========================================================
+# ============================================================
+# EVALUATION METRICS
+# ============================================================
 
-for name, model in models.items():
+scoring = {
 
-    print("\n------------------------------------------")
-    print(name)
-    print("------------------------------------------")
+    "accuracy": "accuracy",
 
-    model.fit(
-        X_train,
-        y_train
-    )
+    "precision": make_scorer(
+        precision_score,
+        average="weighted",
+        zero_division=0
+    ),
 
-    predictions = model.predict(
-        X_test
-    )
+    "recall": make_scorer(
+        recall_score,
+        average="weighted",
+        zero_division=0
+    ),
 
-    accuracy = accuracy_score(
-        y_test,
-        predictions
-    )
-
-    precision = precision_score(
-        y_test,
-        predictions,
+    "f1": make_scorer(
+        f1_score,
         average="weighted",
         zero_division=0
     )
+}
 
-    recall = recall_score(
-        y_test,
-        predictions,
-        average="weighted",
-        zero_division=0
+
+# ============================================================
+# TRAIN + CROSS VALIDATION
+# ============================================================
+
+def run_classification():
+
+    print("\n")
+    print("=" * 70)
+    print("STUDYNOVA CLASSIFICATION MODEL EVALUATION")
+    print("=" * 70)
+
+    # --------------------------------------------------------
+    # Load dataset
+    # --------------------------------------------------------
+
+    df = load_dataset()
+
+    X, y = prepare_classification_data(df)
+
+    print("\nDataset:")
+    print(f"Records : {len(X)}")
+    print(f"Features: {len(X.columns)}")
+
+    print("\nTarget distribution:")
+    print(y.value_counts())
+
+    # --------------------------------------------------------
+    # Store results
+    # --------------------------------------------------------
+
+    results = []
+
+    # --------------------------------------------------------
+    # Train and evaluate each model
+    # --------------------------------------------------------
+
+    for model_name, model in models.items():
+
+        print("\n")
+        print("-" * 70)
+        print(f"MODEL: {model_name}")
+        print("-" * 70)
+
+        cv_results = cross_validate(
+            model,
+            X,
+            y,
+            cv=cv,
+            scoring=scoring,
+            return_train_score=True
+        )
+
+        # ----------------------------------------------------
+        # Calculate metrics
+        # ----------------------------------------------------
+
+        accuracy_mean = (
+            cv_results["test_accuracy"].mean()
+        )
+
+        accuracy_std = (
+            cv_results["test_accuracy"].std()
+        )
+
+        precision_mean = (
+            cv_results["test_precision"].mean()
+        )
+
+        precision_std = (
+            cv_results["test_precision"].std()
+        )
+
+        recall_mean = (
+            cv_results["test_recall"].mean()
+        )
+
+        recall_std = (
+            cv_results["test_recall"].std()
+        )
+
+        f1_mean = (
+            cv_results["test_f1"].mean()
+        )
+
+        f1_std = (
+            cv_results["test_f1"].std()
+        )
+
+        train_accuracy_mean = (
+            cv_results["train_accuracy"].mean()
+        )
+
+        # ----------------------------------------------------
+        # Print results
+        # ----------------------------------------------------
+
+        print(
+            f"Cross-validation Accuracy : "
+            f"{accuracy_mean:.4f} "
+            f"(± {accuracy_std:.4f})"
+        )
+
+        print(
+            f"Precision                 : "
+            f"{precision_mean:.4f} "
+            f"(± {precision_std:.4f})"
+        )
+
+        print(
+            f"Recall                    : "
+            f"{recall_mean:.4f} "
+            f"(± {recall_std:.4f})"
+        )
+
+        print(
+            f"F1-score                  : "
+            f"{f1_mean:.4f} "
+            f"(± {f1_std:.4f})"
+        )
+
+        print(
+            f"Training Accuracy         : "
+            f"{train_accuracy_mean:.4f}"
+        )
+
+        # ----------------------------------------------------
+        # Store result
+        # ----------------------------------------------------
+
+        results.append({
+
+            "Model": model_name,
+
+            "Accuracy_Mean": accuracy_mean,
+
+            "Accuracy_Std": accuracy_std,
+
+            "Precision_Mean": precision_mean,
+
+            "Precision_Std": precision_std,
+
+            "Recall_Mean": recall_mean,
+
+            "Recall_Std": recall_std,
+
+            "F1_Mean": f1_mean,
+
+            "F1_Std": f1_std,
+
+            "Training_Accuracy_Mean":
+                train_accuracy_mean
+        })
+
+
+    # ========================================================
+    # RESULTS TABLE
+    # ========================================================
+
+    results_df = pd.DataFrame(results)
+
+    results_df = results_df.sort_values(
+        by="F1_Mean",
+        ascending=False
     )
 
-    f1 = f1_score(
-        y_test,
-        predictions,
-        average="weighted",
-        zero_division=0
+    result_path = (
+        RESULT_DIR /
+        "classification_results.csv"
     )
+
+    results_df.to_csv(
+        result_path,
+        index=False
+    )
+
+    print("\n")
+    print("=" * 70)
+    print("MODEL COMPARISON")
+    print("=" * 70)
 
     print(
-        f"Accuracy  : {accuracy:.4f}"
-    )
-
-    print(
-        f"Precision : {precision:.4f}"
-    )
-
-    print(
-        f"Recall    : {recall:.4f}"
-    )
-
-    print(
-        f"F1 Score  : {f1:.4f}"
-    )
-
-    print("\nClassification Report:")
-
-    print(
-        classification_report(
-            y_test,
-            predictions,
-            zero_division=0
+        results_df.to_string(
+            index=False
         )
     )
 
-    results.append({
+    print("\nResults saved to:")
 
-        "Algorithm": name,
-
-        "Accuracy": accuracy,
-
-        "Precision": precision,
-
-        "Recall": recall,
-
-        "F1 Score": f1
-    })
-
-    # ------------------------------------------------------
-    # SAVE MODEL
-    # ------------------------------------------------------
-
-    model_filename = (
-        name.lower()
-        .replace(" ", "_")
-        + ".pkl"
-    )
-
-    model_path = (
-        Path(__file__).resolve().parent
-        / "models"
-        / model_filename
-    )
-
-    joblib.dump(
-        model,
-        model_path
-    )
-
-    print(
-        f"Model saved: {model_path}"
-    )
+    print(result_path)
 
 
-# ==========================================================
-# SAVE RESULTS
-# ==========================================================
+# ============================================================
+# TRAIN FINAL MODELS
+# ============================================================
 
-results_df = pd.DataFrame(
-    results
-)
+def train_final_models():
 
-print("\n==========================================")
-print("MODEL COMPARISON")
-print("==========================================")
+    print("\n")
+    print("=" * 70)
+    print("TRAINING FINAL MODELS")
+    print("=" * 70)
 
-print(
-    results_df.to_string(
-        index=False
-    )
-)
+    df = load_dataset()
 
-results_path = (
-    Path(__file__).resolve().parent
-    / "classification_results.csv"
-)
+    X, y = prepare_classification_data(df)
 
-results_df.to_csv(
-    results_path,
-    index=False
-)
+    for model_name, model in models.items():
 
-print(
-    f"\nResults saved to: {results_path}"
-)
+        print(
+            f"\nTraining {model_name}..."
+        )
+
+        model.fit(
+            X,
+            y
+        )
+
+        filename = (
+            model_name
+            .lower()
+            .replace(" ", "_")
+            + ".pkl"
+        )
+
+        model_path = (
+            MODEL_DIR /
+            filename
+        )
+
+        joblib.dump(
+            model,
+            model_path
+        )
+
+        print(
+            f"Saved: {model_path}"
+        )
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+if __name__ == "__main__":
+
+    run_classification()
+
+    train_final_models()
+
+    print("\n")
+    print("=" * 70)
+    print("CLASSIFICATION PROCESS COMPLETED")
+    print("=" * 70)
